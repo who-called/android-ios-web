@@ -1,0 +1,45 @@
+# Periodic DB update: SIA pull + re-score + RGPD retention.
+# Uses the updater image (Node backend + dbforge). Supersedes the scoring-only
+# cron (cronjob-scoring.yaml) since it also re-scores — keep only one enabled.
+# Runs every 6h. Idempotent; safe to retry (UPSERT + version guard, no dups).
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: whocalled-db-update
+  namespace: whocalled-prod
+  labels:
+    app: whocalled-db-update
+    managed-by: kustomize
+spec:
+  schedule: "0 */6 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      activeDeadlineSeconds: 3600
+      template:
+        spec:
+          restartPolicy: Never
+          automountServiceAccountToken: false
+          containers:
+            - name: db-update
+              image: PLACEHOLDER_UPDATER_IMAGE
+              imagePullPolicy: Always
+              envFrom:
+                - configMapRef:
+                    name: whocalled-api-config
+                - secretRef:
+                    name: whocalled-api-secret
+              # Restrict SIA pull to the launch market by default.
+              env:
+                - name: PULL_ARGS
+                  value: "--region WW"
+              command: ["sh", "-c", "db-update.sh"]
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 256Mi
+                limits:
+                  memory: 768Mi

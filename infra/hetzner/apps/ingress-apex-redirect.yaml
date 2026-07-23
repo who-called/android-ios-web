@@ -1,0 +1,41 @@
+# Apex who-called.com -> www.who-called.com redirect, with a real TLS cert.
+# The apex A record must point ONLY to 94.130.161.157 for the ACME HTTP-01
+# challenge to succeed.
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: redirect-apex-to-www
+  namespace: whocalled-prod
+spec:
+  redirectRegex:
+    regex: "^https?://who-called\\.com/(.*)"
+    replacement: "https://www.who-called.com/${1}"
+    permanent: true
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: whocalled-apex
+  namespace: whocalled-prod
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.middlewares: whocalled-prod-redirect-apex-to-www@kubernetescrd
+spec:
+  ingressClassName: traefik
+  tls:
+    - hosts:
+        - who-called.com
+      secretName: whocalled-apex-tls
+  rules:
+    - host: who-called.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: whocalled-web
+                port:
+                  number: 3000

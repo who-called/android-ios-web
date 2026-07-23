@@ -1,0 +1,360 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { parsePhoneNumberFromString } from "libphonenumber-js";
+import { fetchIndexable, fetchSeoNumbers, lookupNumber, type LookupResult, type ReasonCategory } from "@/lib/api";
+import { countryFromCode } from "@/lib/countries";
+import { getDict } from "@/i18n/dictionaries";
+import { toDictLocale, urlLocales } from "@/i18n/locales";
+import { ShieldCheckIcon, BlockIcon, BellIcon, ListIcon } from "@/components/Icons";
+
+// Pre-render the quality pages at build; others render on-demand (and noindex).
+export async function generateStaticParams() {
+  const numbers = await fetchSeoNumbers(2000);
+  const params: { locale: string; phone: string }[] = [];
+  for (const l of urlLocales) {
+    for (const n of numbers) params.push({ locale: l, phone: n.phone });
+  }
+  return params;
+}
+
+function fmt(phone: string) {
+  return `+${phone}`;
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string; phone: string }>;
+}): Promise<Metadata> {
+  const { locale, phone } = await params;
+  const t = getDict(toDictLocale(locale)).seo;
+  const { indexable } = await fetchIndexable(phone);
+  const display = fmt(phone);
+  return {
+    title: t.numberTitle.replace("{phone}", display),
+    description: t.numberDesc.replace("{phone}", display),
+    alternates: { canonical: `/${locale}/numero/${phone}` },
+    robots: indexable ? { index: true, follow: true } : { index: false, follow: true },
+  };
+}
+
+export default async function NumberPage({
+  params,
+}: {
+  params: Promise<{ locale: string; phone: string }>;
+}) {
+  const { locale, phone } = await params;
+  const lang = toDictLocale(locale);
+  const d = getDict(lang);
+  const t = d.seo;
+  const labels = d.tool.labels;
+  const cats = d.tool.cats;
+  const catsList = ["telemarketing", "scam", "robocall", "silent", "debt", "survey", "unknown"] as const;
+  const base = `/${locale}`;
+
+  const [{ isArcep, number }, lookup] = await Promise.all([
+    fetchIndexable(phone),
+    lookupNumber(phone).catch(() => null),
+  ]);
+
+  const parsed = parsePhoneNumberFromString("+" + phone);
+  const country = parsed?.country ? countryFromCode(parsed.country) : null;
+  const intlFormat = parsed?.formatInternational() ?? `+${phone}`;
+  const nationalFormat = parsed?.formatNational() ?? phone;
+  const e164 = parsed?.number ?? `+${phone}`;
+  const display = intlFormat;
+
+  const dateLocale = locale === "fr-FR" ? "fr-FR" : "en-US";
+  const fmtDate = (iso: string | null | undefined) => {
+    if (!iso) return t.never;
+    try {
+      return new Intl.DateTimeFormat(dateLocale, {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      }).format(new Date(iso));
+    } catch {
+      return t.never;
+    }
+  };
+
+  const status = (number?.status ?? lookup?.status ?? "unknown") as "block" | "warn" | "allow" | "unknown";
+  const blocked = status === "block";
+  const accentBar = {
+    block: "bg-coral",
+    warn: "bg-amber",
+    allow: "bg-emerald",
+    unknown: "bg-night/30",
+  }[status];
+  const statusColor =
+    status === "block" ? "text-coral" : status === "warn" ? "text-amber" : "text-emerald";
+  const pill = {
+    block: "bg-coral/10 text-coral",
+    warn: "bg-amber/10 text-amber",
+    allow: "bg-emerald/10 text-emerald",
+    unknown: "bg-night/[0.06] text-night/70",
+  }[status];
+  const StatusIcon = blocked ? BlockIcon : status === "warn" ? BellIcon : ShieldCheckIcon;
+
+  const spamCount = number?.reportCountSpam ?? lookup?.reportCountSpam ?? 0;
+  const legitCount = number?.reportCountLegit ?? lookup?.reportCountLegit ?? 0;
+
+  const freq = lookup?.frequency;
+  const chartBuckets = freq
+    ? [
+        { label: t.period24h, value: freq.last24h },
+        { label: t.period7d, value: Math.max(0, freq.last7d - freq.last24h) },
+        { label: t.period30d, value: Math.max(0, freq.last30d - freq.last7d) },
+        { label: t.period1y, value: Math.max(0, freq.last1y - freq.last30d) },
+      ]
+    : [];
+  const chartMax = Math.max(...chartBuckets.map((b) => b.value), 1);
+  const hasChartData = chartBuckets.some((b) => b.value > 0);
+
+  const reasons: Record<ReasonCategory, number> = lookup?.reasons ?? {
+    telemarketing: 0, scam: 0, robocall: 0, silent: 0, debt: 0, survey: 0, unknown: 0,
+  };
+  const catEntries = catsList
+    .filter((c) => reasons[c] > 0)
+    .map((c) => ({ key: c, label: cats[c], count: reasons[c] }))
+    .sort((a, b) => b.count - a.count);
+  const catTotal = catEntries.reduce((s, e) => s + e.count, 0);
+
+  const hasDates = !!lookup && (!!lookup.firstReportedAt || !!lookup.lastReportedAt);
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: t.whoCalls.replace("{phone}", display),
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: isArcep
+            ? t.arcepNote
+            : number
+              ? `${t.communityNote} (${spamCount} ${t.spamReports.toLowerCase()}, ${legitCount} ${t.legitReports.toLowerCase()}).`
+              : t.noData,
+        },
+      },
+    ],
+  };
+
+  return (
+    <article className="mx-auto max-w-5xl px-4 py-8 sm:py-12">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+
+      <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">
+        {t.whoCalls.replace("{phone}", display)}
+      </h1>
+
+      {number ? (
+        <div className="mt-6 space-y-4">
+          {/* Hero card — status accent bar + number, score, counts */}
+          <div className={`overflow-hidden rounded-2xl border border-hair ${isArcep ? "" : "flex"}`}>
+            {!isArcep && <div className={`w-1.5 shrink-0 ${accentBar}`} />}
+            <div className="flex-1 p-5 sm:p-6">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  {country && <span className="text-3xl">{country.flag}</span>}
+                  <span className="text-xl font-bold tracking-tight sm:text-2xl">{display}</span>
+                </div>
+                {isArcep ? (
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-amber/30 bg-amber/10 px-3 py-1 text-sm font-semibold text-amber">
+                    <ListIcon className="h-4 w-4" /> {t.arcepBadge}
+                  </span>
+                ) : (
+                  <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-semibold ${pill}`}>
+                    <StatusIcon className="h-4 w-4" /> {labels[status]}
+                  </span>
+                )}
+              </div>
+
+              <div className="mt-5 flex flex-wrap items-end gap-x-8 gap-y-4">
+                <div>
+                  <div className="flex items-baseline gap-1.5">
+                    <span className={`text-4xl font-extrabold leading-none sm:text-5xl ${statusColor}`}>
+                      {number.spamScore}
+                    </span>
+                    <span className="text-sm text-night/40">/ 100</span>
+                  </div>
+                  <div className="mt-1 text-xs font-medium uppercase tracking-wide text-night/40">
+                    {d.tool.risk}
+                  </div>
+                </div>
+
+                {!isArcep && (
+                  <div className="flex gap-6">
+                    <div>
+                      <div className="text-2xl font-bold text-coral">{spamCount}</div>
+                      <div className="text-xs text-night/50">{t.spamReports}</div>
+                    </div>
+                    <div>
+                      <div className="text-2xl font-bold text-emerald">{legitCount}</div>
+                      <div className="text-xs text-night/50">{t.legitReports}</div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <p className="mt-4 text-sm text-night/60">{isArcep ? t.arcepNote : t.communityNote}</p>
+            </div>
+          </div>
+
+          {/* Detail grid — country/formats | categories */}
+          {!isArcep && (
+            <div className="grid gap-4 sm:grid-cols-2">
+              {/* Country + formats */}
+              <div className="rounded-2xl border border-hair p-5">
+                <h2 className="text-xs font-semibold uppercase tracking-wide text-night/40">
+                  {country ? t.country : t.formats}
+                </h2>
+                {country && (
+                  <div className="mt-2 flex items-center gap-2">
+                    <span className="text-2xl">{country.flag}</span>
+                    <span className="text-lg font-bold">{country.name}</span>
+                  </div>
+                )}
+                <div className={`mt-3 space-y-1.5 border-t border-hair ${country ? "pt-3" : ""}`}>
+                  <FormatRow label={t.formatIntl} value={intlFormat} />
+                  <FormatRow label={t.formatNational} value={nationalFormat} />
+                  <FormatRow label={t.formatE164} value={e164} />
+                </div>
+              </div>
+
+              {/* Categories */}
+              {catEntries.length > 0 ? (
+                <div className="rounded-2xl border border-hair p-5">
+                  <h2 className="text-xs font-semibold uppercase tracking-wide text-night/40">
+                    {t.reportCategories}
+                  </h2>
+                  <div className="mt-3 space-y-3">
+                    {catEntries.map((e) => (
+                      <div key={e.key}>
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="font-medium">{e.label}</span>
+                          <span className="tabular-nums text-night/50">{e.count}</span>
+                        </div>
+                        <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-night/[0.06]">
+                          <div
+                            className="h-full rounded-full bg-coral/60"
+                            style={{ width: `${(e.count / catTotal) * 100}%` }}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="rounded-2xl border border-hair p-5">
+                  <h2 className="text-xs font-semibold uppercase tracking-wide text-night/40">
+                    {t.reportCategories}
+                  </h2>
+                  <p className="mt-3 text-sm text-night/40">{t.categoriesNa}</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Activity timeline — dates + chart */}
+          {!isArcep && (hasDates || hasChartData) && (
+            <div className="rounded-2xl border border-hair p-5 sm:p-6">
+              <h2 className="text-xs font-semibold uppercase tracking-wide text-night/40">
+                {t.history}
+              </h2>
+
+              {/* Date timeline */}
+              {hasDates && lookup && (
+                <div className="mt-4 flex items-center gap-4">
+                  <div className="text-center">
+                    <div className="text-[0.7rem] uppercase tracking-wide text-night/40">
+                      {t.firstReport}
+                    </div>
+                    <div className="text-sm font-bold">{fmtDate(lookup.firstReportedAt)}</div>
+                  </div>
+                  <div className="flex-1 border-t border-dashed border-hair" />
+                  <div className="text-center">
+                    <div className="text-[0.7rem] uppercase tracking-wide text-night/40">
+                      {t.lastReport}
+                    </div>
+                    <div className="text-sm font-bold">{fmtDate(lookup.lastReportedAt)}</div>
+                  </div>
+                </div>
+              )}
+
+              {/* Frequency chart */}
+              {hasChartData && (
+                <div className="mt-5">
+                  <div className="flex items-end gap-2 sm:gap-3" style={{ height: "6rem" }}>
+                    {chartBuckets.map((b, i) => (
+                      <div key={i} className="flex flex-1 flex-col items-center gap-1.5">
+                        <span className="text-xs font-bold tabular-nums text-night/60">{b.value}</span>
+                        <div className="flex w-full flex-1 items-end">
+                          <div
+                            className={`w-full rounded-t-md transition-all ${
+                              b.value > 0 ? "bg-coral/50" : "bg-night/[0.05]"
+                            }`}
+                            style={{
+                              height: `${Math.max((b.value / chartMax) * 100, b.value > 0 ? 8 : 3)}%`,
+                            }}
+                          />
+                        </div>
+                        <span className="whitespace-nowrap text-[0.65rem] text-night/40">{b.label}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Advice CTA */}
+          <section className="rounded-2xl bg-night p-5 text-white sm:p-6">
+            <h2 className="text-lg font-bold">{t.advice}</h2>
+            <p className="mt-1.5 text-sm text-white/70">{t.adviceBody}</p>
+            <div className="mt-4 flex flex-wrap gap-3">
+              <Link
+                href={`${base}#telecharger`}
+                className="rounded-xl bg-amber px-5 py-2.5 text-sm font-bold text-night transition hover:brightness-95"
+              >
+                {t.blockCta}
+              </Link>
+              <Link
+                href={`${base}/signaler?phone=${phone}`}
+                className="rounded-xl border border-white/25 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-white/10"
+              >
+                {t.reportCta}
+              </Link>
+            </div>
+          </section>
+        </div>
+      ) : (
+        <div className="mt-6 rounded-2xl border border-hair p-6 text-center">
+          <p className="text-night/60">{t.noData}</p>
+          <Link
+            href={`${base}/signaler?phone=${phone}`}
+            className="mt-4 inline-block rounded-xl bg-night px-5 py-3 font-semibold text-white transition hover:bg-night-dark"
+          >
+            {t.reportCta}
+          </Link>
+        </div>
+      )}
+    </article>
+  );
+}
+
+function FormatRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-center justify-between gap-2 text-sm">
+      <span className="text-night/40">{label}</span>
+      <span className="font-medium tabular-nums">{value}</span>
+    </div>
+  );
+}
+
+// Allow on-demand rendering of pages not in generateStaticParams.
+export const dynamicParams = true;

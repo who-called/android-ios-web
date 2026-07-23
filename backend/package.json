@@ -1,0 +1,30 @@
+{
+  "name": "who-called-backend",
+  "version": "0.1.0",
+  "description": "who-called.com backend — crowdsourced call reporting + scoring API",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "node --watch src/server.js",
+    "start": "node src/server.js",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:deploy": "prisma migrate deploy",
+    "db:seed": "node prisma/seed.js",
+    "score": "node src/jobs/scoreJob.js",
+    "scheduler": "node src/jobs/scheduler.js",
+    "arcep": "node src/jobs/arcepImport.js",
+    "purge": "node src/jobs/retention.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.2.1",
+    "express": "^4.21.2",
+    "helmet": "^8.0.0",
+    "morgan": "^1.10.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "prisma": "^6.2.1"
+  }
+}

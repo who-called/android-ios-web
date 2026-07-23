@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1B2A4A"/>
+      <stop offset="1" stop-color="#131F38"/>
+    </linearGradient>
+    <linearGradient id="ring" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F59E0B"/>
+      <stop offset="1" stop-color="#10B981"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Subtle decorative arcs (top-right) -->
+  <circle cx="1080" cy="120" r="260" fill="none" stroke="#FFFFFF" stroke-opacity="0.05" stroke-width="40"/>
+  <circle cx="1080" cy="120" r="180" fill="none" stroke="#FFFFFF" stroke-opacity="0.04" stroke-width="28"/>
+
+  <!-- Shield logo -->
+  <g transform="translate(96,150)">
+    <path d="M70 0l56 21v42c0 38-24 63-56 77C38 126 14 101 14 63V21z" fill="#FFFFFF"/>
+    <path d="M70 14l42 16v34c0 30-19 49-42 60C47 113 28 94 28 64V30z" fill="#1B2A4A"/>
+    <path d="M61 78L43 60l9-9 9 9 33-33 9 9z" fill="#FFFFFF"/>
+  </g>
+
+  <!-- Wordmark -->
+  <text x="250" y="225" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
+        font-size="64" font-weight="800" fill="#FFFFFF" letter-spacing="-1">Who Called</text>
+  <text x="252" y="270" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
+        font-size="26" font-weight="600" fill="#F59E0B" letter-spacing="2">GRATUIT · ANONYME · OPEN SOURCE</text>
+
+  <!-- Headline -->
+  <text x="96" y="400" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
+        font-size="58" font-weight="800" fill="#FFFFFF">Stop au démarchage et aux</text>
+  <text x="96" y="470" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
+        font-size="58" font-weight="800" fill="#FFFFFF">arnaques téléphoniques.</text>
+
+  <!-- Subline -->
+  <text x="96" y="528" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
+        font-size="30" fill="#FFFFFF" fill-opacity="0.8">Vérifiez et signalez un numéro · Android &amp; iOS</text>
+
+  <!-- Score gauge motif (bottom-right) -->
+  <g transform="translate(980,430)">
+    <path d="M -70 50 A 90 90 0 1 1 70 50" fill="none" stroke="#FFFFFF" stroke-opacity="0.12" stroke-width="18" stroke-linecap="round"/>
+    <path d="M -70 50 A 90 90 0 1 1 55 62" fill="none" stroke="url(#ring)" stroke-width="18" stroke-linecap="round"/>
+    <text x="0" y="35" text-anchor="middle" font-family="system-ui, sans-serif" font-size="56" font-weight="800" fill="#FFFFFF">98</text>
+    <text x="0" y="78" text-anchor="middle" font-family="system-ui, sans-serif" font-size="20" fill="#FFFFFF" fill-opacity="0.7">indice spam</text>
+  </g>
+
+  <!-- Domain -->
+  <text x="96" y="600" font-family="system-ui, sans-serif" font-size="24" font-weight="600" fill="#FFFFFF" fill-opacity="0.6">who-called.com</text>
+</svg>

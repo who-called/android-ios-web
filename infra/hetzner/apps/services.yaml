@@ -1,0 +1,35 @@
+# ClusterIP services. TLS is terminated by Traefik (see ingress.yaml).
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: whocalled-api
+  namespace: whocalled-prod
+  labels:
+    app: whocalled-api
+spec:
+  type: ClusterIP
+  selector:
+    app: whocalled-api
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 3000
+      protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: whocalled-web
+  namespace: whocalled-prod
+  labels:
+    app: whocalled-web
+spec:
+  type: ClusterIP
+  selector:
+    app: whocalled-web
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 3000
+      protocol: TCP

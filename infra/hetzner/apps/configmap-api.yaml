@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: whocalled-api-config
+  namespace: whocalled-prod
+  labels:
+    app: whocalled-api
+    managed-by: kustomize
+data:
+  NODE_ENV: "production"
+  PORT: "3000"
+  CORS_ORIGINS: "https://www.who-called.com,https://who-called.com"
+  # ARCEP / operator block list — FR only. Mirror your own JSON and change here.
+  ARCEP_LIST_URL: "https://saracroche.org/api/v1/lists/french-list-arcep-operators"
+  # Scoring + retention (RGPD)
+  SCORE_BLOCK_THRESHOLD: "85"
+  SCORE_WARN_THRESHOLD: "60"
+  MIN_REPORTS_FOR_BLOCK: "5"
+  SCORE_HALF_LIFE_DAYS: "30"
+  SCORE_INTERVAL_MS: "21600000"
+  REPORT_RETENTION_DAYS: "365"
+  MAX_REPORTS_PER_DEVICE_PER_DAY: "50"
+  # TTL (s) of the short-lived /lists download tokens. The signing secret
+  # (LIST_TOKEN_SECRET) is NOT here: it comes from the whocalled-api-secret
+  # k8s secret, synced from GitHub Actions at deploy time.
+  LIST_TOKEN_TTL_S: "900"

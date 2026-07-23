@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="500" viewBox="0 0 1024 500"><rect width="1024" height="500" fill="#2563EB"/><circle cx="930" cy="80" r="240" fill="none" stroke="#FFFFFF" stroke-opacity="0.08" stroke-width="36"/><circle cx="930" cy="80" r="160" fill="none" stroke="#FFFFFF" stroke-opacity="0.06" stroke-width="24"/><g transform="translate(64,56) scale(2)">
+    <path d="M24 3l17 6.4v13c0 11.6-7.4 19-17 23.2C14.4 41.4 7 34 7 22.4v-13z" fill="#FFFFFF"/>
+    <path d="M24 7.6l12.8 4.8v10c0 8.8-5.6 14.5-12.8 17.8-7.2-3.3-12.8-9-12.8-17.8v-10z" fill="#2563EB"/>
+    <path d="M21.4 29.4l-5.4-5.4 2.7-2.7 2.7 2.7 9.6-9.6 2.7 2.7z" fill="#FFFFFF"/>
+  </g><text x="180" y="100" font-family="'Helvetica Neue', 'Segoe UI', Roboto, Arial, sans-serif" font-size="54" font-weight="800" fill="#FFFFFF" text-anchor="start">Who Called</text><text x="182" y="136" font-family="'Helvetica Neue', 'Segoe UI', Roboto, Arial, sans-serif" font-size="19" font-weight="700" fill="#FDE68A" text-anchor="start" letter-spacing="2">GRATUIT · ANONYME · OPEN SOURCE</text><text x="64" y="250" font-family="'Helvetica Neue', 'Segoe UI', Roboto, Arial, sans-serif" font-size="62" font-weight="800" fill="#FFFFFF" text-anchor="start">Bloquez les appels</text><text x="64" y="322" font-family="'Helvetica Neue', 'Segoe UI', Roboto, Arial, sans-serif" font-size="62" font-weight="800" fill="#FFFFFF" text-anchor="start">indésirables.</text><text x="64" y="386" font-family="'Helvetica Neue', 'Segoe UI', Roboto, Arial, sans-serif" font-size="25" font-weight="400" fill="#FFFFFF" text-anchor="start" fill-opacity="0.85">Liste officielle ARCEP + communauté.</text><g transform="translate(660,120) rotate(4)">
+    <rect width="330" height="150" rx="24" fill="#EF4444"/>
+    <circle cx="52" cy="56" r="28" fill="#FFFFFF" fill-opacity="0.2"/>
+    <g transform="translate(38,42) scale(1.1666666666666667)" stroke="#FFFFFF" fill="#FFFFFF"><circle cx="12" cy="12" r="8.4" fill="none" stroke-width="2.4"/><path d="M6.4 6.4l11.2 11.2" stroke-width="2.4" stroke-linecap="round"/></g>
+    <text x="96" y="50" font-family="'Helvetica Neue', 'Segoe UI', Roboto, Arial, sans-serif" font-size="25" font-weight="800" fill="#FFFFFF" text-anchor="start">Démarchage</text>
+    <text x="96" y="80" font-family="'Helvetica Neue', 'Segoe UI', Roboto, Arial, sans-serif" font-size="17" font-weight="400" fill="#FFFFFF" text-anchor="start" fill-opacity="0.9">256 signalements</text>
+    <text x="38" y="126" font-family="'Helvetica Neue', 'Segoe UI', Roboto, Arial, sans-serif" font-size="18" font-weight="700" fill="#FFFFFF" text-anchor="start">Bloqué avant de sonner</text>
+  </g><g transform="translate(688,300) rotate(-3)">
+    <rect width="316" height="110" rx="22" fill="#FFFFFF"/>
+    <g transform="translate(30,34) scale(1.0833333333333333)" stroke="#10B981" fill="#10B981"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></g>
+    <circle cx="43" cy="47" r="19" fill="none" stroke="#10B981" stroke-width="2.6"/>
+    <text x="76" y="44" font-family="'Helvetica Neue', 'Segoe UI', Roboto, Arial, sans-serif" font-size="22" font-weight="800" fill="#0F172A" text-anchor="start">Bloqueur actif</text>
+    <text x="76" y="76" font-family="'Helvetica Neue', 'Segoe UI', Roboto, Arial, sans-serif" font-size="16" font-weight="400" fill="#64748B" text-anchor="start">16 643 100 numéros couverts</text>
+  </g><text x="64" y="448" font-family="'Helvetica Neue', 'Segoe UI', Roboto, Arial, sans-serif" font-size="21" font-weight="600" fill="#FFFFFF" text-anchor="start" fill-opacity="0.6">who-called.com</text></svg>

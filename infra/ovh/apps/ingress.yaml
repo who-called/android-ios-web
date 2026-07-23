@@ -1,0 +1,68 @@
+# ingress-nginx Ingress + cert-manager TLS for the OVH MKS cluster.
+#
+# Ported from infra/hetzner/apps/ingress.yaml. OVH MKS ships NO Traefik, so the
+# ingress class is ingress-nginx (`ingressClassName: nginx`) and the Traefik
+# router annotations are dropped. Everything else (cert-manager ClusterIssuer,
+# namespace, hosts, backend services + ports, TLS secretNames) is IDENTICAL to
+# Hetzner.
+#
+# ingress-nginx terminates TLS using certs that cert-manager obtains from
+# Let's Encrypt via the HTTP-01 solver (ClusterIssuer letsencrypt-prod).
+#
+# DNS required (A records -> OVH ingress-nginx LoadBalancer IP 152.228.144.10):
+#   www.who-called.com
+#   who-called.com        (apex redirect, see ingress-apex-redirect.yaml)
+#   api.who-called.com
+#
+# NOTE: while testing, switch the annotation to letsencrypt-staging to avoid
+# Let's Encrypt rate limits, then flip to letsencrypt-prod for real certs.
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: whocalled-web
+  namespace: whocalled-prod
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - www.who-called.com
+      secretName: whocalled-web-tls
+  rules:
+    - host: www.who-called.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: whocalled-web
+                port:
+                  number: 3000
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: whocalled-api
+  namespace: whocalled-prod
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - api.who-called.com
+      secretName: whocalled-api-tls
+  rules:
+    - host: api.who-called.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: whocalled-api
+                port:
+                  number: 3000

@@ -1,0 +1,40 @@
+# Who Called database on the shared sides-postgres cluster.
+#
+# >>> This file belongs in the db-infra repo <<<
+# Copy to: db-infra/k8s/clouds/hetzner/database-whocalled.yaml
+# and add it to db-infra/k8s/clouds/hetzner/kustomization.yaml `resources:`.
+#
+# TWO things are needed for the app to connect:
+#   1. The login ROLE `whocalled_app` — declared in the Cluster `managed.roles`
+#      (see the patch snippet below), password from the secret.
+#   2. This Database CR — creates the `whocalled` database owned by that role.
+#
+# Create the role's secret first (NOT committed):
+#   kubectl -n db-prod create secret generic sides-postgres-whocalled \
+#     --from-literal=username=whocalled_app \
+#     --from-literal=password='<STRONG_PASSWORD>' \
+#     --dry-run=client -o yaml | kubectl apply -f -
+#
+# Then add to the Cluster spec.managed.roles (in postgres-cluster.yaml or a
+# Hetzner patch), alongside smrz_admin:
+#   - name: whocalled_app
+#     ensure: present
+#     login: true
+#     superuser: false
+#     createdb: false
+#     passwordSecret:
+#       name: sides-postgres-whocalled
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: sides-postgres-whocalled
+  labels:
+    app: sides-postgres
+    managed-by: kustomize
+spec:
+  cluster:
+    name: sides-postgres
+  name: whocalled
+  owner: whocalled_app
+  encoding: UTF8

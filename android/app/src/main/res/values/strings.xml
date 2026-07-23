@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Who Called</string>
+
+    <!-- WARN notification -->
+    <string name="warn_channel_name">Alertes d\'appels suspects</string>
+    <string name="warn_channel_desc">Notifie quand un appel entrant a un score de spam élevé.</string>
+    <string name="warn_title">⚠️ Appel suspect — non bloqué</string>
+    <string name="warn_body">%1$s · risque de spam %2$d%%. À vous de décider de répondre.</string>
+    <string name="warn_subtext">Who Called · le téléphone sonne</string>
+
+    <!-- SMS shield -->
+    <string name="sms_blocked_channel_name">SMS indésirables masqués</string>
+    <string name="sms_blocked_channel_desc">Notifie discrètement quand la notification d\'un SMS indésirable est masquée.</string>
+    <string name="sms_blocked_title">SMS indésirable masqué</string>
+    <string name="sms_blocked_body">Notification masquée pour %1$s. Le message reste dans votre application SMS.</string>
+    <string name="sms_listener_label">Bouclier SMS Who Called</string>
+
+    <!-- Blocked-call notification -->
+    <string name="call_blocked_channel_name">Appels bloqués</string>
+    <string name="call_blocked_channel_desc">Notifie discrètement quand un appel indésirable est bloqué.</string>
+    <string name="call_blocked_title">Appel bloqué</string>
+    <string name="call_blocked_unknown">Numéro masqué</string>
+
+    <!-- Daily game reminder -->
+    <string name="reminder_channel_name">Rappel de jeu</string>
+    <string name="reminder_channel_desc">Un rappel bienveillant, une fois par jour, pour venir jouer le défi. Désactivable dans les réglages.</string>
+</resources>

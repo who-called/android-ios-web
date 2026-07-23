@@ -1,0 +1,65 @@
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: whocalled-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: whocalled
+      POSTGRES_PASSWORD: whocalled
+      POSTGRES_DB: whocalled
+    ports:
+      - "5432:5432"
+    volumes:
+      - whocalled_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U whocalled -d whocalled"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build: .
+    container_name: whocalled-api
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: "postgresql://whocalled:whocalled@db:5432/whocalled?schema=public"
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    command: sh -c "pnpm prisma migrate deploy && node src/server.js"
+
+  # Periodic re-scoring (time decay, reputation re-weighting).
+  scoring:
+    build: .
+    container_name: whocalled-scoring
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      api:
+        condition: service_started
+    environment:
+      DATABASE_URL: "postgresql://whocalled:whocalled@db:5432/whocalled?schema=public"
+      # Override to tune frequency (ms). Default 6h. Use a small value to test.
+      SCORE_INTERVAL_MS: "${SCORE_INTERVAL_MS:-21600000}"
+    command: node src/jobs/scheduler.js
+
+  # On-demand DB update: SIA pull + re-score + retention (dbforge + node).
+  # Run with:  docker compose run --rm updater
+  updater:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile.updater
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: "postgresql://whocalled:whocalled@db:5432/whocalled?schema=public"
+      PULL_ARGS: "${PULL_ARGS:---region WW}"
+    profiles: ["tools"]
+
+volumes:
+  whocalled_pgdata:

@@ -1,0 +1,61 @@
+# Traefik Ingress + cert-manager TLS.
+#
+# DNS required (A records -> 94.130.161.157):
+#   www.who-called.com
+#   who-called.com        (apex redirect, see ingress-apex-redirect.yaml)
+#   api.who-called.com
+#
+# While testing, switch the issuer to letsencrypt-staging to avoid rate limits,
+# then flip to letsencrypt-prod.
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: whocalled-web
+  namespace: whocalled-prod
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+spec:
+  ingressClassName: traefik
+  tls:
+    - hosts:
+        - www.who-called.com
+      secretName: whocalled-web-tls
+  rules:
+    - host: www.who-called.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: whocalled-web
+                port:
+                  number: 3000
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: whocalled-api
+  namespace: whocalled-prod
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+spec:
+  ingressClassName: traefik
+  tls:
+    - hosts:
+        - api.who-called.com
+      secretName: whocalled-api-tls
+  rules:
+    - host: api.who-called.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: whocalled-api
+                port:
+                  number: 3000

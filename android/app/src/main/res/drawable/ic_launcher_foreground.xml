@@ -1,0 +1,18 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Shield outline -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,28 L74,36 L74,54 C74,68 65,77 54,82 C43,77 34,68 34,54 L34,36 Z" />
+    <!-- Inner cut to give the shield a rim, revealing the blue background -->
+    <path
+        android:fillColor="#2563EB"
+        android:pathData="M54,34 L69,40 L69,54 C69,65 62,72 54,76 C46,72 39,65 39,54 L39,40 Z" />
+    <!-- Check mark (protection confirmed) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M48.5,56.5 L45,53 L42.5,55.5 L48.5,61.5 L66,44 L63.5,41.5 Z" />
+</vector>

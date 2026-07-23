@@ -1,0 +1,150 @@
+name: "[ovh] Deploy DB updater (SIA pull + cron + bootstrap)"
+
+# OVH MKS clone of deploy-updater-hetzner.yaml. Builds the whocalled-updater
+# image and deploys the periodic DB-update CronJob (+ optional one-shot Jobs).
+# Manual trigger only (workflow_dispatch) — the updater is triggered on demand,
+# not on push. Reuses the cluster-agnostic Job/CronJob manifests under
+# infra/hetzner/apps/ (only PLACEHOLDER_UPDATER_IMAGE + namespace whocalled-prod,
+# both cluster-neutral).
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_bootstrap:
+        description: "Also run the one-shot SIA bootstrap Job (fills a fresh prod DB)"
+        type: boolean
+        default: false
+      run_full_ingest:
+        description: "Ingest the FULL 11.3M baseline from the sia-seed-full release asset"
+        type: boolean
+        default: false
+      publish_warmup:
+        description: "Regenerate FR warm-up from prod and publish to the warmup-latest release"
+        type: boolean
+        default: false
+
+concurrency:
+  group: whocalled-updater-ovh
+  cancel-in-progress: false
+
+env:
+  IMAGE_REPO: ghcr.io/${{ github.repository_owner }}/whocalled-updater
+  NS: whocalled-prod
+
+jobs:
+  build:
+    name: Build & Push updater image (GHCR)
+    runs-on: [self-hosted, ovh]
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build & Push (Go dbforge + Node backend)
+        uses: docker/build-push-action@v6
+        with:
+          context: . # repo root: image needs both tools/ and backend/
+          file: ./infra/Dockerfile.updater
+          push: true
+          platforms: linux/amd64
+          tags: |
+            ${{ env.IMAGE_REPO }}:${{ github.sha }}
+            ${{ env.IMAGE_REPO }}:latest
+
+  deploy:
+    name: Deploy cron (+ optional bootstrap)
+    needs: build
+    runs-on: [self-hosted, ovh]
+    permissions:
+      contents: write # publish_warmup creates/uploads the warmup-latest release
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Apply periodic DB-update cron
+        run: |
+          set -euo pipefail
+          IMAGE="${IMAGE_REPO}:${{ github.sha }}"
+          sed "s|PLACEHOLDER_UPDATER_IMAGE|${IMAGE}|g" \
+            infra/hetzner/apps/cronjob-db-update.yaml | kubectl apply -n "$NS" --validate=false -f -
+
+      - name: Run one-shot SIA bootstrap Job
+        if: github.event_name == 'workflow_dispatch' && inputs.run_bootstrap
+        run: |
+          set -euo pipefail
+          IMAGE="${IMAGE_REPO}:${{ github.sha }}"
+          kubectl delete job whocalled-sia-bootstrap -n "$NS" --ignore-not-found
+          sed "s|PLACEHOLDER_UPDATER_IMAGE|${IMAGE}|g" \
+            infra/hetzner/apps/job-sia-bootstrap.yaml | kubectl apply -n "$NS" --validate=false -f -
+          echo "Bootstrap Job started. Follow logs with:"
+          echo "  kubectl logs -f job/whocalled-sia-bootstrap -n $NS"
+
+      - name: Run FULL 11.3M ingest Job (from release asset)
+        if: github.event_name == 'workflow_dispatch' && inputs.run_full_ingest
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          IMAGE="${IMAGE_REPO}:${{ github.sha }}"
+          ASSET_URL=$(curl -fsSL -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/releases/tags/sia-seed-full" \
+            | grep -oE 'https://api\.github\.com/repos/[^"]*/releases/assets/[0-9]+' | head -1)
+          echo "Asset: $ASSET_URL"
+          [ -n "$ASSET_URL" ] || { echo "asset URL not found"; exit 1; }
+          kubectl create secret generic sia-dl -n "$NS" \
+            --from-literal=GH_TOKEN="${{ secrets.GITHUB_TOKEN }}" \
+            --from-literal=ASSET_URL="$ASSET_URL" \
+            --dry-run=client -o yaml | kubectl apply -f -
+          kubectl delete job whocalled-sia-full-ingest -n "$NS" --ignore-not-found
+          sed "s|PLACEHOLDER_UPDATER_IMAGE|${IMAGE}|g" \
+            infra/hetzner/apps/job-sia-full-ingest.yaml | kubectl apply -n "$NS" --validate=false -f -
+          echo "Waiting for full ingest (downloads early while token is valid, then ingests)…"
+          STATUS=timeout
+          for i in $(seq 1 360); do   # up to 3h, 30s steps
+            C=$(kubectl get job whocalled-sia-full-ingest -n "$NS" -o jsonpath='{.status.conditions[?(@.type=="Complete")].status}' 2>/dev/null || true)
+            F=$(kubectl get job whocalled-sia-full-ingest -n "$NS" -o jsonpath='{.status.conditions[?(@.type=="Failed")].status}' 2>/dev/null || true)
+            [ "$C" = "True" ] && { STATUS=complete; break; }
+            [ "$F" = "True" ] && { STATUS=failed; break; }
+            sleep 30
+          done
+          echo "Job status: $STATUS"
+          kubectl logs job/whocalled-sia-full-ingest -n "$NS" --tail=40 || true
+          kubectl delete secret sia-dl -n "$NS" --ignore-not-found
+          [ "$STATUS" = "complete" ] || exit 1
+
+      - name: Publish FR warm-up to release (from prod)
+        if: github.event_name == 'workflow_dispatch' && inputs.publish_warmup
+        run: |
+          set -euo pipefail
+          IMAGE="${IMAGE_REPO}:${{ github.sha }}"
+          kubectl create secret generic warmup-pub -n "$NS" \
+            --from-literal=GH_TOKEN="${{ secrets.GITHUB_TOKEN }}" \
+            --from-literal=GH_REPO="${{ github.repository }}" \
+            --dry-run=client -o yaml | kubectl apply -f -
+          kubectl delete job whocalled-warmup-publish -n "$NS" --ignore-not-found
+          sed "s|PLACEHOLDER_UPDATER_IMAGE|${IMAGE}|g" \
+            infra/hetzner/apps/job-warmup-publish.yaml | kubectl apply -n "$NS" --validate=false -f -
+          echo "Waiting for warm-up publish…"
+          STATUS=timeout
+          for i in $(seq 1 60); do   # up to 30min
+            C=$(kubectl get job whocalled-warmup-publish -n "$NS" -o jsonpath='{.status.conditions[?(@.type=="Complete")].status}' 2>/dev/null || true)
+            F=$(kubectl get job whocalled-warmup-publish -n "$NS" -o jsonpath='{.status.conditions[?(@.type=="Failed")].status}' 2>/dev/null || true)
+            [ "$C" = "True" ] && { STATUS=complete; break; }
+            [ "$F" = "True" ] && { STATUS=failed; break; }
+            sleep 30
+          done
+          echo "Job status: $STATUS"
+          kubectl logs job/whocalled-warmup-publish -n "$NS" --tail=40 || true
+          kubectl delete secret warmup-pub -n "$NS" --ignore-not-found
+          [ "$STATUS" = "complete" ] || exit 1

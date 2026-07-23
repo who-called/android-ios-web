@@ -1,0 +1,54 @@
+# One-shot FULL SIA ingest (the complete 11.3M baseline, not just deltas).
+# Downloads the gzipped full NDJSON release asset and ingests it in-cluster
+# (fast local PG via DATABASE_URL), then materializes `numbers`. Union with the
+# existing delta data ≈ the full base. Idempotent (UPSERT on phone).
+#
+# The download token + asset URL come from the short-lived `sia-dl` secret the
+# deploy workflow creates from its Actions token (valid for the run's duration).
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: whocalled-sia-full-ingest
+  namespace: whocalled-prod
+  labels:
+    app: whocalled-sia-full-ingest
+    managed-by: kustomize
+spec:
+  backoffLimit: 1
+  activeDeadlineSeconds: 10800 # up to 3h
+  ttlSecondsAfterFinished: 86400
+  template:
+    spec:
+      restartPolicy: Never
+      automountServiceAccountToken: false
+      containers:
+        - name: full-ingest
+          image: PLACEHOLDER_UPDATER_IMAGE
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: whocalled-api-config
+            - secretRef:
+                name: whocalled-api-secret
+            - secretRef:
+                name: sia-dl
+          command:
+            - sh
+            - -c
+            - |
+              set -e
+              echo "[full-ingest] downloading release asset"
+              curl -fSL -H "Authorization: Bearer $GH_TOKEN" \
+                   -H "Accept: application/octet-stream" \
+                   "$ASSET_URL" -o /tmp/sia_full.ndjson.gz
+              echo "[full-ingest] ingesting 11.3M into sia_seed"
+              gunzip -c /tmp/sia_full.ndjson.gz | dbforge ingest --in - --dsn "$DATABASE_URL" --batch 200000
+              echo "[full-ingest] materialize numbers"
+              node src/jobs/scoreJob.js
+              echo "[full-ingest] done"
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1Gi
+            limits:
+              memory: 2Gi

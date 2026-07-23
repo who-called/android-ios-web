@@ -1,0 +1,46 @@
+# Regenerate the FR warm-up artifacts from PROD and publish them to the stable
+# `warmup-latest` release, so app builds fetch them (no local DB dependency).
+# Runs in-cluster (snapshot via DATABASE_URL), uploads via the GitHub API using
+# the short-lived `warmup-pub` secret created by the deploy workflow.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: whocalled-warmup-publish
+  namespace: whocalled-prod
+  labels:
+    app: whocalled-warmup-publish
+    managed-by: kustomize
+spec:
+  backoffLimit: 1
+  activeDeadlineSeconds: 1800
+  ttlSecondsAfterFinished: 86400
+  template:
+    spec:
+      restartPolicy: Never
+      automountServiceAccountToken: false
+      containers:
+        - name: warmup-publish
+          image: PLACEHOLDER_UPDATER_IMAGE
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: whocalled-api-config
+            - secretRef:
+                name: whocalled-api-secret
+            - secretRef:
+                name: warmup-pub
+          command:
+            - sh
+            - -c
+            - |
+              set -e
+              echo "[warmup-publish] snapshot FR from prod"
+              dbforge snapshot --dsn "$DATABASE_URL" --prefix 33 --out /tmp/w
+              echo "[warmup-publish] upload to release"
+              WARMUP_DIR=/tmp/w node /usr/local/bin/publish-warmup.mjs
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              memory: 1Gi

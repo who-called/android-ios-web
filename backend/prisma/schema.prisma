@@ -1,0 +1,135 @@
+// who-called.com — Prisma schema
+// Crowdsourced call reporting + scoring.
+
+generator client {
+  provider      = "prisma-client-js"
+  // Build runs on node:22-alpine (musl). Include the Alpine engine + native
+  // for safety so the query engine is always present at runtime.
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// Aggregated number with computed spam score and derived status.
+model Number {
+  phone            String   @id // E.164 without '+', e.g. "33899123456"
+  spamScore        Int      @default(0) @map("spam_score") // 0..100
+  category         String   @default("unknown") // telemarketing | scam | robocall | legit | unknown
+  source           String   @default("community") // community | arcep
+  reportCountSpam  Int      @default(0) @map("report_count_spam")
+  reportCountLegit Int      @default(0) @map("report_count_legit")
+  status           String   @default("unknown") // block | warn | allow | unknown
+  firstReportedAt  DateTime @default(now()) @map("first_reported_at")
+  lastReportedAt   DateTime @default(now()) @map("last_reported_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  reports Report[]
+
+  @@index([status])
+  @@index([updatedAt]) // for delta sync (GET /lists?since=...)
+  @@map("numbers")
+}
+
+/// Wildcard pattern (ARCEP / operator ranges), e.g. "33899######" (# = any digit).
+model Pattern {
+  pattern   String   @id // digits + trailing '#' wildcards, no '+'
+  status    String   @default("block") // block | warn
+  category  String   @default("telemarketing")
+  source    String   @default("arcep") // arcep | community
+  name      String? // human label, e.g. "Démarchage ARCEP"
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([updatedAt])
+  @@map("patterns")
+}
+
+/// One raw user vote about a phone number.
+model Report {
+  id        BigInt   @id @default(autoincrement())
+  phone     String
+  deviceId  String   @map("device_id") // anonymous UUID, no PII
+  vote      String // spam | legit
+  category  String? // optional
+  locale    String   @default("fr") // FR-first, ready for i18n
+  createdAt DateTime @default(now()) @map("created_at")
+
+  number Number @relation(fields: [phone], references: [phone], onDelete: Cascade)
+
+  @@index([phone])
+  @@index([deviceId])
+  @@index([vote, createdAt]) // trending: recent spam reports within a window
+  @@map("reports")
+}
+
+/// External seed evidence imported from the SIA community database.
+/// INTERNAL ONLY — never serialized to apps. The scoring job turns these
+/// aggregate counts into a decaying weighted prior that feeds the unified
+/// `numbers` row, so SIA-sourced risk looks identical to our own.
+/// SIA gives no per-vote timestamps, so `importedAt` is the synthetic age used
+/// for time decay.
+model SiaSeed {
+  phone      String   @id // E.164 without '+', matches Number.phone
+  pos        Int      @default(0) // POSITIVE votes
+  neg        Int      @default(0) // NEGATIVE votes
+  neu        Int      @default(0) // NEUTRAL votes
+  categoryId Int      @default(0) @map("category_id") // SIA enum f (0..18)
+  category   String   @default("unknown") // mapped who-called category
+  dbVer      Int      @default(0) @map("db_ver") // SIA slice version
+  importedAt DateTime @default(now()) @map("imported_at")
+
+  @@map("sia_seed")
+}
+
+/// Records phones that left the apps' interest (no longer block/warn, or
+/// deleted entirely) so the delta endpoint can tell clients to drop them from
+/// their local cache. Without this a "healed" number stays blocked forever.
+model NumberTombstone {
+  phone     String   @id
+  removedAt DateTime @default(now()) @map("removed_at")
+
+  @@index([removedAt]) // delta: deleted since <ts>
+  @@map("number_tombstones")
+}
+
+/// Tracks the latest SIA slice version ingested per region, so incremental
+/// pulls resume from the right `_dbVer` and never re-fetch what we already have.
+model SiaSync {
+  region   String   @id // e.g. "WW"
+  dbVer    Int      @default(0) @map("db_ver")
+  syncedAt DateTime @default(now()) @map("synced_at")
+
+  @@map("sia_sync")
+}
+
+/// Daily-game score (anonymous). One row per device per day PER GAME (keeps the
+/// best). Feeds each game's own daily leaderboard (rank / median), no PII.
+/// `gameType` discriminates the games ("defense" arcade, "trace" puzzle, …) so
+/// they never share a board.
+model GameScore {
+  day       Int // epoch-day of the challenge
+  deviceId  String   @map("device_id")
+  gameType  String   @default("defense") @map("game_type") // defense | trace
+  score     Int      @default(0) // arcade/puzzle score (higher = better)
+  waves     Int      @default(1) // DEFENSE: waves survived · TRACE: grids solved
+  mistakes  Int      @default(0)
+  timeMs    Int      @default(0) @map("time_ms") // legacy reflex game — unused
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@id([day, deviceId, gameType])
+  @@index([gameType, day, score])
+  @@map("game_scores")
+}
+
+/// Anonymous device for anti-abuse (rate limiting + reputation weighting).
+model Device {
+  deviceId         String   @id @map("device_id")
+  reputationWeight Float    @default(1.0) @map("reputation_weight")
+  reportsToday     Int      @default(0) @map("reports_today")
+  lastReportDate   DateTime @default(now()) @map("last_report_date")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  @@map("devices")
+}

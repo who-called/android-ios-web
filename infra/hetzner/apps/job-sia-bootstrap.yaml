@@ -1,0 +1,47 @@
+# One-shot SIA bootstrap for a fresh prod DB.
+# Pulls SIA deltas from the bundled baseline (v3357) up to current INSIDE the
+# cluster (fast local PG access), then materializes `numbers`. Primes sia_sync
+# so the periodic cronjob-db-update can resume with light increments afterwards.
+#
+# Re-run: delete then re-apply (Job names are immutable). Idempotent (UPSERT).
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: whocalled-sia-bootstrap
+  namespace: whocalled-prod
+  labels:
+    app: whocalled-sia-bootstrap
+    managed-by: kustomize
+spec:
+  backoffLimit: 1
+  activeDeadlineSeconds: 10800 # up to 3h for the initial heavy load
+  ttlSecondsAfterFinished: 86400
+  template:
+    spec:
+      restartPolicy: Never
+      automountServiceAccountToken: false
+      containers:
+        - name: bootstrap
+          image: PLACEHOLDER_UPDATER_IMAGE
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: whocalled-api-config
+            - secretRef:
+                name: whocalled-api-secret
+          command:
+            - sh
+            - -c
+            - |
+              set -e
+              echo "[bootstrap] SIA pull from baseline"
+              dbforge pull --dsn "$DATABASE_URL" --region WW --floor 3357
+              echo "[bootstrap] materialize numbers"
+              node src/jobs/scoreJob.js
+              echo "[bootstrap] done"
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              memory: 1536Mi

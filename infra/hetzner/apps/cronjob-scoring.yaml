@@ -1,0 +1,39 @@
+# Periodic re-scoring + RGPD retention purge, on the API image.
+# Runs every 6h. Idempotent; uses the same DATABASE_URL secret as the API.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: whocalled-scoring
+  namespace: whocalled-prod
+  labels:
+    app: whocalled-scoring
+    managed-by: kustomize
+spec:
+  schedule: "0 */6 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      activeDeadlineSeconds: 1800
+      template:
+        spec:
+          restartPolicy: Never
+          automountServiceAccountToken: false
+          containers:
+            - name: scoring
+              image: PLACEHOLDER_IMAGE
+              imagePullPolicy: Always
+              envFrom:
+                - configMapRef:
+                    name: whocalled-api-config
+                - secretRef:
+                    name: whocalled-api-secret
+              command: ["sh", "-c", "node src/jobs/scoreJob.js && node src/jobs/retention.js"]
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 128Mi
+                limits:
+                  memory: 384Mi

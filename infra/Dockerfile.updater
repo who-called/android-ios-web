@@ -1,0 +1,30 @@
+# Combined image for the periodic DB-update cron: Node backend (scoring,
+# retention, Prisma) + the Go `dbforge` binary (SIA pull/snapshot).
+#
+# Build context = repo root:  docker build -f infra/Dockerfile.updater .
+
+# --- stage 1: build dbforge (static Go binary) ---
+FROM golang:1.25-alpine AS dbforge
+WORKDIR /src
+COPY tools/dbforge/go.mod tools/dbforge/go.sum ./
+RUN go mod download
+COPY tools/dbforge/ ./
+RUN CGO_ENABLED=0 go build -o /out/dbforge .
+
+# --- stage 2: node backend + dbforge ---
+FROM node:22-alpine
+RUN corepack enable && apk add --no-cache curl
+WORKDIR /app
+
+COPY backend/package.json backend/pnpm-lock.yaml backend/pnpm-workspace.yaml ./
+RUN pnpm install --frozen-lockfile --prod=false --ignore-scripts
+COPY backend/prisma ./prisma
+RUN pnpm prisma generate
+COPY backend/src ./src
+COPY scripts/db-update.sh /usr/local/bin/db-update.sh
+COPY scripts/publish-warmup.mjs /usr/local/bin/publish-warmup.mjs
+COPY --from=dbforge /out/dbforge /usr/local/bin/dbforge
+RUN chmod +x /usr/local/bin/db-update.sh /usr/local/bin/dbforge
+
+ENV NODE_ENV=production
+CMD ["db-update.sh"]

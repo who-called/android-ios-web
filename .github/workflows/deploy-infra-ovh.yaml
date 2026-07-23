@@ -1,0 +1,68 @@
+name: "[ovh] Deploy Infra (secrets + services + ingress) (OVH)"
+
+# OVH MKS clone of deploy-infra-hetzner.yaml. Applies the namespace, GHCR pull
+# secret, API secret (from GitHub secrets), configmap, ClusterIP services and
+# the ingress-nginx Ingress (OVH port of the Traefik one). Run this once first,
+# then the API/Web build workflows deploy the images. Does NOT touch Hetzner.
+# Manual trigger only (workflow_dispatch) while validating the OVH terrain.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "infra/hetzner/apps/configmap-api.yaml"
+      - "infra/hetzner/apps/services.yaml"
+      - "infra/ovh/apps/ingress.yaml"
+      - "infra/ovh/apps/ingress-apex-redirect.yaml"
+      - ".github/workflows/deploy-infra-ovh.yaml"
+  workflow_dispatch: {}
+
+concurrency:
+  group: whocalled-infra-hetzner-ovh
+  cancel-in-progress: true
+
+env:
+  NS: whocalled-prod
+
+jobs:
+  deploy:
+    name: Deploy infra to OVH MKS
+    runs-on: [self-hosted, ovh]
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Test cluster connection
+        run: kubectl get nodes
+
+      - name: Create namespace if not exists
+        run: kubectl create namespace "$NS" --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Ensure GHCR image pull secret (private packages)
+        run: |
+          set -euo pipefail
+          kubectl create secret docker-registry ghcr-pull \
+            --docker-server=ghcr.io \
+            --docker-username=${{ github.repository_owner }} \
+            --docker-password="${{ secrets.GHCR_PULL_TOKEN }}" \
+            -n "$NS" --dry-run=client -o yaml | kubectl apply -f -
+          kubectl patch serviceaccount default -n "$NS" \
+            -p '{"imagePullSecrets":[{"name":"ghcr-pull"}]}'
+
+      - name: Apply whocalled-api secret
+        run: |
+          kubectl create secret generic whocalled-api-secret \
+            --from-literal=DATABASE_URL="${{ secrets.DATABASE_URL }}" \
+            -n "$NS" --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Apply configmap + services + ingress
+        run: |
+          kubectl apply -n "$NS" -f infra/hetzner/apps/configmap-api.yaml --validate=false
+          kubectl apply -n "$NS" -f infra/hetzner/apps/services.yaml
+          kubectl apply -n "$NS" -f infra/ovh/apps/ingress.yaml
+          kubectl apply -n "$NS" -f infra/ovh/apps/ingress-apex-redirect.yaml
+
+      - name: Summary
+        run: kubectl get ingress,svc -n "$NS"
