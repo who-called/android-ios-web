@@ -41,7 +41,9 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.whocalled.android"
+        // Public Play Store application id. The Kotlin namespace stays
+        // com.whocalled.android to avoid a noisy source-package migration.
+        applicationId = "com.devfi.whocalled"
         minSdk = 29
         targetSdk = 37
         versionCode = 3

@@ -4,16 +4,16 @@ import { config } from "@/lib/config";
 export function StoreBadges({ className = "" }: { className?: string }) {
   return (
     <div className={`flex flex-wrap gap-3 ${className}`}>
-      <a
-        href={config.links.appStore}
-        className="flex items-center gap-2 rounded-xl bg-night px-5 py-3 text-white transition hover:bg-night-dark"
+      <div
+        aria-label="Application iOS bientôt disponible"
+        className="flex cursor-default items-center gap-2 rounded-xl bg-night/65 px-5 py-3 text-white"
       >
         <AppleIcon />
         <span>
-          <span className="block text-[11px] opacity-80">Télécharger sur</span>
+          <span className="block text-[11px] opacity-80">Bientôt sur</span>
           <span className="block text-sm font-semibold leading-tight">App Store</span>
         </span>
-      </a>
+      </div>
       <a
         href={config.links.playStore}
         className="flex items-center gap-2 rounded-xl border border-hair bg-white px-5 py-3 text-night transition hover:border-night/30"

@@ -25,7 +25,7 @@ const privacyFr: LegalDoc = {
   updated: "23 juillet 2026",
   intro:
     "Cette politique couvre le site who-called.com et les applications mobiles Who Called " +
-    "pour Android (com.whocalled.android) et iOS (com.whocalled.app), éditées par " +
+    "pour Android (com.devfi.whocalled) et iOS (bientôt disponible), éditées par " +
     company.name +
     ". Nous appliquons une logique de minimisation stricte : nous ne collectons que le strict nécessaire au filtrage des appels indésirables. Pas de compte, pas de nom, pas d'email, pas de publicité, pas de traceur tiers. Nous ne vendons ni ne partageons aucune donnée.",
   sections: [
@@ -97,7 +97,7 @@ const privacyEn: LegalDoc = {
   updated: "July 23, 2026",
   intro:
     "This policy covers the who-called.com website and the Who Called mobile apps " +
-    "for Android (com.whocalled.android) and iOS (com.whocalled.app), published by " +
+    "for Android (com.devfi.whocalled) and iOS (coming soon), published by " +
     company.name +
     ". We apply strict data minimization: we only collect what is strictly necessary to filter unwanted calls. No account, no name, no email, no ads, no third-party trackers. We never sell or share your data.",
   sections: [
