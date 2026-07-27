@@ -1,4 +1,5 @@
 import type { Locale } from "./dictionaries";
+import { config } from "@/lib/config";
 
 // Company / publisher info — single source of truth.
 export const company = {
@@ -166,7 +167,7 @@ const privacyEn: LegalDoc = {
 
 const policyFr: LegalDoc = {
   title: "Mentions légales & conditions",
-  updated: "16 juin 2026",
+  updated: "27 juillet 2026",
   sections: [
     {
       title: "1. Éditeur",
@@ -178,22 +179,26 @@ const policyFr: LegalDoc = {
     },
     {
       title: "3. Objet",
-      body: "Who Called est une application gratuite de filtrage des appels indésirables, basée sur une liste officielle de préfixes de démarchage (ARCEP) et sur des signalements communautaires anonymes. Elle ne passe pas d'appels.",
+      body: `Who Called est une application gratuite de filtrage des appels indésirables, basée sur la liste officielle des préfixes de démarchage publiée par l'ARCEP (Autorité de régulation des communications électroniques, des postes et de la distribution de la presse) et sur des signalements communautaires anonymes. Elle ne passe pas d'appels. Source officielle des préfixes : ${config.links.arcepSource}`,
     },
     {
-      title: "4. Conditions d'utilisation",
+      title: "4. Indépendance et non-affiliation",
+      body: `Who Called est un service indépendant édité par ${company.name}. Il n'est pas une application officielle : il n'est affilié ni à l'ARCEP ni à aucune entité gouvernementale, et ne représente aucun organisme public. Les informations issues de sources officielles sont reproduites à titre informatif, avec un lien vers leur source d'origine.`,
+    },
+    {
+      title: "5. Conditions d'utilisation",
       body: "L'application est fournie gratuitement, « en l'état », sans garantie de résultat. En signalant un numéro, vous vous engagez à le faire de bonne foi. Vous restez responsable de la décision de répondre ou non à un appel.",
     },
     {
-      title: "5. Liste communautaire",
+      title: "6. Liste communautaire",
       body: `Les scores sont calculés automatiquement et ne constituent pas un jugement. Toute personne responsable d'un numéro peut demander son retrait à ${company.privacyEmail}.`,
     },
     {
-      title: "6. Propriété intellectuelle",
+      title: "7. Propriété intellectuelle",
       body: `La marque « Who Called » et les contenus appartiennent à ${company.name}.`,
     },
     {
-      title: "7. Droit applicable",
+      title: "8. Droit applicable",
       body: "Droit français. Tribunaux compétents français.",
     },
   ],
@@ -201,7 +206,7 @@ const policyFr: LegalDoc = {
 
 const policyEn: LegalDoc = {
   title: "Legal notice & terms",
-  updated: "June 16, 2026",
+  updated: "July 27, 2026",
   sections: [
     {
       title: "1. Publisher",
@@ -213,22 +218,26 @@ const policyEn: LegalDoc = {
     },
     {
       title: "3. Purpose",
-      body: "Who Called is a free app that filters unwanted calls, based on an official telemarketer prefix list (ARCEP) and anonymous community reports. It does not place calls.",
+      body: `Who Called is a free app that filters unwanted calls, based on the official telemarketer prefix list published by ARCEP (the French regulator of electronic communications) and anonymous community reports. It does not place calls. Official source of the prefixes: ${config.links.arcepSource}`,
     },
     {
-      title: "4. Terms of use",
+      title: "4. Independence and non-affiliation",
+      body: `Who Called is an independent service published by ${company.name}. It is not an official app: it is not affiliated with ARCEP or any government entity, and does not represent any public body. Information coming from official sources is reproduced for information purposes, with a link to its original source.`,
+    },
+    {
+      title: "5. Terms of use",
       body: 'The app is provided free of charge, "as is", with no guarantee of results. When reporting a number, you agree to do so in good faith. You remain responsible for the decision to answer a call or not.',
     },
     {
-      title: "5. Community list",
+      title: "6. Community list",
       body: `Scores are computed automatically and do not constitute a judgment. Anyone responsible for a number can request its removal at ${company.privacyEmail}.`,
     },
     {
-      title: "6. Intellectual property",
+      title: "7. Intellectual property",
       body: `The "Who Called" brand and contents belong to ${company.name}.`,
     },
     {
-      title: "7. Governing law",
+      title: "8. Governing law",
       body: "French law. French courts have jurisdiction.",
     },
   ],

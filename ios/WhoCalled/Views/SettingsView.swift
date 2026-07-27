@@ -60,6 +60,7 @@ struct SettingsView: View {
           link("Confidentialité", "lock.fill", AppConstants.Links.privacy)
           link("Mentions légales", "doc.text.fill", AppConstants.Links.policy)
           link("Site officiel", "safari.fill", AppConstants.Links.site)
+          link("Source des préfixes ARCEP (arcep.fr)", "building.columns.fill", AppConstants.Links.arcepSource)
           link("Noter l’application", "star.fill", AppConstants.Links.rate)
           link("Code source (open source)", "chevron.left.forwardslash.chevron.right", AppConstants.Links.repo)
           if !AppConstants.Links.contactEmail.isEmpty {
@@ -94,6 +95,16 @@ struct SettingsView: View {
           VStack(alignment: .leading, spacing: 4) {
             Text("Gratuit et open source").font(.subheadline.weight(.semibold))
             Text("Who Called est 100 % gratuit et son code est ouvert. 100 % anonyme — aucun compte, aucune donnée personnelle. Numéros au format international.")
+              .font(.footnote).foregroundStyle(WhoCalledColors.muted)
+          }
+        }
+
+        // Non-affiliation disclaimer (store policies: apps sharing government
+        // info must clearly state they are not official).
+        Section {
+          VStack(alignment: .leading, spacing: 4) {
+            Text("Application indépendante").font(.subheadline.weight(.semibold))
+            Text("Who Called n’est pas une application officielle : elle n’est pas affiliée à l’ARCEP ni à aucune entité gouvernementale, et ne représente aucun organisme public. Les préfixes de démarchage utilisés proviennent du plan national de numérotation publié par l’ARCEP (lien « Source des préfixes ARCEP » ci-dessus).")
               .font(.footnote).foregroundStyle(WhoCalledColors.muted)
           }
         }

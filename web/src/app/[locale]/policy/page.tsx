@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getPolicy } from "@/i18n/legal";
-import { toDictLocale } from "@/i18n/locales";
+import { alternatesFor, toDictLocale } from "@/i18n/locales";
+import { LegalBody } from "@/components/LegalBody";
 
 export async function generateMetadata({
   params,
@@ -11,7 +12,7 @@ export async function generateMetadata({
   const doc = getPolicy(toDictLocale(locale));
   return {
     title: doc.title,
-    alternates: { canonical: `/${locale}/policy` },
+    alternates: alternatesFor(locale, "/policy"),
   };
 }
 
@@ -30,7 +31,7 @@ export default async function PolicyPage({ params }: { params: Promise<{ locale:
       {doc.sections.map((s) => (
         <section key={s.title} className="mt-6">
           <h2 className="text-xl font-bold">{s.title}</h2>
-          <p className="mt-2 text-night/80">{s.body}</p>
+          <LegalBody text={s.body} />
         </section>
       ))}
     </article>

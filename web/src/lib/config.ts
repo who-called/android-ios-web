@@ -9,5 +9,9 @@ export const config = {
     contact: "contact@who-called.com",
     privacy: "/privacy",
     policy: "/policy",
+    // Official government source for the telemarketing prefixes (store policies:
+    // government info requires a visible link to the original source).
+    arcepSource:
+      "https://www.arcep.fr/la-regulation/grands-dossiers-thematiques-transverses/la-numerotation.html",
   },
 };

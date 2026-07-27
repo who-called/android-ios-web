@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { fetchPrefix, fetchPrefixes } from "@/lib/api";
+import { config } from "@/lib/config";
 import { getDict } from "@/i18n/dictionaries";
-import { toDictLocale, urlLocales } from "@/i18n/locales";
+import { alternatesFor, toDictLocale, urlLocales } from "@/i18n/locales";
 
 export const revalidate = 3600;
 export const dynamicParams = true;
@@ -26,7 +27,7 @@ export async function generateMetadata({
   return {
     title: t.title.replace("{display}", display),
     description: t.desc.replace("{display}", display),
-    alternates: { canonical: `/${locale}/prefixe/${intl}` },
+    alternates: alternatesFor(locale, `/prefixe/${intl}`),
     // Index only real ARCEP prefixes (aggregate, no personal data → RGPD-safe).
     robots: exists ? { index: true, follow: true } : { index: false, follow: true },
   };
@@ -66,6 +67,16 @@ export default async function PrefixPage({
       </h1>
       <div className="mt-4 rounded-2xl border border-amber/30 bg-amber/[0.06] p-5">
         <p className="text-night/80">{t.arcepNote.replace("{display}", display)}</p>
+        <p className="mt-2 text-sm">
+          <a
+            href={config.links.arcepSource}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold text-night/70 underline hover:text-night"
+          >
+            {t.arcepSource}
+          </a>
+        </p>
       </div>
 
       <section className="mt-8">

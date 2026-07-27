@@ -1,5 +1,7 @@
 package com.whocalled.android.ui.screen
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,6 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.automirrored.rounded.OpenInNew
 import androidx.compose.material.icons.rounded.Block
 import androidx.compose.material.icons.rounded.ContentCopy
 import androidx.compose.material.icons.rounded.Flag
@@ -25,6 +28,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -32,9 +36,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.whocalled.android.BuildConfig
 import com.whocalled.android.data.ReportCategory
 import com.whocalled.android.network.LookupResponse
 import com.whocalled.android.ui.LoadState
@@ -62,6 +68,7 @@ fun CallDetailScreen(
     val report by viewModel.report.collectAsState()
     val rule by viewModel.detailRule.collectAsState()
     val clipboard = LocalClipboardManager.current
+    val context = LocalContext.current
 
     // ARCEP if the server says so OR the number matches a local official pattern.
     val isArcep = lookup?.source == "arcep" || arcepMatch != null
@@ -143,6 +150,26 @@ fun CallDetailScreen(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = 2.dp),
                 )
+                if (isArcep) {
+                    // Play "misleading claims" policy: government info must link
+                    // to its official source, with a non-affiliation disclaimer.
+                    TextButton(
+                        onClick = {
+                            context.startActivity(
+                                Intent(Intent.ACTION_VIEW, Uri.parse(BuildConfig.ARCEP_SOURCE_URL)),
+                            )
+                        },
+                        contentPadding = PaddingValues(0.dp),
+                    ) {
+                        Icon(Icons.AutoMirrored.Rounded.OpenInNew, contentDescription = null, modifier = Modifier.padding(end = 6.dp).size(16.dp))
+                        Text("Source officielle : plan de numérotation (arcep.fr)")
+                    }
+                    Text(
+                        "Who Called est une application indépendante, non affiliée à l’ARCEP ni à aucune entité gouvernementale.",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
             }
         }
 

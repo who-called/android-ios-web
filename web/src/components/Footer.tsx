@@ -24,6 +24,20 @@ export function Footer({ locale }: { locale: UrlLocale }) {
           <a href={`mailto:${config.links.contact}`} className="hover:text-night">{t.footer.contact}</a>
         </nav>
       </div>
+      {/* Government-info compliance: official source link + non-affiliation disclaimer. */}
+      <div className="mx-auto max-w-5xl px-4 pb-8 text-xs text-night/50">
+        <p>
+          {t.footer.disclaimer}{" "}
+          <a
+            href={config.links.arcepSource}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline hover:text-night"
+          >
+            {t.footer.arcepSource}
+          </a>
+        </p>
+      </div>
     </footer>
   );
 }

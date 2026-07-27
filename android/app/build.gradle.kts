@@ -46,8 +46,8 @@ android {
         applicationId = "com.devfi.whocalled"
         minSdk = 29
         targetSdk = 37
-        versionCode = 3
-        versionName = "0.3.0"
+        versionCode = 4
+        versionName = "0.3.1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         // API base URL — override per build type / .env later.
@@ -60,6 +60,13 @@ android {
         buildConfigField("String", "REPO_URL", "\"https://github.com/who-called/android-ios-web\"")
         buildConfigField("String", "CONTACT_EMAIL", "\"contact@who-called.com\"")
         buildConfigField("String", "RATE_URL", "\"https://www.who-called.com\"")
+        // Official government source for the telemarketing prefixes (Play policy:
+        // government info requires a visible link to the original source).
+        buildConfigField(
+            "String",
+            "ARCEP_SOURCE_URL",
+            "\"https://www.arcep.fr/la-regulation/grands-dossiers-thematiques-transverses/la-numerotation.html\"",
+        )
     }
 
     buildTypes {

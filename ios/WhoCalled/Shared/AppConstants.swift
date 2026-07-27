@@ -31,6 +31,9 @@ enum AppConstants {
     static let repo = "https://github.com/who-called/android-ios-web"
     static let rate = "https://www.who-called.com"
     static let contactEmail = "contact@who-called.com"
+    /// Official government source for the telemarketing prefixes (store policy:
+    /// government info requires a visible link to the original source).
+    static let arcepSource = "https://www.arcep.fr/la-regulation/grands-dossiers-thematiques-transverses/la-numerotation.html"
   }
 
   /// File (in the App Group container) holding the scored numbers the extension reads.

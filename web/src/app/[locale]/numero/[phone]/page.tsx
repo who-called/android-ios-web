@@ -3,8 +3,9 @@ import Link from "next/link";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
 import { fetchIndexable, fetchSeoNumbers, lookupNumber, type LookupResult, type ReasonCategory } from "@/lib/api";
 import { countryFromCode } from "@/lib/countries";
+import { config } from "@/lib/config";
 import { getDict } from "@/i18n/dictionaries";
-import { toDictLocale, urlLocales } from "@/i18n/locales";
+import { alternatesFor, toDictLocale, urlLocales } from "@/i18n/locales";
 import { ShieldCheckIcon, BlockIcon, BellIcon, ListIcon } from "@/components/Icons";
 
 // Pre-render the quality pages at build; others render on-demand (and noindex).
@@ -33,7 +34,7 @@ export async function generateMetadata({
   return {
     title: t.numberTitle.replace("{phone}", display),
     description: t.numberDesc.replace("{phone}", display),
-    alternates: { canonical: `/${locale}/numero/${phone}` },
+    alternates: alternatesFor(locale, `/numero/${phone}`),
     robots: indexable ? { index: true, follow: true } : { index: false, follow: true },
   };
 }
@@ -202,6 +203,18 @@ export default async function NumberPage({
               </div>
 
               <p className="mt-4 text-sm text-night/60">{isArcep ? t.arcepNote : t.communityNote}</p>
+              {isArcep && (
+                <p className="mt-2 text-sm">
+                  <a
+                    href={config.links.arcepSource}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-semibold text-night/70 underline hover:text-night"
+                  >
+                    {t.arcepSource}
+                  </a>
+                </p>
+              )}
             </div>
           </div>
 

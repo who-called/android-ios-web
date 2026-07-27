@@ -40,6 +40,22 @@ struct NumberDetailView: View {
               ? "Ce numéro fait partie de la liste officielle des préfixes de démarchage (ARCEP / opérateurs). Il est bloqué indépendamment des signalements."
               : "Ce numéro est évalué à partir des signalements de la communauté.")
               .font(.footnote).foregroundStyle(WhoCalledColors.muted)
+            if isArcep {
+              // Store "misleading claims" policies: government info must link
+              // to its official source, with a non-affiliation disclaimer.
+              Button {
+                if let url = URL(string: AppConstants.Links.arcepSource) {
+                  UIApplication.shared.open(url)
+                }
+              } label: {
+                Label("Source officielle : plan de numérotation (arcep.fr)", systemImage: "arrow.up.right.square")
+                  .font(.footnote)
+              }
+              .padding(.top, 4)
+              Text("Who Called est une application indépendante, non affiliée à l’ARCEP ni à aucune entité gouvernementale.")
+                .font(.caption2).foregroundStyle(WhoCalledColors.muted)
+                .padding(.top, 2)
+            }
           }
         }
 

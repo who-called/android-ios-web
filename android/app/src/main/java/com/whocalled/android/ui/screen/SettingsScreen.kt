@@ -20,6 +20,7 @@ import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Code
 import androidx.compose.material.icons.rounded.Description
 import androidx.compose.material.icons.rounded.Edit
+import androidx.compose.material.icons.rounded.Gavel
 import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.MailOutline
@@ -434,6 +435,7 @@ fun SettingsScreen(viewModel: MainViewModel) {
                 LinkRow("Confidentialité", Icons.Rounded.Lock, BuildConfig.PRIVACY_URL, ::open)
                 LinkRow("Mentions légales", Icons.Rounded.Description, BuildConfig.POLICY_URL, ::open)
                 LinkRow("Site officiel", Icons.Rounded.Language, BuildConfig.SITE_URL, ::open)
+                LinkRow("Source des préfixes ARCEP (arcep.fr)", Icons.Rounded.Gavel, BuildConfig.ARCEP_SOURCE_URL, ::open)
                 LinkRow("Noter l’application", Icons.Rounded.StarBorder, BuildConfig.RATE_URL, ::open)
                 LinkRow("Code source (open source)", Icons.Rounded.Code, BuildConfig.REPO_URL, ::open)
                 if (BuildConfig.CONTACT_EMAIL.isNotBlank()) {
@@ -507,6 +509,21 @@ fun SettingsScreen(viewModel: MainViewModel) {
                 Text("Gratuit et open source", fontWeight = FontWeight.SemiBold)
                 Text(
                     "Who Called est 100 % gratuit et son code est ouvert. 100 % anonyme — aucun compte, aucune donnée personnelle. Numéros au format international.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(top = 4.dp),
+                )
+            }
+        }
+
+        // Non-affiliation disclaimer (Play "misleading claims" policy: apps
+        // sharing government info must clearly state they are not official).
+        item {
+            BorderedCard(Modifier.padding(horizontal = 16.dp)) {
+                Text("Application indépendante", fontWeight = FontWeight.SemiBold)
+                Text(
+                    "Who Called n’est pas une application officielle : elle n’est pas affiliée à l’ARCEP ni à aucune entité gouvernementale, et ne représente aucun organisme public. " +
+                        "Les préfixes de démarchage utilisés proviennent du plan national de numérotation publié par l’ARCEP (lien « Source des préfixes ARCEP » ci-dessus).",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = 4.dp),

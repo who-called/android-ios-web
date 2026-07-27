@@ -110,6 +110,7 @@ const fr = {
     whoCalls: "Qui appelle avec le numéro {phone} ?",
     arcepBadge: "Liste officielle ARCEP",
     arcepNote: "Ce préfixe figure dans la liste officielle des numéros de démarchage (ARCEP / opérateurs français). Les appels de ce type sont du démarchage commercial.",
+    arcepSource: "Source officielle : plan de numérotation ARCEP (arcep.fr)",
     communityNote: "Réputation établie à partir des signalements anonymes de la communauté.",
     reports: "Signalements",
     spamReports: "Indésirable",
@@ -177,6 +178,7 @@ const fr = {
     desc: "Le préfixe {display} fait partie des numéros de démarchage officiels (ARCEP). Découvrez les numéros signalés sous ce préfixe.",
     heading: "Le préfixe {display}",
     arcepNote: "Ce préfixe est réservé au démarchage téléphonique en France (attribution ARCEP / opérateurs). Les appels commençant par {display} sont du démarchage commercial — vous pouvez les refuser et les bloquer.",
+    arcepSource: "Source officielle : plan de numérotation ARCEP (arcep.fr)",
     reportedNumbers: "Numéros signalés sous ce préfixe",
     noNumbers: "Aucun numéro précis n'a encore été signalé sous ce préfixe. Si l'un d'eux vous dérange, signalez-le.",
     seeNumber: "Voir le numéro",
@@ -194,6 +196,9 @@ const fr = {
     deleteData: "Supprimer mes données",
     source: "Code source",
     contact: "Contact",
+    arcepSource: "Source des préfixes : plan de numérotation ARCEP (arcep.fr)",
+    disclaimer:
+      "Who Called est une application indépendante : elle n'est pas affiliée à l'ARCEP ni à aucune entité gouvernementale et ne représente aucun organisme public.",
   },
 };
 
@@ -309,6 +314,7 @@ const en: Dict = {
     whoCalls: "Who is calling from {phone}?",
     arcepBadge: "Official ARCEP list",
     arcepNote: "This prefix is on the official French telemarketing list (ARCEP / carriers). Calls of this kind are commercial solicitation.",
+    arcepSource: "Official source: ARCEP numbering plan (arcep.fr)",
     communityNote: "Reputation based on anonymous reports from the community.",
     reports: "Reports",
     spamReports: "Unwanted",
@@ -376,6 +382,7 @@ const en: Dict = {
     desc: "The {display} prefix is part of the official French telemarketing numbers (ARCEP). See the reported numbers under this prefix.",
     heading: "The {display} prefix",
     arcepNote: "This prefix is reserved for telemarketing in France (ARCEP / carrier allocation). Calls starting with {display} are commercial solicitation — you may refuse and block them.",
+    arcepSource: "Official source: ARCEP numbering plan (arcep.fr)",
     reportedNumbers: "Reported numbers under this prefix",
     noNumbers: "No specific number has been reported under this prefix yet. If one bothers you, report it.",
     seeNumber: "View number",
@@ -393,6 +400,9 @@ const en: Dict = {
     deleteData: "Delete my data",
     source: "Source code",
     contact: "Contact",
+    arcepSource: "Prefix source: ARCEP numbering plan (arcep.fr)",
+    disclaimer:
+      "Who Called is an independent app: it is not affiliated with ARCEP or any government entity and does not represent any public body.",
   },
 };
 
