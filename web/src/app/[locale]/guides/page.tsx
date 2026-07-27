@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getDict } from "@/i18n/dictionaries";
-import { toDictLocale } from "@/i18n/locales";
+import { alternatesFor, toDictLocale } from "@/i18n/locales";
 
 export async function generateMetadata({
   params,
@@ -13,7 +13,7 @@ export async function generateMetadata({
   return {
     title: t.indexTitle,
     description: t.indexDesc,
-    alternates: { canonical: `/${locale}/guides` },
+    alternates: alternatesFor(locale, "/guides"),
   };
 }
 

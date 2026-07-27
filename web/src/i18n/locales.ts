@@ -19,3 +19,15 @@ export function ogLocale(url: UrlLocale): string {
 export function isUrlLocale(seg: string): seg is UrlLocale {
   return (urlLocales as readonly string[]).includes(seg);
 }
+
+/**
+ * Canonical + hreflang cluster for a page. Every locale variant lists all
+ * alternates, and x-default points to fr-FR (the site's default locale) so
+ * Google consolidates duplicates onto fr-FR instead of picking another lang.
+ */
+export function alternatesFor(locale: string, path = "") {
+  const languages: Record<string, string> = {};
+  for (const l of urlLocales) languages[l] = `/${l}${path}`;
+  languages["x-default"] = `/${defaultUrlLocale}${path}`;
+  return { canonical: `/${locale}${path}`, languages };
+}

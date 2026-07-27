@@ -36,7 +36,9 @@ export function middleware(req: NextRequest) {
 
   const url = req.nextUrl.clone();
   url.pathname = `/${locale}${pathname === "/" ? "" : pathname}`;
-  return NextResponse.redirect(url);
+  // 308 permanent: lets Google consolidate "/" → "/<locale>" instead of
+  // reporting a lingering temporary redirect (default is 307).
+  return NextResponse.redirect(url, 308);
 }
 
 export const config = {

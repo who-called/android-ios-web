@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { NumberTool } from "@/components/NumberTool";
 import { getDict } from "@/i18n/dictionaries";
-import { toDictLocale } from "@/i18n/locales";
+import { alternatesFor, toDictLocale } from "@/i18n/locales";
 
 export async function generateMetadata({
   params,
@@ -14,7 +14,7 @@ export async function generateMetadata({
   return {
     title: t.meta.reportTitle,
     description: t.meta.reportDescription,
-    alternates: { canonical: `/${locale}/signaler` },
+    alternates: alternatesFor(locale, "/signaler"),
   };
 }
 

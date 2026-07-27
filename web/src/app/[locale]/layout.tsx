@@ -4,7 +4,7 @@ import { config } from "@/lib/config";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { getDict } from "@/i18n/dictionaries";
-import { isUrlLocale, toDictLocale, ogLocale, urlLocales, type UrlLocale } from "@/i18n/locales";
+import { alternatesFor, isUrlLocale, toDictLocale, ogLocale, urlLocales, type UrlLocale } from "@/i18n/locales";
 
 export function generateStaticParams() {
   return urlLocales.map((locale) => ({ locale }));
@@ -19,20 +19,18 @@ export async function generateMetadata({
   if (!isUrlLocale(locale)) return {};
   const t = getDict(toDictLocale(locale));
 
-  // hreflang alternates for SEO.
-  const languages: Record<string, string> = {};
-  for (const l of urlLocales) languages[l] = `${config.siteUrl}/${l}`;
-
   return {
     metadataBase: new URL(config.siteUrl),
     title: { default: t.meta.homeTitle, template: "%s — Who Called" },
     description: t.meta.homeDescription,
     applicationName: "Who Called",
-    alternates: { canonical: `/${locale}`, languages },
+    // hreflang cluster + x-default → fr-FR (pages override with their own path).
+    alternates: alternatesFor(locale),
+    // NOTE: no og:url here — it would be inherited by every sub-page and act
+    // as a conflicting canonical hint (GSC "duplicate, wrong canonical").
     openGraph: {
       type: "website",
       locale: ogLocale(locale),
-      url: `${config.siteUrl}/${locale}`,
       siteName: "Who Called",
       title: t.meta.homeTitle,
       description: t.meta.homeDescription,

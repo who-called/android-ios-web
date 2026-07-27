@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { fetchTrending, type TrendingNumber } from "@/lib/api";
 import { getDict } from "@/i18n/dictionaries";
-import { toDictLocale } from "@/i18n/locales";
+import { alternatesFor, toDictLocale } from "@/i18n/locales";
 import { BlockIcon, BellIcon } from "@/components/Icons";
 
 export async function generateMetadata({
@@ -15,7 +15,7 @@ export async function generateMetadata({
   return {
     title: t.metaTitle,
     description: t.metaDesc,
-    alternates: { canonical: `/${locale}/tendances` },
+    alternates: alternatesFor(locale, "/tendances"),
   };
 }
 

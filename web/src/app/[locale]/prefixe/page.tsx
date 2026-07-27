@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { fetchPrefixes } from "@/lib/api";
 import { getDict } from "@/i18n/dictionaries";
-import { toDictLocale } from "@/i18n/locales";
+import { alternatesFor, toDictLocale } from "@/i18n/locales";
 
 export const revalidate = 600;
 
@@ -16,7 +16,7 @@ export async function generateMetadata({
   return {
     title: t.indexTitle,
     description: t.indexDesc,
-    alternates: { canonical: `/${locale}/prefixe` },
+    alternates: alternatesFor(locale, "/prefixe"),
   };
 }
 

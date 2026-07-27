@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getDict } from "@/i18n/dictionaries";
 import { getPrivacy } from "@/i18n/legal";
-import { toDictLocale } from "@/i18n/locales";
+import { alternatesFor, toDictLocale } from "@/i18n/locales";
 
 export async function generateMetadata({
   params,
@@ -13,7 +13,7 @@ export async function generateMetadata({
   return {
     title: doc.title,
     description: getDict(toDictLocale(locale)).meta.homeDescription,
-    alternates: { canonical: `/${locale}/privacy` },
+    alternates: alternatesFor(locale, "/privacy"),
     robots: { index: true, follow: true },
   };
 }

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDict } from "@/i18n/dictionaries";
-import { toDictLocale, urlLocales } from "@/i18n/locales";
+import { alternatesFor, toDictLocale, urlLocales } from "@/i18n/locales";
 
 export function generateStaticParams() {
   // Slugs are shared across locales; build all combinations.
@@ -27,7 +27,7 @@ export async function generateMetadata({
   return {
     title: g.title,
     description: g.excerpt,
-    alternates: { canonical: `/${locale}/guides/${slug}` },
+    alternates: alternatesFor(locale, `/guides/${slug}`),
   };
 }
 

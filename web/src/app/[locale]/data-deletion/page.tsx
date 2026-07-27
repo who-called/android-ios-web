@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getDataDeletion } from "@/i18n/legal";
-import { toDictLocale } from "@/i18n/locales";
+import { alternatesFor, toDictLocale } from "@/i18n/locales";
 
 export async function generateMetadata({
   params,
@@ -12,7 +12,7 @@ export async function generateMetadata({
   return {
     title: doc.title,
     description: doc.intro,
-    alternates: { canonical: `/${locale}/data-deletion` },
+    alternates: alternatesFor(locale, "/data-deletion"),
     robots: { index: true, follow: true },
   };
 }
