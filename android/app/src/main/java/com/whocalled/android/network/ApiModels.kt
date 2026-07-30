@@ -55,19 +55,29 @@ data class TopReason(
     val share: Int = 0, // 0..100 — share of spam reports
 )
 
+data class OfficialPattern(
+    val pattern: String,
+    val status: String,
+    val category: String,
+    val name: String? = null,
+)
+
 /** GET /lookup/:phone enriched response (detail screen). */
 data class LookupResponse(
     val phone: String,
     val spamScore: Int,
     val status: String,
+    val confidence: Int? = 0,
+    val confidenceLevel: String? = null, // none | low | medium | high | official
     val category: String? = null,
-    val source: String = "community",
+    val source: String? = null, // none | community | arcep | mixed
     val reportCountSpam: Int = 0,
     val reportCountLegit: Int = 0,
     val frequency: LookupFrequency = LookupFrequency(),
     val topReason: TopReason? = null,
     val firstReportedAt: String? = null,
     val lastReportedAt: String? = null,
+    val officialPattern: OfficialPattern? = null,
 )
 
 /** One number in the "qui montent" trending list. */

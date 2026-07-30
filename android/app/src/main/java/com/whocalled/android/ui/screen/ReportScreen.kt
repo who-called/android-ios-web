@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ListAlt
 import androidx.compose.material.icons.rounded.Block
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.History
@@ -55,6 +56,7 @@ fun ReportScreen(
     viewModel: MainViewModel,
     onRequestCallLogPermission: () -> Unit,
     onOpenNumber: (String) -> Unit = {},
+    onOpenMyReports: () -> Unit = {},
 ) {
     var phone by remember { mutableStateOf("") }
     var isSpam by remember { mutableStateOf(true) }
@@ -95,6 +97,16 @@ fun ReportScreen(
                 title = "Signaler un numéro",
                 subtitle = "Anonyme — aucun compte, aucune donnée personnelle.",
             )
+        }
+
+        item {
+            OutlinedButton(
+                onClick = onOpenMyReports,
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+            ) {
+                Icon(Icons.AutoMirrored.Rounded.ListAlt, contentDescription = null, modifier = Modifier.padding(end = 8.dp))
+                Text("Voir mes signalements")
+            }
         }
 
         item {

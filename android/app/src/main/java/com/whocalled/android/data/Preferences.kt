@@ -59,6 +59,7 @@ object Preferences {
     private val KEY_TRACE_TUTORIAL_SEEN = booleanPreferencesKey("trace_tutorial_seen")
     private val KEY_NOTIF_PROMPT_SEEN = booleanPreferencesKey("notif_prompt_seen")
     private val KEY_REMINDER_IGNORED = intPreferencesKey("game_reminder_ignored_count")
+    private val KEY_RECENT_CALL_HANDLED_AT = longPreferencesKey("recent_call_handled_at")
 
     /** Consecutive unanswered reminders before the nudge auto-mutes (anti-spam). */
     const val REMINDER_IGNORED_LIMIT = 3
@@ -201,6 +202,19 @@ object Preferences {
 
     suspend fun setNotifPromptSeen(context: Context) {
         context.dataStore.edit { it[KEY_NOTIF_PROMPT_SEEN] = true }
+    }
+
+    /** Most recent call already opened or dismissed from the Home prompt. */
+    suspend fun recentCallHandledAt(context: Context): Long =
+        context.dataStore.data.first()[KEY_RECENT_CALL_HANDLED_AT] ?: 0L
+
+    suspend fun setRecentCallHandledAt(context: Context, timestamp: Long) {
+        context.dataStore.edit { prefs ->
+            prefs[KEY_RECENT_CALL_HANDLED_AT] = maxOf(
+                prefs[KEY_RECENT_CALL_HANDLED_AT] ?: 0L,
+                timestamp,
+            )
+        }
     }
 
     /**

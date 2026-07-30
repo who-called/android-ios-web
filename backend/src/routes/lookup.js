@@ -2,6 +2,14 @@ import { Router } from "express";
 import { prisma } from "../db.js";
 import { normalizePhone } from "../phone.js";
 import { REPORT_CATEGORIES } from "../categories.js";
+import { config } from "../config.js";
+import { scoreFromReports, siaPrior } from "../scoring.js";
+import { reportsWithWeights } from "../reportWeights.js";
+import {
+  confidenceLevel,
+  findMatchingPattern,
+  presentationSource,
+} from "../lookupPresentation.js";
 
 export const lookupRouter = Router();
 
@@ -19,27 +27,39 @@ lookupRouter.get("/:phone", async (req, res) => {
     return res.status(400).json({ error: "invalid_phone" });
   }
 
-  const number = await prisma.number.findUnique({ where: { phone } });
-
-  if (!number) {
-    return res.json({
-      phone,
-      spamScore: 0,
-      status: "unknown",
-      reportCountSpam: 0,
-      reportCountLegit: 0,
-      frequency: { last24h: 0, last7d: 0, last30d: 0, last1y: 0 },
-      firstReportedAt: null,
-      lastReportedAt: null,
-    });
-  }
+  const [number, patterns] = await Promise.all([
+    prisma.number.findUnique({ where: { phone } }),
+    prisma.pattern.findMany({
+      select: { pattern: true, status: true, category: true, source: true, name: true },
+    }),
+  ]);
+  const officialPattern = findMatchingPattern(
+    phone,
+    patterns.filter((pattern) => pattern.source === "arcep"),
+  );
 
   // All reports for frequency (spam + legit — the chart shows total activity,
   // consistent with firstReportedAt/lastReportedAt which also cover all votes).
-  const allReports = await prisma.report.findMany({
-    where: { phone },
-    select: { createdAt: true, vote: true, category: true },
-  });
+  const allReports = number
+    ? await prisma.report.findMany({
+        where: { phone },
+        select: { createdAt: true, vote: true, category: true },
+      })
+    : [];
+
+  // Recompute confidence at lookup time so time decay and device reputation are
+  // reflected immediately. The materialized Number row remains the fast list source.
+  let liveScore = null;
+  if (number) {
+    const [weightedReports, seed] = await Promise.all([
+      reportsWithWeights(prisma, phone),
+      prisma.siaSeed.findUnique({ where: { phone } }),
+    ]);
+    const prior = seed ? siaPrior(seed) : undefined;
+    if (weightedReports.length > 0 || prior) {
+      liveScore = scoreFromReports(weightedReports, { prior });
+    }
+  }
 
   // Spam reports only for the reason breakdown (category is null on legit).
   const spamReports = allReports.filter((r) => r.vote === "spam");
@@ -60,7 +80,7 @@ lookupRouter.get("/:phone", async (req, res) => {
   // No individual spam reports (e.g. SIA-seeded aggregate) but we still have
   // a category + count on the Number row → synthesize a catch-all entry so
   // the category breakdown is never empty when we actually know something.
-  if (spamReports.length === 0 && number.reportCountSpam > 0) {
+  if (spamReports.length === 0 && (number?.reportCountSpam ?? 0) > 0) {
     const cat = number.category && number.category in reasons ? number.category : "unknown";
     reasons[cat] = number.reportCountSpam;
   }
@@ -74,17 +94,42 @@ lookupRouter.get("/:phone", async (req, res) => {
     ? { category: top[0], count: top[1], share: Math.round((top[1] / reasonTotal) * 100) }
     : null;
 
-  // `source` is intentionally NOT exposed: SIA / community / ARCEP all surface
-  // as one homogeneous "who-called" entry. Dates are shown only when we have
-  // real timestamped reports — SIA seed has no period, so we don't fabricate one.
-  const hasOwnReports = number.source === "community" || number.source === "mixed";
+  const totalReports = (number?.reportCountSpam ?? 0) + (number?.reportCountLegit ?? 0);
+  const hasStatisticalEvidence = !!number && (totalReports > 0 || liveScore !== null);
+  const hasOfficialPattern = officialPattern !== null || number?.source === "arcep";
+  const source = presentationSource({ hasStatisticalEvidence, hasOfficialPattern });
+  const officialOnly = hasOfficialPattern && !hasStatisticalEvidence;
+  const fallbackConfidence = Math.min(
+    100,
+    Math.round((totalReports / config.scoring.minReportsForBlock) * 100),
+  );
+  const confidence = officialOnly
+    ? null
+    : hasStatisticalEvidence
+      ? (liveScore?.confidence ?? fallbackConfidence)
+      : 0;
+  const status = hasStatisticalEvidence
+    ? (liveScore?.status ?? number.status)
+    : (officialPattern?.status ?? number?.status ?? "unknown");
+  const spamScore = hasStatisticalEvidence
+    ? (liveScore?.score ?? number.spamScore)
+    : officialOnly
+      ? (number?.spamScore ?? (status === "block" ? 100 : 70))
+      : 0;
+  const category = number?.category && number.category !== "unknown"
+    ? number.category
+    : (officialPattern?.category ?? "unknown");
+
   return res.json({
-    phone: number.phone,
-    spamScore: number.spamScore,
-    status: number.status,
-    category: number.category,
-    reportCountSpam: number.reportCountSpam,
-    reportCountLegit: number.reportCountLegit,
+    phone,
+    spamScore,
+    status,
+    confidence,
+    confidenceLevel: confidenceLevel(confidence, officialOnly),
+    source,
+    category,
+    reportCountSpam: number?.reportCountSpam ?? 0,
+    reportCountLegit: number?.reportCountLegit ?? 0,
     frequency: {
       last24h: within(1),
       last7d: within(7),
@@ -93,7 +138,15 @@ lookupRouter.get("/:phone", async (req, res) => {
     },
     reasons,
     topReason,
-    firstReportedAt: hasOwnReports ? number.firstReportedAt : null,
-    lastReportedAt: hasOwnReports ? number.lastReportedAt : null,
+    firstReportedAt: allReports.length > 0 ? number?.firstReportedAt : null,
+    lastReportedAt: allReports.length > 0 ? number?.lastReportedAt : null,
+    officialPattern: officialPattern
+      ? {
+          pattern: officialPattern.pattern,
+          status: officialPattern.status,
+          category: officialPattern.category,
+          name: officialPattern.name,
+        }
+      : null,
   });
 });

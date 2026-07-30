@@ -172,10 +172,12 @@ async function reconcileTombstones(wasActive, now) {
 }
 
 /** ARCEP overlay handled at lookup; here: our reports' majority category, else SIA's. */
-function resolveCategory(reports, seed) {
+export function resolveCategory(reports, seed) {
   const counts = {};
   for (const r of reports) {
-    if (r.category) counts[r.category] = (counts[r.category] ?? 0) + 1;
+    if (r.vote === "spam" && r.category) {
+      counts[r.category] = (counts[r.category] ?? 0) + 1;
+    }
   }
   const top = Object.entries(counts).sort((a, b) => b[1] - a[1])[0];
   return top?.[0] ?? (seed ? categoryFromSiaId(seed.categoryId) : "unknown");

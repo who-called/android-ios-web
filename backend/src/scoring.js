@@ -18,7 +18,7 @@ import { config } from "./config.js";
  *
  * @param {Array<{vote:string, createdAt:Date|string, weight?:number}>} reports
  * @param {{ now?: number }} [opts]
- * @returns {{ score:number, status:string, spam:number, legit:number,
+ * @returns {{ score:number, status:string, confidence:number, spam:number, legit:number,
  *             weightedSpam:number, weightedLegit:number, velocity:number }}
  */
 export function scoreFromReports(reports, opts = {}) {
@@ -63,6 +63,7 @@ export function scoreFromReports(reports, opts = {}) {
     return {
       score: 0,
       status: "unknown",
+      confidence: 0,
       spam,
       legit,
       weightedSpam,
@@ -86,6 +87,7 @@ export function scoreFromReports(reports, opts = {}) {
   return {
     score,
     status,
+    confidence: Math.round(confidence * 100),
     spam,
     legit,
     weightedSpam: round2(weightedSpam),

@@ -20,6 +20,8 @@ private class FakeScoredDao(private val map: Map<String, ScoredNumberEntity>) : 
     override suspend fun lastUpdatedAt(): Long? = null
     override suspend fun count(): Int = map.size
     override suspend fun deleteByPhone(phone: String) {}
+    override suspend fun deleteByPhones(phones: List<String>) {}
+    override suspend fun clear() {}
 }
 
 private class FakeRuleDao(private val map: Map<String, UserRuleEntity>) : UserRuleDao {

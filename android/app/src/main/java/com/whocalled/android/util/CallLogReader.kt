@@ -7,6 +7,7 @@ import androidx.core.content.ContextCompat
 
 /** An entry read from the device's system call log. */
 data class PhoneCall(
+    val systemId: Long,
     val rawNumber: String,
     val normalizedPhone: String?,
     val timestamp: Long,
@@ -34,6 +35,7 @@ object CallLogReader {
         if (!hasPermission(context)) return emptyList()
 
         val projection = arrayOf(
+            CallLog.Calls._ID,
             CallLog.Calls.NUMBER,
             CallLog.Calls.DATE,
             CallLog.Calls.TYPE,
@@ -49,6 +51,7 @@ object CallLogReader {
                 null,
                 "${CallLog.Calls.DATE} DESC",
             )?.use { cursor ->
+                val idIdx = cursor.getColumnIndexOrThrow(CallLog.Calls._ID)
                 val numberIdx = cursor.getColumnIndexOrThrow(CallLog.Calls.NUMBER)
                 val dateIdx = cursor.getColumnIndexOrThrow(CallLog.Calls.DATE)
                 val typeIdx = cursor.getColumnIndexOrThrow(CallLog.Calls.TYPE)
@@ -58,6 +61,7 @@ object CallLogReader {
                     val raw = cursor.getString(numberIdx) ?: continue
                     calls.add(
                         PhoneCall(
+                            systemId = cursor.getLong(idIdx),
                             rawNumber = raw,
                             normalizedPhone = PhoneNormalizer.normalize(raw),
                             timestamp = cursor.getLong(dateIdx),

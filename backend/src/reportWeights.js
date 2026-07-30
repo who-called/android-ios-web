@@ -4,12 +4,12 @@
  *
  * @param {import("@prisma/client").Prisma.TransactionClient | import("@prisma/client").PrismaClient} client
  * @param {string} phone
- * @returns {Promise<Array<{vote:string, createdAt:Date, weight:number}>>}
+ * @returns {Promise<Array<{vote:string, category:string|null, createdAt:Date, weight:number}>>}
  */
 export async function reportsWithWeights(client, phone) {
   const reports = await client.report.findMany({
     where: { phone },
-    select: { vote: true, createdAt: true, deviceId: true },
+    select: { vote: true, category: true, createdAt: true, deviceId: true },
   });
   if (reports.length === 0) return [];
 
@@ -22,6 +22,7 @@ export async function reportsWithWeights(client, phone) {
 
   return reports.map((r) => ({
     vote: r.vote,
+    category: r.category,
     createdAt: r.createdAt,
     weight: weightById.get(r.deviceId) ?? 1.0,
   }));

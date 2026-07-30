@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,18 +16,21 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.automirrored.rounded.OpenInNew
 import androidx.compose.material.icons.rounded.Block
+import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.ContentCopy
-import androidx.compose.material.icons.rounded.Flag
 import androidx.compose.material.icons.rounded.Gavel
 import androidx.compose.material.icons.rounded.Group
 import androidx.compose.material.icons.rounded.LockOpen
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.WarningAmber
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -58,7 +62,8 @@ import java.util.Locale
 @Composable
 fun CallDetailScreen(
     viewModel: MainViewModel,
-    callId: Long,
+    callId: Long? = null,
+    phone: String? = null,
     onBack: () -> Unit,
 ) {
     val detail by viewModel.detail.collectAsState()
@@ -67,18 +72,33 @@ fun CallDetailScreen(
     val arcepMatch by viewModel.arcepMatch.collectAsState()
     val report by viewModel.report.collectAsState()
     val rule by viewModel.detailRule.collectAsState()
+    val detailPhone by viewModel.detailPhone.collectAsState()
+    val myReports by viewModel.myReports.collectAsState()
     val clipboard = LocalClipboardManager.current
     val context = LocalContext.current
 
-    // ARCEP if the server says so OR the number matches a local official pattern.
-    val isArcep = lookup?.source == "arcep" || arcepMatch != null
+    val call = if (callId != null) detail?.takeIf { it.id == callId } else null
+    val displayedPhone = phone?.takeIf { it.isNotBlank() }
+        ?: call?.phone
+        ?: detailPhone.takeIf { callId == null }
 
-    LaunchedEffect(callId) {
-        viewModel.loadCallDetail(callId)
+    // The backend is the presentation source of truth; the local ARCEP match is
+    // retained as an offline fallback.
+    val source = lookup?.source ?: if (arcepMatch != null) "arcep" else "none"
+    val isArcep = source == "arcep" || source == "mixed" || arcepMatch != null
+    val hasCommunityData = source == "community" || source == "mixed" ||
+        (lookup?.reportCountSpam ?: 0) > 0 ||
+        (lookup?.reportCountLegit ?: 0) > 0
+    val myVote = myReports.firstOrNull { it.phone == displayedPhone }?.vote
+
+    LaunchedEffect(callId, phone) {
+        if (callId != null) {
+            viewModel.loadCallDetail(callId)
+        } else if (phone != null) {
+            viewModel.loadNumberDetail(phone)
+        }
         viewModel.clearReportState() // no stale banner from a previous action
     }
-
-    val call = detail
 
     LazyColumn(
         Modifier.fillMaxSize().padding(horizontal = 16.dp),
@@ -94,13 +114,22 @@ fun CallDetailScreen(
             }
         }
 
-        if (call == null) {
+        if (displayedPhone == null) {
             item { Text("Chargement…") }
             return@LazyColumn
         }
 
-        val blocked = call.action == "blocked"
-        val statusColor = if (blocked) WCColor.Coral else WCColor.Amber
+        val status = when {
+            call?.action == "blocked" -> "block"
+            call?.action == "warned" -> "warn"
+            else -> lookup?.status ?: "unknown"
+        }
+        val statusColor = when (status) {
+            "block" -> WCColor.Coral
+            "warn" -> WCColor.Amber
+            "allow" -> WCColor.Emerald
+            else -> WCColor.Blue
+        }
 
         item {
             // Compact header: the gauge sits beside the number/badges (not stacked
@@ -112,21 +141,37 @@ fun CallDetailScreen(
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
                     ScoreGauge(
-                        score = lookup?.spamScore ?: call.spamScore,
+                        score = lookup?.spamScore ?: call?.spamScore ?: 0,
                         diameter = 64.dp,
                         stroke = 6.dp,
                     )
                     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                        Text("+${call.phone}", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text("+$displayedPhone", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             StatusBadge(
-                                label = if (blocked) "Bloqué" else "Alerté",
+                                label = when (status) {
+                                    "block" -> "Indésirable"
+                                    "warn" -> "Suspect"
+                                    "allow" -> "Plutôt légitime"
+                                    else -> "Données insuffisantes"
+                                },
                                 color = statusColor,
-                                icon = if (blocked) Icons.Rounded.Block else Icons.Rounded.WarningAmber,
+                                icon = when (status) {
+                                    "block" -> Icons.Rounded.Block
+                                    "warn" -> Icons.Rounded.WarningAmber
+                                    "allow" -> Icons.Rounded.CheckCircle
+                                    else -> Icons.Rounded.Search
+                                },
                             )
-                            SourceBadge(isArcep)
+                            if (isArcep || hasCommunityData) {
+                                SourceBadge(source, isArcep, hasCommunityData)
+                            }
                         }
-                        Text("Indice de spam", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(
+                            verdictExplanation(status, lookup?.confidenceLevel ?: "none"),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
                     }
                 }
             }
@@ -136,16 +181,25 @@ fun CallDetailScreen(
         item {
             BorderedCard {
                 Text(
-                    if (isArcep) "Liste officielle ARCEP" else "Signalé par la communauté",
+                    when {
+                        source == "mixed" -> "ARCEP et avis de la communauté"
+                        isArcep -> "Plage officielle ARCEP"
+                        hasCommunityData -> "Avis de la communauté"
+                        else -> "Aucune donnée communautaire"
+                    },
                     fontWeight = FontWeight.SemiBold,
                 )
                 Text(
-                    if (isArcep)
+                    if (source == "mixed")
+                        "Ce numéro correspond à une plage ARCEP et possède aussi des avis communautaires. Le verdict tient compte des deux."
+                    else if (isArcep)
                         "Ce numéro correspond à un préfixe de la liste officielle des démarcheurs (ARCEP / opérateurs)" +
                             (arcepMatch?.pattern?.let { " : $it" } ?: "") +
-                            ". Il est bloqué indépendamment des signalements."
+                            ". Cette source est distincte des avis communautaires."
+                    else if (hasCommunityData)
+                        "Le verdict combine les avis récents, leur volume et la réputation des contributeurs."
                     else
-                        "Ce numéro est évalué à partir des signalements de la communauté.",
+                        "L’absence d’avis ne signifie pas que ce numéro est fiable. Restez prudent avant de rappeler.",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = 2.dp),
@@ -174,14 +228,16 @@ fun CallDetailScreen(
         }
 
         // Compact details — type + date grouped in a single card.
-        item {
-            BorderedCard {
-                DetailLine("Type d’appel", ReportCategory.fromApi(lookup?.category ?: call.category)?.label ?: "Inconnu")
-                DetailLine(
-                    "Filtré le",
-                    DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT, Locale.FRANCE)
-                        .format(Date(call.timestamp)),
-                )
+        call?.let { filteredCall ->
+            item {
+                BorderedCard {
+                    DetailLine("Type d’appel", ReportCategory.fromApi(lookup?.category ?: filteredCall.category)?.label ?: "Inconnu")
+                    DetailLine(
+                        "Filtré le",
+                        DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT, Locale.FRANCE)
+                            .format(Date(filteredCall.timestamp)),
+                    )
+                }
             }
         }
 
@@ -199,19 +255,39 @@ fun CallDetailScreen(
             lookup?.let { stats -> item { StatsCard(stats) } }
         }
 
-        // Actions
         item {
-            Button(
-                onClick = { viewModel.submitReport(call.phone, isSpam = true, ReportCategory.OTHER.api) },
-                enabled = report !is LoadState.Loading,
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                if (report is LoadState.Loading) {
-                    CircularProgressIndicator(Modifier.padding(end = 8.dp).size(18.dp), strokeWidth = 2.dp)
-                } else {
-                    Icon(Icons.Rounded.Flag, contentDescription = null, modifier = Modifier.padding(end = 8.dp))
+            BorderedCard {
+                Text("Votre avis", fontWeight = FontWeight.SemiBold)
+                Text(
+                    "Votre vote améliore l’évaluation communautaire. Il ne bloque pas automatiquement le numéro.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(top = 2.dp, bottom = 10.dp),
+                )
+                SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
+                    SegmentedButton(
+                        selected = myVote == "spam",
+                        onClick = {
+                            viewModel.submitReport(
+                                displayedPhone,
+                                isSpam = true,
+                                ReportCategory.OTHER.api,
+                            )
+                        },
+                        enabled = report !is LoadState.Loading,
+                        shape = SegmentedButtonDefaults.itemShape(0, 2),
+                    ) {
+                        Text("Indésirable")
+                    }
+                    SegmentedButton(
+                        selected = myVote == "legit",
+                        onClick = { viewModel.submitReport(displayedPhone, isSpam = false) },
+                        enabled = report !is LoadState.Loading,
+                        shape = SegmentedButtonDefaults.itemShape(1, 2),
+                    ) {
+                        Text("Légitime")
+                    }
                 }
-                Text("Confirmer comme indésirable")
             }
         }
         // Feedback so tapping the button never feels like a no-op.
@@ -226,14 +302,14 @@ fun CallDetailScreen(
         item {
             BlockToggle(
                 rule = rule,
-                effectivelyBlocked = rule == "block" || (rule == null && (isArcep || (lookup?.status == "block") || blocked)),
-                onBlock = { viewModel.block(call.phone) },
-                onUnblock = { viewModel.unblock(call.phone) },
+                effectivelyBlocked = rule == "block" || (rule == null && status == "block"),
+                onBlock = { viewModel.block(displayedPhone) },
+                onUnblock = { viewModel.unblock(displayedPhone) },
             )
         }
         item {
             OutlinedButton(
-                onClick = { clipboard.setText(AnnotatedString("+${call.phone}")) },
+                onClick = { clipboard.setText(AnnotatedString("+$displayedPhone")) },
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Icon(Icons.Rounded.ContentCopy, contentDescription = null, modifier = Modifier.padding(end = 8.dp))
@@ -243,12 +319,7 @@ fun CallDetailScreen(
     }
 }
 
-/**
- * Block/unblock toggle whose action + look reflect the number's current state:
- *   - allow rule set  → shown as "débloqué", offers to re-block
- *   - blocked (rule/list/ARCEP) → offers to unblock (the active case)
- *   - neutral → offers to block
- */
+/** Personal device rule, intentionally separate from the community vote. */
 @Composable
 fun BlockToggle(
     rule: String?,
@@ -256,55 +327,95 @@ fun BlockToggle(
     onBlock: () -> Unit,
     onUnblock: () -> Unit,
 ) {
-    when {
-        rule == "allow" -> {
-            BorderedCard(accent = WCColor.Emerald) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Rounded.LockOpen, contentDescription = null, tint = WCColor.Emerald)
-                    Text(
-                        "  Débloqué — ce numéro sonnera normalement.",
-                        fontWeight = FontWeight.SemiBold,
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
-                }
-                OutlinedButton(onClick = onBlock, modifier = Modifier.fillMaxWidth().padding(top = 8.dp)) {
+    val isAllowed = rule == "allow"
+    BorderedCard(
+        accent = when {
+            isAllowed -> WCColor.Emerald
+            effectivelyBlocked -> WCColor.Coral
+            else -> null
+        },
+    ) {
+        Text("Sur mon téléphone", fontWeight = FontWeight.SemiBold)
+        Text(
+            when {
+                isAllowed -> "Toujours autorisé : ce numéro sonnera normalement."
+                effectivelyBlocked -> "Ce numéro est actuellement bloqué sur cet appareil."
+                else -> "Aucune règle personnelle pour ce numéro."
+            },
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(top = 2.dp, bottom = 8.dp),
+        )
+        when {
+            isAllowed -> {
+                OutlinedButton(onClick = onBlock, modifier = Modifier.fillMaxWidth()) {
                     Icon(Icons.Rounded.Block, contentDescription = null, modifier = Modifier.padding(end = 8.dp))
-                    Text("Re-bloquer ce numéro")
+                    Text("Bloquer sur mon téléphone")
                 }
             }
-        }
-        effectivelyBlocked -> {
-            OutlinedButton(onClick = onUnblock, modifier = Modifier.fillMaxWidth()) {
-                Icon(Icons.Rounded.LockOpen, contentDescription = null, modifier = Modifier.padding(end = 8.dp))
-                Text("Débloquer ce numéro")
+            effectivelyBlocked -> {
+                OutlinedButton(onClick = onUnblock, modifier = Modifier.fillMaxWidth()) {
+                    Icon(Icons.Rounded.LockOpen, contentDescription = null, modifier = Modifier.padding(end = 8.dp))
+                    Text("Toujours autoriser")
+                }
             }
-        }
-        else -> {
-            OutlinedButton(onClick = onBlock, modifier = Modifier.fillMaxWidth()) {
-                Icon(Icons.Rounded.Block, contentDescription = null, modifier = Modifier.padding(end = 8.dp))
-                Text("Bloquer ce numéro")
+            else -> {
+                OutlinedButton(onClick = onBlock, modifier = Modifier.fillMaxWidth()) {
+                    Icon(Icons.Rounded.Block, contentDescription = null, modifier = Modifier.padding(end = 8.dp))
+                    Text("Bloquer sur mon téléphone")
+                }
             }
         }
     }
 }
 
 @Composable
-fun SourceBadge(isArcep: Boolean) {
-    if (isArcep) {
-        StatusBadge("ARCEP", WCColor.Indigo, Icons.Rounded.Gavel)
-    } else {
-        StatusBadge("Communauté", WCColor.Slate, Icons.Rounded.Group)
+fun SourceBadge(source: String, isArcep: Boolean, hasCommunityData: Boolean) {
+    when {
+        source == "mixed" -> StatusBadge("ARCEP + communauté", WCColor.Indigo, Icons.Rounded.Gavel)
+        isArcep -> StatusBadge("ARCEP", WCColor.Indigo, Icons.Rounded.Gavel)
+        hasCommunityData -> StatusBadge("Communauté", WCColor.Slate, Icons.Rounded.Group)
+        else -> StatusBadge("Aucune donnée", WCColor.Blue, Icons.Rounded.Search)
     }
 }
 
 @Composable
 fun StatsCard(stats: LookupResponse) {
+    val confidenceLevel = stats.confidenceLevel ?: "none"
     BorderedCard {
-        Text("Signalements", fontWeight = FontWeight.SemiBold)
+        Text("Avis de la communauté", fontWeight = FontWeight.SemiBold)
         Row(Modifier.fillMaxWidth().padding(top = 8.dp), horizontalArrangement = Arrangement.SpaceBetween) {
             Stat("Indésirable", stats.reportCountSpam.toString(), WCColor.Coral)
             Stat("Légitime", stats.reportCountLegit.toString(), WCColor.Emerald)
         }
+        Text(
+            "Ces nombres sont les avis bruts. Le verdict pondère aussi leur récence et la réputation des contributeurs.",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(top = 8.dp),
+        )
+
+        Text(
+            "Fiabilité de l’évaluation",
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.padding(top = 14.dp),
+        )
+        Text(
+            confidenceTitle(confidenceLevel),
+            color = when (confidenceLevel) {
+                "high", "official" -> WCColor.Emerald
+                "medium" -> WCColor.Amber
+                else -> MaterialTheme.colorScheme.onSurfaceVariant
+            },
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.padding(top = 4.dp),
+        )
+        Text(
+            confidenceExplanation(confidenceLevel, stats.confidence),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+
         // Community "why did it call?" headline — only when we have a known reason.
         stats.topReason
             ?.takeIf { it.category != "unknown" && it.count > 0 }
@@ -318,14 +429,42 @@ fun StatsCard(stats: LookupResponse) {
                     modifier = Modifier.padding(top = 12.dp),
                 )
             }
-        Text("Fréquence des signalements", fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(top = 14.dp))
-        Row(Modifier.fillMaxWidth().padding(top = 8.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-            Stat("24 h", stats.frequency.last24h.toString(), MaterialTheme.colorScheme.primary)
-            Stat("7 j", stats.frequency.last7d.toString(), MaterialTheme.colorScheme.primary)
-            Stat("30 j", stats.frequency.last30d.toString(), MaterialTheme.colorScheme.primary)
-            Stat("1 an", stats.frequency.last1y.toString(), MaterialTheme.colorScheme.primary)
+        val frequency = stats.frequency
+        if (frequency.last1y > 0) {
+            Text("Activité des avis", fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(top = 14.dp))
+            Row(Modifier.fillMaxWidth().padding(top = 8.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+                Stat("24 h", frequency.last24h.toString(), MaterialTheme.colorScheme.primary)
+                Stat("7 j", frequency.last7d.toString(), MaterialTheme.colorScheme.primary)
+                Stat("30 j", frequency.last30d.toString(), MaterialTheme.colorScheme.primary)
+                Stat("1 an", frequency.last1y.toString(), MaterialTheme.colorScheme.primary)
+            }
         }
     }
+}
+
+private fun verdictExplanation(status: String, confidenceLevel: String): String = when (status) {
+    "block" -> if (confidenceLevel == "high") "Forte convergence vers un appel indésirable."
+        else "Évalué comme indésirable, avec encore peu de recul."
+    "warn" -> "Des avis négatifs existent, mais le verdict reste à confirmer."
+    "allow" -> if (confidenceLevel == "high") "Les avis convergent vers un numéro légitime."
+        else "Tendance plutôt légitime, avec encore peu d’avis."
+    else -> "Pas assez d’éléments pour évaluer ce numéro."
+}
+
+private fun confidenceTitle(level: String): String = when (level) {
+    "official" -> "Source officielle"
+    "high" -> "Élevée"
+    "medium" -> "Moyenne"
+    "low" -> "Faible"
+    else -> "Non évaluée"
+}
+
+private fun confidenceExplanation(level: String, confidence: Int?): String = when (level) {
+    "official" -> "Le statut provient d’une plage officielle, pas d’un calcul communautaire."
+    "high" -> "Le volume pondéré d’avis est suffisant pour une évaluation solide (${confidence ?: 100} %)."
+    "medium" -> "Plusieurs avis existent, mais davantage de recul est utile (${confidence ?: 0} %)."
+    "low" -> "Trop peu d’avis pondérés pour conclure avec assurance (${confidence ?: 0} %)."
+    else -> "Aucun avis pondéré exploitable pour le moment."
 }
 
 @Composable

@@ -60,7 +60,7 @@ struct RootView: View {
         .tabItem { Label("Signaler", systemImage: "flag.fill") }
         .tag(RootTab.report)
       MyReportsView()
-        .tabItem { Label("Mes signal.", systemImage: "list.bullet.rectangle.fill") }
+        .tabItem { Label("Signalements", systemImage: "list.bullet.rectangle.fill") }
         .tag(RootTab.myReports)
       GamesView()
         .tabItem { Label("Jeux", systemImage: "gamecontroller.fill") }

@@ -50,10 +50,19 @@ struct TopReasonDTO: Codable {
   let share: Int  // 0..100 — share of spam reports
 }
 
+struct OfficialPatternDTO: Codable {
+  let pattern: String
+  let status: String
+  let category: String
+  let name: String?
+}
+
 struct LookupResponseDTO: Codable {
   let phone: String
   let spamScore: Int
   let status: String
+  let confidence: Int?
+  let confidenceLevel: String?
   let category: String?
   let source: String?
   let reportCountSpam: Int?
@@ -62,6 +71,7 @@ struct LookupResponseDTO: Codable {
   let topReason: TopReasonDTO?
   let firstReportedAt: String?
   let lastReportedAt: String?
+  let officialPattern: OfficialPatternDTO?
 }
 
 /// One number in the "qui montent" trending list.

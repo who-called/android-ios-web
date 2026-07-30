@@ -94,6 +94,7 @@ export function NumberTool({
         deviceId: webDeviceId(),
         vote,
         category: vote === "spam" ? category : null,
+        locale,
       });
       // Playful nudge if they re-report the same number (clicking again is fine).
       setMessage({ kind: "ok", text: n === lastReported ? t.reportOkAgain : t.reportOk });

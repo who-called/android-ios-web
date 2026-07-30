@@ -22,13 +22,27 @@ struct MyReportsView: View {
             ForEach(viewModel.myReports) { report in
               BorderedCard {
                 HStack {
-                  VStack(alignment: .leading, spacing: 2) {
-                    Text("+\(report.phone)").fontWeight(.bold)
-                    Text(subtitle(report))
-                      .font(.caption)
-                      .foregroundStyle(report.syncState == "failed" ? WhoCalledColors.coral : WhoCalledColors.muted)
+                  NavigationLink {
+                    NumberDetailView(
+                      number: ScoredNumber(
+                        phone: report.phone,
+                        status: "unknown",
+                        spamScore: 0,
+                        category: report.category ?? "unknown",
+                        source: "none"))
+                  } label: {
+                    HStack {
+                      VStack(alignment: .leading, spacing: 2) {
+                        Text("+\(report.phone)").fontWeight(.bold)
+                        Text(subtitle(report))
+                          .font(.caption)
+                          .foregroundStyle(report.syncState == "failed" ? WhoCalledColors.coral : WhoCalledColors.muted)
+                      }
+                      Spacer()
+                      Image(systemName: "chevron.right").foregroundStyle(WhoCalledColors.muted)
+                    }
                   }
-                  Spacer()
+                  .buttonStyle(.plain)
                   Button {
                     viewModel.flipReport(report)
                   } label: {

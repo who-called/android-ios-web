@@ -4,9 +4,76 @@ struct NumberDetailView: View {
   @EnvironmentObject private var viewModel: MainViewModel
   let number: ScoredNumber
 
-  private var blocked: Bool { number.status == "block" }
-  private var statusColor: Color { blocked ? WhoCalledColors.coral : WhoCalledColors.amber }
-  private var isArcep: Bool { viewModel.lookup?.source == "arcep" || number.source == "arcep" }
+  private var status: String { viewModel.lookup?.status ?? number.status }
+  private var statusColor: Color {
+    switch status {
+    case "block": WhoCalledColors.coral
+    case "warn": WhoCalledColors.amber
+    case "allow": WhoCalledColors.emerald
+    default: WhoCalledColors.blue
+    }
+  }
+  private var source: String { viewModel.lookup?.source ?? number.source }
+  private var isArcep: Bool { source == "arcep" || source == "mixed" || number.source == "arcep" }
+  private var hasCommunityData: Bool {
+    source == "community" || source == "mixed" ||
+      (viewModel.lookup?.reportCountSpam ?? 0) > 0 ||
+      (viewModel.lookup?.reportCountLegit ?? 0) > 0
+  }
+  private var myVote: String? {
+    viewModel.myReports.first(where: { $0.phone == number.phone })?.vote
+  }
+  private var verdictLabel: String {
+    switch status {
+    case "block": "Indésirable"
+    case "warn": "Suspect"
+    case "allow": "Plutôt légitime"
+    default: "Données insuffisantes"
+    }
+  }
+  private var statusImage: String {
+    switch status {
+    case "block": "nosign"
+    case "warn": "exclamationmark.triangle.fill"
+    case "allow": "checkmark.circle.fill"
+    default: "questionmark.circle"
+    }
+  }
+  private var verdictExplanation: String {
+    let confidence = viewModel.lookup?.confidenceLevel ?? "none"
+    switch status {
+    case "block":
+      confidence == "high"
+        ? "Forte convergence vers un appel indésirable."
+        : "Évalué comme indésirable, avec encore peu de recul."
+    case "warn": "Des avis négatifs existent, mais le verdict reste à confirmer."
+    case "allow":
+      confidence == "high"
+        ? "Les avis convergent vers un numéro légitime."
+        : "Tendance plutôt légitime, avec encore peu d’avis."
+    default: "Pas assez d’éléments pour évaluer ce numéro."
+    }
+  }
+  private var sourceTitle: String {
+    switch source {
+    case "mixed": "ARCEP et avis de la communauté"
+    case "arcep": "Plage officielle ARCEP"
+    case "community": "Avis de la communauté"
+    default: "Aucune donnée communautaire"
+    }
+  }
+  private var sourceExplanation: String {
+    switch source {
+    case "mixed":
+      "Ce numéro correspond à une plage ARCEP et possède aussi des avis communautaires. Le verdict tient compte des deux."
+    case "arcep":
+      "Ce numéro correspond à une plage officielle de démarchage. Cette source est distincte des avis communautaires."
+    case "community":
+      "Le verdict combine les avis récents, leur volume et la réputation des contributeurs."
+    default:
+      "L’absence d’avis ne signifie pas que ce numéro est fiable. Restez prudent avant de rappeler."
+    }
+  }
 
   var body: some View {
     ScrollToTopScreen {
@@ -20,11 +87,11 @@ struct NumberDetailView: View {
               Text("+\(number.phone)").font(.title3.bold())
               HStack(spacing: 8) {
                 StatusBadge(
-                  label: blocked ? "Bloqué" : "Alerté", color: statusColor,
-                  systemImage: blocked ? "nosign" : "exclamationmark.triangle.fill")
-                sourceBadge
+                  label: verdictLabel, color: statusColor,
+                  systemImage: statusImage)
+                if isArcep || hasCommunityData { sourceBadge }
               }
-              Text("Indice de spam").font(.caption).foregroundStyle(WhoCalledColors.muted)
+              Text(verdictExplanation).font(.caption).foregroundStyle(WhoCalledColors.muted)
             }
             Spacer(minLength: 0)
           }
@@ -34,11 +101,9 @@ struct NumberDetailView: View {
         // Source explanation
         BorderedCard {
           VStack(alignment: .leading, spacing: 2) {
-            Text(isArcep ? "Liste officielle ARCEP" : "Signalé par la communauté")
+            Text(sourceTitle)
               .font(.subheadline.weight(.semibold))
-            Text(isArcep
-              ? "Ce numéro fait partie de la liste officielle des préfixes de démarchage (ARCEP / opérateurs). Il est bloqué indépendamment des signalements."
-              : "Ce numéro est évalué à partir des signalements de la communauté.")
+            Text(sourceExplanation)
               .font(.footnote).foregroundStyle(WhoCalledColors.muted)
             if isArcep {
               // Store "misleading claims" policies: government info must link
@@ -69,16 +134,21 @@ struct NumberDetailView: View {
           statsCard(stats)
         }
 
-        Button {
-          viewModel.reportPhone = "+\(number.phone)"
-          viewModel.reportIsSpam = true
-          viewModel.submitReport()
-        } label: {
-          Label("Confirmer comme indésirable", systemImage: "flag.fill").frame(maxWidth: .infinity)
+        BorderedCard {
+          VStack(alignment: .leading, spacing: 10) {
+            Text("Votre avis").font(.subheadline.weight(.semibold))
+            Text("Votre vote améliore l’évaluation communautaire. Il ne bloque pas automatiquement le numéro.")
+              .font(.footnote).foregroundStyle(WhoCalledColors.muted)
+            HStack(spacing: 8) {
+              voteButton(label: "Indésirable", image: "nosign", vote: "spam", color: WhoCalledColors.coral) {
+                submitVote(isSpam: true)
+              }
+              voteButton(label: "Légitime", image: "checkmark.circle.fill", vote: "legit", color: WhoCalledColors.emerald) {
+                submitVote(isSpam: false)
+              }
+            }
+          }
         }
-        .buttonStyle(.borderedProminent)
-        .tint(WhoCalledColors.indigo)
-        .disabled(viewModel.reportSubmitting)
 
         // Feedback so tapping the button never feels like a no-op.
         if let banner = viewModel.reportBanner {
@@ -102,21 +172,37 @@ struct NumberDetailView: View {
     }
   }
 
+  @ViewBuilder
   private var sourceBadge: some View {
-    isArcep
-      ? StatusBadge(label: "ARCEP", color: WhoCalledColors.nightBlue, systemImage: "checkmark.seal.fill")
-      : StatusBadge(label: "Communauté", color: WhoCalledColors.muted, systemImage: "person.3.fill")
+    if source == "mixed" {
+      StatusBadge(label: "ARCEP + avis", color: WhoCalledColors.nightBlue, systemImage: "checkmark.seal.fill")
+    } else if isArcep {
+      StatusBadge(label: "ARCEP", color: WhoCalledColors.nightBlue, systemImage: "checkmark.seal.fill")
+    } else if hasCommunityData {
+      StatusBadge(label: "Communauté", color: WhoCalledColors.muted, systemImage: "person.3.fill")
+    } else {
+      StatusBadge(label: "Aucune donnée", color: WhoCalledColors.blue, systemImage: "questionmark.circle")
+    }
   }
 
   private func statsCard(_ stats: LookupResponseDTO) -> some View {
     BorderedCard {
       VStack(alignment: .leading, spacing: 10) {
-        Text("Signalements").font(.subheadline.weight(.semibold))
+        Text("Avis de la communauté").font(.subheadline.weight(.semibold))
         HStack {
           stat("Indésirable", "\(stats.reportCountSpam ?? 0)", WhoCalledColors.coral)
           Spacer()
           stat("Légitime", "\(stats.reportCountLegit ?? 0)", WhoCalledColors.emerald)
         }
+        Text("Ces nombres sont les avis bruts. Le verdict pondère aussi leur récence et la réputation des contributeurs.")
+          .font(.footnote).foregroundStyle(WhoCalledColors.muted)
+
+        Text("Fiabilité de l’évaluation").font(.subheadline.weight(.semibold)).padding(.top, 4)
+        Text(confidenceTitle(stats.confidenceLevel ?? "none"))
+          .font(.subheadline.weight(.semibold))
+          .foregroundStyle(confidenceColor(stats.confidenceLevel ?? "none"))
+        Text(confidenceExplanation(stats.confidenceLevel ?? "none", stats.confidence))
+          .font(.footnote).foregroundStyle(WhoCalledColors.muted)
         // Community "why did it call?" headline — only when we have a known reason.
         if let top = stats.topReason, top.category != "unknown", top.count > 0 {
           let label = ReportCategory.from(top.category)?.label ?? top.category
@@ -125,21 +211,90 @@ struct NumberDetailView: View {
             .foregroundStyle(WhoCalledColors.coral)
             .padding(.top, 4)
         }
-        Text("Fréquence des signalements").font(.subheadline.weight(.semibold)).padding(.top, 6)
-        HStack {
-          stat("24 h", "\(stats.frequency?.last24h ?? 0)", WhoCalledColors.indigo)
-          Spacer()
-          stat("7 j", "\(stats.frequency?.last7d ?? 0)", WhoCalledColors.indigo)
-          Spacer()
-          stat("30 j", "\(stats.frequency?.last30d ?? 0)", WhoCalledColors.indigo)
-          Spacer()
-          stat("1 an", "\(stats.frequency?.last1y ?? 0)", WhoCalledColors.indigo)
+        if (stats.frequency?.last1y ?? 0) > 0 {
+          Text("Activité des avis").font(.subheadline.weight(.semibold)).padding(.top, 6)
+          HStack {
+            stat("24 h", "\(stats.frequency?.last24h ?? 0)", WhoCalledColors.indigo)
+            Spacer()
+            stat("7 j", "\(stats.frequency?.last7d ?? 0)", WhoCalledColors.indigo)
+            Spacer()
+            stat("30 j", "\(stats.frequency?.last30d ?? 0)", WhoCalledColors.indigo)
+            Spacer()
+            stat("1 an", "\(stats.frequency?.last1y ?? 0)", WhoCalledColors.indigo)
+          }
         }
         if let last = parseDate(stats.lastReportedAt) {
           Text("Dernier signalement : \(frenchDate(last))")
             .font(.footnote).foregroundStyle(WhoCalledColors.muted).padding(.top, 4)
         }
       }
+    }
+  }
+
+  private func submitVote(isSpam: Bool) {
+    viewModel.reportPhone = "+\(number.phone)"
+    viewModel.reportIsSpam = isSpam
+    if isSpam { viewModel.reportCategory = .other }
+    viewModel.submitReport()
+  }
+
+  private func voteButton(
+    label: String,
+    image: String,
+    vote: String,
+    color: Color,
+    action: @escaping () -> Void
+  ) -> some View {
+    let selected = myVote == vote
+    return Button(action: action) {
+      Label(label, systemImage: image)
+        .font(.subheadline.weight(.semibold))
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 10)
+        .foregroundStyle(selected ? Color.white : color)
+        .background(
+          RoundedRectangle(cornerRadius: 10)
+            .fill(selected ? color : color.opacity(0.08))
+        )
+        .overlay(
+          RoundedRectangle(cornerRadius: 10)
+            .stroke(color.opacity(0.35), lineWidth: 1)
+        )
+    }
+    .buttonStyle(.plain)
+    .disabled(viewModel.reportSubmitting)
+  }
+
+  private func confidenceTitle(_ level: String) -> String {
+    switch level {
+    case "official": "Source officielle"
+    case "high": "Élevée"
+    case "medium": "Moyenne"
+    case "low": "Faible"
+    default: "Non évaluée"
+    }
+  }
+
+  private func confidenceColor(_ level: String) -> Color {
+    switch level {
+    case "official", "high": WhoCalledColors.emerald
+    case "medium": WhoCalledColors.amber
+    default: WhoCalledColors.muted
+    }
+  }
+
+  private func confidenceExplanation(_ level: String, _ confidence: Int?) -> String {
+    switch level {
+    case "official":
+      "Le statut provient d’une plage officielle, pas d’un calcul communautaire."
+    case "high":
+      "Le volume pondéré d’avis est suffisant pour une évaluation solide (\(confidence ?? 100) %)."
+    case "medium":
+      "Plusieurs avis existent, mais davantage de recul est utile (\(confidence ?? 0) %)."
+    case "low":
+      "Trop peu d’avis pondérés pour conclure avec assurance (\(confidence ?? 0) %)."
+    default:
+      "Aucun avis pondéré exploitable pour le moment."
     }
   }
 

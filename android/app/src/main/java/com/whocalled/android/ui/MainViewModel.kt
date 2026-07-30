@@ -13,6 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -30,8 +31,10 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
 
     private val repo = WhoCalledRepository(app)
     private val db = WhoCalledDatabase.get(app)
+    private val filteredCalls = db.callLogDao().observeRecent()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
-    // Home stats + history
+    // Home protection stats.
     val blockedCount: StateFlow<Int> =
         db.callLogDao().observeBlockedCount()
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 0)
@@ -39,16 +42,6 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     val warnedCount: StateFlow<Int> =
         db.callLogDao().observeWarnedCount()
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 0)
-
-    val recentCalls = db.callLogDao().observeRecent()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
-
-    // Full history grouped into time sections (Aujourd'hui / Hier / …) with
-    // same-number-same-day repeats collapsed — for the dedicated history screen.
-    val groupedHistory: StateFlow<List<com.whocalled.android.util.CallHistorySection>> =
-        db.callLogDao().observeRecent()
-            .map { com.whocalled.android.util.groupCallHistory(it) }
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     // SMS shield state (mirrors DataStore; refreshed on resume / after toggling).
     private val _smsBlockingEnabled = MutableStateFlow(false)
@@ -92,9 +85,42 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     private val _systemCalls = MutableStateFlow<List<PhoneCall>>(emptyList())
     val systemCalls: StateFlow<List<PhoneCall>> = _systemCalls
 
+    /** Unknown system calls + calls blocked/warned by Who Called, newest first. */
+    val callEvents: StateFlow<List<com.whocalled.android.util.CallEvent>> =
+        combine(filteredCalls, systemCalls) { filtered, system ->
+            com.whocalled.android.util.mergeCallEvents(filtered, system)
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    val groupedCallEvents: StateFlow<List<com.whocalled.android.util.CallHistorySection>> =
+        callEvents
+            .map { com.whocalled.android.util.groupCallHistory(it) }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    private val _recentCallHandledAt = MutableStateFlow<Long?>(null)
+
+    /**
+     * The newest unhandled call stays on Home for up to 24 hours. A nullable
+     * handled timestamp prevents a brief stale prompt while DataStore loads.
+     */
+    val recentCallPrompt: StateFlow<com.whocalled.android.util.CallEvent?> =
+        combine(callEvents, _recentCallHandledAt) { calls, handledAt ->
+            if (handledAt == null) {
+                null
+            } else {
+                com.whocalled.android.util.findRecentCallPrompt(calls, handledAt)
+            }
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
     // Observable permission state so the UI recomposes after the grant.
     private val _callLogPermission = MutableStateFlow(false)
     val callLogPermission: StateFlow<Boolean> = _callLogPermission
+
+    init {
+        viewModelScope.launch {
+            _recentCallHandledAt.value =
+                com.whocalled.android.data.Preferences.recentCallHandledAt(getApplication())
+        }
+    }
 
     // Async states
     private val _sync = MutableStateFlow<LoadState>(LoadState.Idle)
@@ -222,6 +248,21 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
+    fun markRecentCallHandled(call: com.whocalled.android.util.CallEvent) {
+        markRecentCallHandledAt(call.timestamp)
+    }
+
+    private fun markRecentCallHandledAt(timestamp: Long) {
+        val handledAt = maxOf(_recentCallHandledAt.value ?: 0L, timestamp)
+        _recentCallHandledAt.value = handledAt
+        viewModelScope.launch {
+            com.whocalled.android.data.Preferences.setRecentCallHandledAt(
+                getApplication(),
+                handledAt,
+            )
+        }
+    }
+
     /**
      * First-launch auto-sync: if the list has never been synced from the server
      * (only the embedded warm-up is present), fetch it now — no button tap
@@ -285,6 +326,10 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
                         if (isRepeat) "C'est bien noté 😊 Pas besoin d'insister — un signalement suffit !"
                         else "Merci ! Signalement enregistré 🛡️",
                     )
+                    val normalized = com.whocalled.android.util.PhoneNormalizer.normalize(phone)
+                    if (normalized != null && normalized == _detailPhone.value) {
+                        fetchLookup(normalized)
+                    }
                 },
                 onFailure = {
                     // Stored locally even if the network failed → make that clear.
@@ -358,19 +403,32 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     val detailRule: StateFlow<String?> = _detailRule
 
     fun loadCallDetail(id: Long) {
+        resetDetailState()
         viewModelScope.launch {
             val entry = db.callLogDao().findById(id)
             _detail.value = entry
-            entry?.let { prepareDetail(it.phone) }
+            entry?.let {
+                markRecentCallHandledAt(it.timestamp)
+                prepareDetail(it.phone)
+            }
         }
     }
 
     /** Phone-based detail (from a recent call / a report — no call-log entry). */
     fun loadNumberDetail(phone: String) {
+        resetDetailState()
         viewModelScope.launch {
-            _detail.value = null
             prepareDetail(phone)
         }
+    }
+
+    private fun resetDetailState() {
+        _detail.value = null
+        _detailPhone.value = null
+        _lookup.value = null
+        _lookupLoading.value = false
+        _arcepMatch.value = null
+        _detailRule.value = null
     }
 
     private fun prepareDetail(phone: String) {

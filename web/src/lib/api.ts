@@ -20,8 +20,10 @@ export type LookupResult = {
   phone: string;
   spamScore: number;
   status: "block" | "warn" | "allow" | "unknown";
+  confidence?: number | null;
+  confidenceLevel?: "none" | "low" | "medium" | "high" | "official";
   category?: string | null;
-  source?: string;
+  source?: "none" | "community" | "arcep" | "mixed";
   reportCountSpam?: number;
   reportCountLegit?: number;
   frequency?: { last24h: number; last7d: number; last30d: number; last1y: number };
@@ -29,6 +31,12 @@ export type LookupResult = {
   topReason?: TopReason | null;
   firstReportedAt?: string | null;
   lastReportedAt?: string | null;
+  officialPattern?: {
+    pattern: string;
+    status: string;
+    category: string;
+    name?: string | null;
+  } | null;
 };
 
 export type TrendingNumber = {
@@ -70,11 +78,12 @@ export async function reportNumber(input: {
   deviceId: string;
   vote: "spam" | "legit";
   category?: string | null;
+  locale?: string;
 }): Promise<void> {
   const res = await fetch(`${config.apiBaseUrl}/reports`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ ...input, locale: "fr" }),
+    body: JSON.stringify({ ...input, locale: input.locale ?? "fr" }),
   });
   if (!res.ok) throw new Error(`report failed: ${res.status}`);
 }

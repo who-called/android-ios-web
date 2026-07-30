@@ -202,6 +202,7 @@ final class MainViewModel: ObservableObject {
     Task {
       reportSubmitting = true
       reportBanner = nil
+      let submittedPhone = PhoneNormalizer.normalize(reportPhone)
       let isRepeat = reportPhone.trimmingCharacters(in: .whitespaces) == lastReportedPhone
       lastReportedPhone = reportPhone.trimmingCharacters(in: .whitespaces)
       do {
@@ -211,6 +212,7 @@ final class MainViewModel: ObservableObject {
         reportBanner = isRepeat
           ? (.success, "C'est bien noté 😊 Pas besoin d'insister — un signalement suffit !")
           : (.success, "Merci ! Signalement enregistré 🛡️")
+        if let submittedPhone { loadLookup(phone: submittedPhone) }
         reportPhone = ""
       } catch {
         reportBanner = (.error, "Enregistré localement. Envoi au serveur échoué.")

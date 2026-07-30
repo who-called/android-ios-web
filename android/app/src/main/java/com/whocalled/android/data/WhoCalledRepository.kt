@@ -165,10 +165,6 @@ class WhoCalledRepository(
         db.myReportDao().upsert(
             MyReportEntity(phone, vote, category, now, now, syncState = "pending"),
         )
-        // Keep a local rule so behaviour is consistent meanwhile.
-        db.userRuleDao().upsert(
-            UserRuleEntity(phone, if (isSpam) "block" else "allow", now),
-        )
 
         pushReport(phone, vote, category, now)
     }
@@ -190,7 +186,6 @@ class WhoCalledRepository(
      */
     suspend fun deleteMyReport(phone: String): Result<Unit> = guarded {
         db.myReportDao().deleteByPhone(phone)
-        db.userRuleDao().deleteByPhone(phone)
         // Best-effort corrective vote (ignored if offline).
         runCatching {
             api.report(ReportRequest(phone, Preferences.deviceId(context), "legit", null))

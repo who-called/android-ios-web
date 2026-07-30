@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Flag
 import androidx.compose.material.icons.rounded.Home
-import androidx.compose.material.icons.rounded.ListAlt
+import androidx.compose.material.icons.rounded.Phone
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -24,14 +24,13 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.whocalled.android.ui.screen.CallDetailScreen
+import com.whocalled.android.ui.screen.CallsScreen
 import com.whocalled.android.ui.screen.DefenseGameScreen
 import com.whocalled.android.ui.screen.GamesScreen
-import com.whocalled.android.ui.screen.HistoryScreen
 import com.whocalled.android.ui.screen.HomeScreen
 import com.whocalled.android.ui.screen.LeaderboardScreen
 import com.whocalled.android.ui.screen.TraceGameScreen
 import com.whocalled.android.ui.screen.MyReportsScreen
-import com.whocalled.android.ui.screen.NumberLookupScreen
 import com.whocalled.android.ui.screen.StreakScreen
 import com.whocalled.android.ui.screen.ReportScreen
 import com.whocalled.android.ui.screen.SettingsScreen
@@ -50,8 +49,8 @@ fun WhoCalledApp(
     val nav = rememberNavController()
     val tabs = listOf(
         Tab("home", "Accueil") { Icon(Icons.Rounded.Home, null) },
+        Tab("calls", "Appels") { Icon(Icons.Rounded.Phone, null) },
         Tab("report", "Signaler") { Icon(Icons.Rounded.Flag, null) },
-        Tab("myreports", "Journal") { Icon(Icons.Rounded.ListAlt, null) },
         Tab("games", "Jeux") { Text("🎮") },
         Tab("settings", "Réglages") { Icon(Icons.Rounded.Settings, null) },
     )
@@ -120,17 +119,31 @@ fun WhoCalledApp(
                     isScreeningRoleHeld = isScreeningRoleHeld.value,
                     onRequestRole = onRequestRole,
                     onSyncNow = onSyncNow,
-                    onSeeAllHistory = { nav.navigate("history") },
+                    onSeeAllHistory = { nav.navigate("calls") },
+                    onRecentCallClick = { call ->
+                        if (call.callLogId != null) {
+                            nav.navigate("call/${call.callLogId}")
+                        } else {
+                            nav.navigate("number/${call.phone}")
+                        }
+                    },
                     onSmsClick = { nav.navigate("sms") },
                     onPlayGame = { nav.navigate("games") },
                     onOpenLeaderboard = { nav.navigate("games") },
                 )
             }
-            composable("history") {
-                HistoryScreen(
+            composable("calls") {
+                CallsScreen(
                     viewModel = viewModel,
-                    onBack = { nav.popBackStack() },
-                    onCallClick = { id -> nav.navigate("call/$id") },
+                    onCallClick = { call ->
+                        viewModel.markRecentCallHandled(call)
+                        if (call.callLogId != null) {
+                            nav.navigate("call/${call.callLogId}")
+                        } else {
+                            nav.navigate("number/${call.phone}")
+                        }
+                    },
+                    onRequestCallLogPermission = onRequestCallLogPermission,
                 )
             }
             composable("sms") {
@@ -141,10 +154,15 @@ fun WhoCalledApp(
                     viewModel,
                     onRequestCallLogPermission,
                     onOpenNumber = { phone -> nav.navigate("number/$phone") },
+                    onOpenMyReports = { nav.navigate("myreports") },
                 )
             }
             composable("myreports") {
-                MyReportsScreen(viewModel, onOpenNumber = { phone -> nav.navigate("number/$phone") })
+                MyReportsScreen(
+                    viewModel,
+                    onBack = { nav.popBackStack() },
+                    onOpenNumber = { phone -> nav.navigate("number/$phone") },
+                )
             }
             composable("settings") { SettingsScreen(viewModel) }
             composable("games") {
@@ -220,7 +238,7 @@ fun WhoCalledApp(
                 "number/{phone}",
                 arguments = listOf(navArgument("phone") { type = NavType.StringType }),
             ) { entry ->
-                NumberLookupScreen(
+                CallDetailScreen(
                     viewModel = viewModel,
                     phone = entry.arguments?.getString("phone") ?: "",
                     onBack = { nav.popBackStack() },

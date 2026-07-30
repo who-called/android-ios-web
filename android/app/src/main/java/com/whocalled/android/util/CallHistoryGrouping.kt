@@ -2,28 +2,33 @@ package com.whocalled.android.util
 
 import com.whocalled.android.data.CallLogEntity
 import java.util.Calendar
+import kotlin.math.abs
 
 /**
- * One displayable history row. When the same number is filtered several times
- * within the same day section, the entries collapse into a single row carrying
- * the attempt count and the most recent event (so the list stays readable even
- * with dozens of blocked calls). Distinct days stay distinct — a number blocked
- * 3 weeks ago and again 2 days ago shows up in two different sections.
+ * A call event shown by Who Called. Filtered events come from our Room journal;
+ * unknown allowed/missed calls come from Android's system call log.
  */
-data class CallHistoryItem(
-    val representativeId: Long, // id of the most recent entry (for the detail screen)
+data class CallEvent(
+    val key: String,
+    val callLogId: Long?,
     val phone: String,
-    val action: String, // blocked | warned (most recent)
+    val action: CallEventAction,
     val spamScore: Int,
     val category: String,
-    val timestamp: Long, // most recent occurrence
-    val attempts: Int, // how many times within this day section
+    val timestamp: Long,
+    val attempts: Int = 1,
 )
 
-/** A titled section of the history ("Aujourd'hui", "Hier", …) with its rows. */
+enum class CallEventAction {
+    BLOCKED,
+    WARNED,
+    UNKNOWN,
+}
+
+/** A titled section of the calls screen ("Aujourd'hui", "Hier", …). */
 data class CallHistorySection(
     val title: String,
-    val items: List<CallHistoryItem>,
+    val items: List<CallEvent>,
 )
 
 /** Time buckets, coarsened the further back we go (Phone-app style). */
@@ -33,6 +38,81 @@ private enum class Bucket(val title: String) {
     THIS_WEEK("Cette semaine"),
     THIS_MONTH("Ce mois-ci"),
     OLDER("Plus ancien"),
+}
+
+private const val DUPLICATE_WINDOW_MS = 2 * 60_000L
+private const val RECENT_CALL_MAX_AGE_MS = 24 * 60 * 60 * 1_000L
+
+// CallLog.Calls values kept here so this merge stays a plain JVM-testable function.
+private val incomingCallTypes = setOf(1, 3, 5, 6) // incoming, missed, rejected, blocked
+
+/**
+ * Merge the app's filtered-call journal with Android's system call log.
+ *
+ * WARN calls normally exist in both sources. Calls close in time with the same
+ * normalized number collapse into the richer Room event. Contacts and outgoing
+ * calls are intentionally excluded: this screen is about unknown/filtered calls,
+ * not a replacement for the system Phone app.
+ */
+fun mergeCallEvents(
+    filteredCalls: List<CallLogEntity>,
+    systemCalls: List<PhoneCall>,
+): List<CallEvent> {
+    val filtered = filteredCalls.sortedByDescending { it.timestamp }
+    val unmatchedFiltered = filtered.indices.toMutableSet()
+    val result = filtered.map { call ->
+        CallEvent(
+            key = "filtered:${call.id}",
+            callLogId = call.id,
+            phone = call.phone,
+            action = if (call.action == "blocked") CallEventAction.BLOCKED else CallEventAction.WARNED,
+            spamScore = call.spamScore,
+            category = call.category,
+            timestamp = call.timestamp,
+        )
+    }.toMutableList()
+
+    systemCalls
+        .asSequence()
+        .filter { it.type in incomingCallTypes }
+        .filterNot { it.isContact }
+        .forEach { call ->
+            val phone = call.normalizedPhone ?: return@forEach
+            val duplicate = unmatchedFiltered
+                .asSequence()
+                .filter { filtered[it].phone == phone }
+                .filter { abs(filtered[it].timestamp - call.timestamp) <= DUPLICATE_WINDOW_MS }
+                .minByOrNull { abs(filtered[it].timestamp - call.timestamp) }
+
+            if (duplicate != null) {
+                unmatchedFiltered.remove(duplicate)
+            } else {
+                result += CallEvent(
+                    key = "system:${call.systemId}",
+                    callLogId = null,
+                    phone = phone,
+                    action = CallEventAction.UNKNOWN,
+                    spamScore = 0,
+                    category = "unknown",
+                    timestamp = call.timestamp,
+                )
+            }
+        }
+
+    return result.sortedByDescending { it.timestamp }
+}
+
+/** Newest event eligible for the Home prompt, bounded to the last 24 hours. */
+fun findRecentCallPrompt(
+    events: List<CallEvent>,
+    handledAt: Long,
+    now: Long = System.currentTimeMillis(),
+): CallEvent? {
+    val cutoff = now - RECENT_CALL_MAX_AGE_MS
+    return events
+        .asSequence()
+        .filter { it.timestamp > handledAt && it.timestamp >= cutoff }
+        .maxByOrNull { it.timestamp }
 }
 
 private fun bucketOf(timestamp: Long, now: Long): Bucket {
@@ -63,45 +143,32 @@ private fun dayKey(timestamp: Long): Long {
 }
 
 /**
- * Group a flat, timestamp-DESC call log into sections. Within each calendar day,
- * repeated calls from the same number collapse into one row with an attempt
- * count; the representative row keeps the most recent occurrence.
+ * Group merged calls into time sections. Repeated calls from the same number on
+ * the same day collapse into one row while preserving the latest event's status.
  */
 fun groupCallHistory(
-    entries: List<CallLogEntity>,
+    events: List<CallEvent>,
     now: Long = System.currentTimeMillis(),
 ): List<CallHistorySection> {
-    if (entries.isEmpty()) return emptyList()
+    if (events.isEmpty()) return emptyList()
 
-    // Collapse same-number repeats inside the same day, preserving order.
-    val collapsed = LinkedHashMap<Pair<Long, String>, CallHistoryItem>()
-    for (e in entries) {
-        val key = dayKey(e.timestamp) to e.phone
+    val collapsed = LinkedHashMap<Pair<Long, String>, CallEvent>()
+    for (event in events.sortedByDescending { it.timestamp }) {
+        val key = dayKey(event.timestamp) to event.phone
         val existing = collapsed[key]
         if (existing == null) {
-            collapsed[key] = CallHistoryItem(
-                representativeId = e.id,
-                phone = e.phone,
-                action = e.action,
-                spamScore = e.spamScore,
-                category = e.category,
-                timestamp = e.timestamp,
-                attempts = 1,
-            )
+            collapsed[key] = event
         } else {
-            // entries are DESC, so the first seen is already the most recent.
             collapsed[key] = existing.copy(attempts = existing.attempts + 1)
         }
     }
 
-    // Bucket the collapsed rows, keeping DESC order within each section.
-    val sections = LinkedHashMap<Bucket, MutableList<CallHistoryItem>>()
+    val sections = LinkedHashMap<Bucket, MutableList<CallEvent>>()
     for (item in collapsed.values) {
         val bucket = bucketOf(item.timestamp, now)
         sections.getOrPut(bucket) { mutableListOf() }.add(item)
     }
 
-    // Emit in chronological bucket order.
     return Bucket.entries
         .mapNotNull { b -> sections[b]?.let { CallHistorySection(b.title, it) } }
 }

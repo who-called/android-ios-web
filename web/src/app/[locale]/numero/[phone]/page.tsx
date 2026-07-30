@@ -6,7 +6,8 @@ import { countryFromCode } from "@/lib/countries";
 import { config } from "@/lib/config";
 import { getDict } from "@/i18n/dictionaries";
 import { alternatesFor, toDictLocale, urlLocales } from "@/i18n/locales";
-import { ShieldCheckIcon, BlockIcon, BellIcon, ListIcon } from "@/components/Icons";
+import { ShieldIcon, CheckCircleIcon, BlockIcon, BellIcon, ListIcon } from "@/components/Icons";
+import { NumberVote } from "@/components/NumberVote";
 
 // Pre-render the quality pages at build; others render on-demand (and noindex).
 export async function generateStaticParams() {
@@ -53,7 +54,7 @@ export default async function NumberPage({
   const catsList = ["telemarketing", "scam", "robocall", "silent", "debt", "survey", "unknown"] as const;
   const base = `/${locale}`;
 
-  const [{ isArcep, number }, lookup] = await Promise.all([
+  const [{ isArcep: seoIsArcep, number }, lookup] = await Promise.all([
     fetchIndexable(phone),
     lookupNumber(phone).catch(() => null),
   ]);
@@ -79,7 +80,15 @@ export default async function NumberPage({
     }
   };
 
-  const status = (number?.status ?? lookup?.status ?? "unknown") as "block" | "warn" | "allow" | "unknown";
+  const status = (lookup?.status ?? number?.status ?? "unknown") as "block" | "warn" | "allow" | "unknown";
+  const source = lookup?.source ?? (seoIsArcep ? "arcep" : number ? "community" : "none");
+  const isArcep = source === "arcep" || source === "mixed" || seoIsArcep;
+  const hasCommunityData =
+    source === "community" ||
+    source === "mixed" ||
+    (lookup?.reportCountSpam ?? number?.reportCountSpam ?? 0) > 0 ||
+    (lookup?.reportCountLegit ?? number?.reportCountLegit ?? 0) > 0;
+  const hasDetail = lookup !== null || number !== null;
   const blocked = status === "block";
   const accentBar = {
     block: "bg-coral",
@@ -87,26 +96,34 @@ export default async function NumberPage({
     allow: "bg-emerald",
     unknown: "bg-night/30",
   }[status];
-  const statusColor =
-    status === "block" ? "text-coral" : status === "warn" ? "text-amber" : "text-emerald";
+  const statusColor = {
+    block: "text-coral",
+    warn: "text-amber",
+    allow: "text-emerald",
+    unknown: "text-blue",
+  }[status];
   const pill = {
     block: "bg-coral/10 text-coral",
     warn: "bg-amber/10 text-amber",
     allow: "bg-emerald/10 text-emerald",
     unknown: "bg-night/[0.06] text-night/70",
   }[status];
-  const StatusIcon = blocked ? BlockIcon : status === "warn" ? BellIcon : ShieldCheckIcon;
+  const StatusIcon =
+    blocked ? BlockIcon : status === "warn" ? BellIcon : status === "allow" ? CheckCircleIcon : ShieldIcon;
 
-  const spamCount = number?.reportCountSpam ?? lookup?.reportCountSpam ?? 0;
-  const legitCount = number?.reportCountLegit ?? lookup?.reportCountLegit ?? 0;
+  const spamCount = lookup?.reportCountSpam ?? number?.reportCountSpam ?? 0;
+  const legitCount = lookup?.reportCountLegit ?? number?.reportCountLegit ?? 0;
+  const spamScore = lookup?.spamScore ?? number?.spamScore ?? 0;
+  const confidenceLevel = lookup?.confidenceLevel ?? (isArcep ? "official" : "none");
+  const confidence = lookup?.confidence;
 
   const freq = lookup?.frequency;
   const chartBuckets = freq
     ? [
         { label: t.period24h, value: freq.last24h },
-        { label: t.period7d, value: Math.max(0, freq.last7d - freq.last24h) },
-        { label: t.period30d, value: Math.max(0, freq.last30d - freq.last7d) },
-        { label: t.period1y, value: Math.max(0, freq.last1y - freq.last30d) },
+        { label: t.period7d, value: freq.last7d },
+        { label: t.period30d, value: freq.last30d },
+        { label: t.period1y, value: freq.last1y },
       ]
     : [];
   const chartMax = Math.max(...chartBuckets.map((b) => b.value), 1);
@@ -153,33 +170,34 @@ export default async function NumberPage({
         {t.whoCalls.replace("{phone}", display)}
       </h1>
 
-      {number ? (
+      {hasDetail ? (
         <div className="mt-6 space-y-4">
           {/* Hero card — status accent bar + number, score, counts */}
-          <div className={`overflow-hidden rounded-2xl border border-hair ${isArcep ? "" : "flex"}`}>
-            {!isArcep && <div className={`w-1.5 shrink-0 ${accentBar}`} />}
+          <div className="flex overflow-hidden rounded-2xl border border-hair">
+            <div className={`w-1.5 shrink-0 ${accentBar}`} />
             <div className="flex-1 p-5 sm:p-6">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
                   {country && <span className="text-3xl">{country.flag}</span>}
                   <span className="text-xl font-bold tracking-tight sm:text-2xl">{display}</span>
                 </div>
-                {isArcep ? (
-                  <span className="inline-flex items-center gap-1.5 rounded-full border border-amber/30 bg-amber/10 px-3 py-1 text-sm font-semibold text-amber">
-                    <ListIcon className="h-4 w-4" /> {t.arcepBadge}
-                  </span>
-                ) : (
+                <div className="flex flex-wrap gap-2">
                   <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-semibold ${pill}`}>
                     <StatusIcon className="h-4 w-4" /> {labels[status]}
                   </span>
-                )}
+                  {isArcep && (
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-amber/30 bg-amber/10 px-3 py-1 text-sm font-semibold text-amber">
+                    <ListIcon className="h-4 w-4" /> {t.arcepBadge}
+                  </span>
+                  )}
+                </div>
               </div>
 
               <div className="mt-5 flex flex-wrap items-end gap-x-8 gap-y-4">
                 <div>
                   <div className="flex items-baseline gap-1.5">
                     <span className={`text-4xl font-extrabold leading-none sm:text-5xl ${statusColor}`}>
-                      {number.spamScore}
+                      {spamScore}
                     </span>
                     <span className="text-sm text-night/40">/ 100</span>
                   </div>
@@ -188,21 +206,17 @@ export default async function NumberPage({
                   </div>
                 </div>
 
-                {!isArcep && (
-                  <div className="flex gap-6">
-                    <div>
-                      <div className="text-2xl font-bold text-coral">{spamCount}</div>
-                      <div className="text-xs text-night/50">{t.spamReports}</div>
-                    </div>
-                    <div>
-                      <div className="text-2xl font-bold text-emerald">{legitCount}</div>
-                      <div className="text-xs text-night/50">{t.legitReports}</div>
-                    </div>
-                  </div>
-                )}
               </div>
 
-              <p className="mt-4 text-sm text-night/60">{isArcep ? t.arcepNote : t.communityNote}</p>
+              <p className="mt-4 text-sm text-night/60">
+                {source === "mixed"
+                  ? `${t.arcepNote} ${t.communityNote}`
+                  : isArcep
+                    ? t.arcepNote
+                    : hasCommunityData
+                      ? t.communityNote
+                      : t.noData}
+              </p>
               {isArcep && (
                 <p className="mt-2 text-sm">
                   <a
@@ -216,6 +230,38 @@ export default async function NumberPage({
                 </p>
               )}
             </div>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <section className="rounded-2xl border border-hair p-5">
+              <h2 className="text-xs font-semibold uppercase tracking-wide text-night/40">
+                {t.reports}
+              </h2>
+              <div className="mt-3 flex gap-8">
+                <div>
+                  <div className="text-2xl font-bold text-coral">{spamCount}</div>
+                  <div className="text-xs text-night/50">{t.spamReports}</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-emerald">{legitCount}</div>
+                  <div className="text-xs text-night/50">{t.legitReports}</div>
+                </div>
+              </div>
+              <p className="mt-3 text-xs leading-relaxed text-night/50">{t.rawVotesNote}</p>
+            </section>
+
+            <section className="rounded-2xl border border-hair p-5">
+              <h2 className="text-xs font-semibold uppercase tracking-wide text-night/40">
+                {t.confidence}
+              </h2>
+              <p className="mt-3 text-xl font-bold">
+                {t.confidenceLevels[confidenceLevel]}
+                {typeof confidence === "number" && confidenceLevel !== "none" ? ` · ${confidence} %` : ""}
+              </p>
+              <p className="mt-2 text-sm leading-relaxed text-night/55">
+                {t.confidenceNotes[confidenceLevel]}
+              </p>
+            </section>
           </div>
 
           {/* Detail grid — country/formats | categories */}
@@ -324,6 +370,17 @@ export default async function NumberPage({
               )}
             </div>
           )}
+
+          <NumberVote
+            phone={phone}
+            locale={lang}
+            title={t.yourOpinion}
+            note={t.opinionNote}
+            spamLabel={t.spamReports}
+            legitLabel={t.legitReports}
+            savedMessage={t.voteSaved}
+            errorMessage={t.voteError}
+          />
 
           {/* Advice CTA */}
           <section className="rounded-2xl bg-night p-5 text-white sm:p-6">

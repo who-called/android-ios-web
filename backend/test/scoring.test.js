@@ -17,6 +17,7 @@ test("no reports → unknown, score 0", () => {
   const r = scoreFromReports([], { now });
   assert.equal(r.score, 0);
   assert.equal(r.status, "unknown");
+  assert.equal(r.confidence, 0);
 });
 
 test("many fresh spam reports → block", () => {
@@ -42,6 +43,14 @@ test("single uncontradicted spam report → warn (potential spam, not unknown)",
   const r = scoreFromReports(reps(1, "spam"), { now });
   assert.ok(r.score < 60, `score=${r.score}`);
   assert.equal(r.status, "warn");
+  assert.ok(r.confidence > 0 && r.confidence < 100, `confidence=${r.confidence}`);
+});
+
+test("confidence reflects weighted evidence volume", () => {
+  const low = scoreFromReports(reps(1, "legit"), { now });
+  const high = scoreFromReports(reps(5, "legit"), { now });
+  assert.ok(low.confidence < high.confidence);
+  assert.equal(high.confidence, 100);
 });
 
 test("balanced 1 spam / 1 legit → unknown (no clear signal either way)", () => {

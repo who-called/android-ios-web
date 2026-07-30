@@ -16,6 +16,7 @@ import androidx.compose.material.icons.rounded.ChevronRight
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.outlined.Shield
 import androidx.compose.material.icons.rounded.PowerSettingsNew
+import androidx.compose.material.icons.rounded.PhoneInTalk
 import androidx.compose.material.icons.rounded.VerifiedUser
 import androidx.compose.material.icons.rounded.WarningAmber
 import androidx.compose.material.icons.rounded.Storage
@@ -57,6 +58,8 @@ import com.whocalled.android.ui.components.GradientHeader
 import com.whocalled.android.ui.components.ScrollableScreen
 import com.whocalled.android.ui.theme.WCColor
 import com.whocalled.android.network.StatsResponse
+import com.whocalled.android.util.CallEvent
+import com.whocalled.android.util.CallEventAction
 import java.text.DateFormat
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
@@ -71,6 +74,7 @@ fun HomeScreen(
     onRequestRole: () -> Unit,
     onSyncNow: () -> Unit,
     onSeeAllHistory: () -> Unit,
+    onRecentCallClick: (CallEvent) -> Unit,
     onSmsClick: () -> Unit,
     onPlayGame: () -> Unit = {},
     onOpenLeaderboard: () -> Unit = {},
@@ -80,6 +84,7 @@ fun HomeScreen(
     val sync by viewModel.sync.collectAsState()
     val syncProgress by viewModel.syncProgress.collectAsState()
     val stats by viewModel.stats.collectAsState()
+    val recentCall by viewModel.recentCallPrompt.collectAsState()
 
     val gameState by viewModel.gameState.collectAsState()
     val playedToday = gameState?.lastPlayedDay == com.whocalled.android.game.GameDay.epochDay()
@@ -153,6 +158,19 @@ fun HomeScreen(
             )
         },
     ) {
+        recentCall?.let { call ->
+            item(key = "recent-call-${call.key}") {
+                RecentCallCard(
+                    call = call,
+                    onOpen = {
+                        viewModel.markRecentCallHandled(call)
+                        onRecentCallClick(call)
+                    },
+                    onDismiss = { viewModel.markRecentCallHandled(call) },
+                )
+            }
+        }
+
         // Primary action first: update the list (visible without scrolling).
         item {
             OutlinedButton(
@@ -288,6 +306,71 @@ fun HomeScreen(
                 onPlay = onPlayGame,
                 onLeaderboard = onOpenLeaderboard,
             )
+        }
+    }
+}
+
+@Composable
+private fun RecentCallCard(
+    call: CallEvent,
+    onOpen: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val (title, message, color) = when (call.action) {
+        CallEventAction.BLOCKED -> Triple(
+            "Appel indésirable bloqué",
+            "Who Called a raccroché avant qu’il ne sonne.",
+            WCColor.Coral,
+        )
+        CallEventAction.WARNED -> Triple(
+            "Appel suspect détecté",
+            "L’appel a sonné avec une alerte.",
+            WCColor.Amber,
+        )
+        CallEventAction.UNKNOWN -> Triple(
+            "Un numéro inconnu vous a appelé",
+            "Vérifiez ce numéro avant de rappeler.",
+            WCColor.Blue,
+        )
+    }
+
+    BorderedCard(
+        Modifier.padding(horizontal = 16.dp),
+        accent = color,
+    ) {
+        Row(verticalAlignment = Alignment.Top) {
+            Icon(
+                Icons.Rounded.PhoneInTalk,
+                contentDescription = null,
+                tint = color,
+                modifier = Modifier.size(28.dp),
+            )
+            Column(Modifier.weight(1f).padding(horizontal = 10.dp)) {
+                Text(title, fontWeight = FontWeight.Bold)
+                Text(
+                    "+${call.phone}",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(top = 4.dp),
+                )
+                Text(
+                    "${com.whocalled.android.util.RelativeTime.format(call.timestamp)} · $message",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            Icon(
+                Icons.Rounded.Close,
+                contentDescription = "Fermer",
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.clickable(onClick = onDismiss).padding(4.dp),
+            )
+        }
+        Button(
+            onClick = onOpen,
+            modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
+        ) {
+            Text("Voir le numéro")
         }
     }
 }

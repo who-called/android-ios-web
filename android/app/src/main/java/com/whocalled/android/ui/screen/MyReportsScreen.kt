@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Flag
 import androidx.compose.material.icons.rounded.SwapHoriz
@@ -27,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.whocalled.android.ui.MainViewModel
@@ -36,7 +38,11 @@ import com.whocalled.android.ui.components.GradientHeader
 import com.whocalled.android.ui.components.ScrollableScreen
 
 @Composable
-fun MyReportsScreen(viewModel: MainViewModel, onOpenNumber: (String) -> Unit = {}) {
+fun MyReportsScreen(
+    viewModel: MainViewModel,
+    onBack: () -> Unit,
+    onOpenNumber: (String) -> Unit = {},
+) {
     val reports by viewModel.myReports.collectAsState()
     var pendingDelete by remember { mutableStateOf<String?>(null) }
 
@@ -55,7 +61,22 @@ fun MyReportsScreen(viewModel: MainViewModel, onOpenNumber: (String) -> Unit = {
         )
     }
 
-    ScrollableScreen(header = { GradientHeader(title = "Mes signalements") }) {
+    ScrollableScreen(
+        header = {
+            GradientHeader(
+                title = "Mes signalements",
+                leading = {
+                    IconButton(onClick = onBack) {
+                        Icon(
+                            Icons.AutoMirrored.Rounded.ArrowBack,
+                            contentDescription = "Retour",
+                            tint = Color.White,
+                        )
+                    }
+                },
+            )
+        },
+    ) {
         item {
             Text(
                 "Changez d’avis ou supprimez un signalement fait par erreur.",
