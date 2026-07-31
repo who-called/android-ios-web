@@ -61,6 +61,7 @@ object Preferences {
     private val KEY_GAME_REMINDER = booleanPreferencesKey("game_reminder_enabled")
     private val KEY_TRACE_TUTORIAL_SEEN = booleanPreferencesKey("trace_tutorial_seen")
     private val KEY_NOTIF_PROMPT_SEEN = booleanPreferencesKey("notif_prompt_seen")
+    private val KEY_SHIELD_SETUP_COMPLETED = booleanPreferencesKey("shield_setup_completed")
     private val KEY_REMINDER_IGNORED = intPreferencesKey("game_reminder_ignored_count")
     private val KEY_RECENT_CALL_HANDLED_AT = longPreferencesKey("recent_call_handled_at")
 
@@ -215,6 +216,18 @@ object Preferences {
 
     suspend fun setNotifPromptSeen(context: Context) {
         context.dataStore.edit { it[KEY_NOTIF_PROMPT_SEEN] = true }
+    }
+
+    /**
+     * First-launch shield setup wizard (screening + notifications + call log).
+     * Once completed or skipped, the full-screen tunnel never returns — Home
+     * keeps a lighter "protection partielle" nudge instead.
+     */
+    suspend fun isShieldSetupCompleted(context: Context): Boolean =
+        context.dataStore.data.first()[KEY_SHIELD_SETUP_COMPLETED] ?: false
+
+    suspend fun setShieldSetupCompleted(context: Context, completed: Boolean = true) {
+        context.dataStore.edit { it[KEY_SHIELD_SETUP_COMPLETED] = completed }
     }
 
     /** Most recent call already opened or dismissed from the Home prompt. */

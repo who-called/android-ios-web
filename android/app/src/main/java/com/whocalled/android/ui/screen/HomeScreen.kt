@@ -71,7 +71,10 @@ import java.util.TimeZone
 fun HomeScreen(
     viewModel: MainViewModel,
     isScreeningRoleHeld: Boolean,
+    notificationsGranted: Boolean = true,
     onRequestRole: () -> Unit,
+    onRequestNotifications: () -> Unit = {},
+    onRequestCallLogPermission: () -> Unit = {},
     onSyncNow: () -> Unit,
     onSeeAllHistory: () -> Unit,
     onRecentCallClick: (CallEvent) -> Unit,
@@ -85,6 +88,7 @@ fun HomeScreen(
     val syncProgress by viewModel.syncProgress.collectAsState()
     val stats by viewModel.stats.collectAsState()
     val recentCall by viewModel.recentCallPrompt.collectAsState()
+    val callLogGranted by viewModel.callLogPermission.collectAsState()
 
     val gameState by viewModel.gameState.collectAsState()
     val playedToday = gameState?.lastPlayedDay == com.whocalled.android.game.GameDay.epochDay()
@@ -237,22 +241,57 @@ fun HomeScreen(
             }
         }
         item {
-            if (!isScreeningRoleHeld) {
+            val shieldSteps = listOf(isScreeningRoleHeld, notificationsGranted, callLogGranted)
+            val shieldDone = shieldSteps.count { it }
+            val shieldTotal = shieldSteps.size
+
+            if (shieldDone < shieldTotal) {
                 BorderedCard(
                     Modifier.padding(horizontal = 16.dp),
-                    accent = WCColor.Coral,
+                    accent = if (isScreeningRoleHeld) WCColor.Amber else WCColor.Coral,
                 ) {
-                    Text("Bloqueur non activé", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                    Text("Activez Who Called pour filtrer les appels.", Modifier.padding(vertical = 6.dp), style = MaterialTheme.typography.bodySmall)
-                    Button(onClick = onRequestRole) {
-                        Icon(Icons.Rounded.PowerSettingsNew, contentDescription = null, modifier = Modifier.padding(end = 8.dp))
-                        Text("Activer le bloqueur")
+                    Text(
+                        if (isScreeningRoleHeld) "Protection partielle · $shieldDone/$shieldTotal"
+                        else "Bouclier non activé · $shieldDone/$shieldTotal",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                    )
+                    Text(
+                        when {
+                            !isScreeningRoleHeld ->
+                                "Activez le filtre d’appels pour bloquer les indésirables."
+                            !notificationsGranted ->
+                                "Les alertes sont coupées : activez les notifications."
+                            else ->
+                                "Autorisez l’historique pour voir qui a appelé."
+                        },
+                        Modifier.padding(vertical = 6.dp),
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                    Button(
+                        onClick = when {
+                            !isScreeningRoleHeld -> onRequestRole
+                            !notificationsGranted -> onRequestNotifications
+                            else -> onRequestCallLogPermission
+                        },
+                    ) {
+                        Icon(
+                            Icons.Rounded.PowerSettingsNew,
+                            contentDescription = null,
+                            modifier = Modifier.padding(end = 8.dp),
+                        )
+                        Text(
+                            when {
+                                !isScreeningRoleHeld -> "Activer le bloqueur"
+                                !notificationsGranted -> "Activer les alertes"
+                                else -> "Afficher mon historique"
+                            },
+                        )
                     }
                 }
-            } else {
+            }
+            if (isScreeningRoleHeld) {
                 // Saracroche-style "active and up to date" card, but in our emerald.
-                // Two tappable rows: the DB count (reassurance) and the blocked-call
-                // count — tapping the latter opens the full list (loaded on tap).
                 ProtectionCard(
                     blocked = blocked,
                     warned = warned,

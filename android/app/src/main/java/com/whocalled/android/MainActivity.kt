@@ -20,6 +20,7 @@ class MainActivity : ComponentActivity() {
 
     private val viewModel: MainViewModel by viewModels()
     private val isScreeningRole = mutableStateOf(false)
+    private val notificationsGranted = mutableStateOf(false)
 
     private val roleLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
@@ -34,6 +35,7 @@ class MainActivity : ComponentActivity() {
     private val notifLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission(),
     ) { granted ->
+        notificationsGranted.value = granted
         // The daily game reminder is on by default but stays dormant until the
         // permission exists — arm it as soon as we actually can notify.
         if (granted) {
@@ -44,6 +46,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         refreshRoleState()
+        refreshNotificationState()
         handleShareIntent(intent)
         handleOpenCallIntent(intent)
         handleOpenGamesIntent(intent)
@@ -63,72 +66,23 @@ class MainActivity : ComponentActivity() {
                     WhoCalledApp(
                         viewModel = viewModel,
                         isScreeningRoleHeld = isScreeningRole,
+                        notificationsGranted = notificationsGranted,
                         onRequestRole = ::requestScreeningRole,
+                        onRequestNotifications = ::requestNotificationPermission,
                         onSyncNow = viewModel::syncNow,
                         onRequestCallLogPermission = {
                             callLogLauncher.launch(android.Manifest.permission.READ_CALL_LOG)
                         },
                     )
-                    NotificationPrePrompt()
                 }
             }
         }
-    }
-
-    /**
-     * One-time, in-app notification pre-prompt (Android 13+). Framed around what
-     * the user installed the app for — protection: alerts on suspicious calls,
-     * blocked-call notices… and the daily challenge reminder rides along. Shown
-     * once, BEFORE the system dialog, so a "no" here costs none of the ~2 system
-     * prompts Android allows.
-     */
-    @androidx.compose.runtime.Composable
-    private fun NotificationPrePrompt() {
-        if (Build.VERSION.SDK_INT < 33) return
-        val show = androidx.compose.runtime.remember { mutableStateOf(false) }
-        androidx.compose.runtime.LaunchedEffect(Unit) {
-            val granted = checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) ==
-                PackageManager.PERMISSION_GRANTED
-            show.value = !granted && !com.whocalled.android.data.Preferences.isNotifPromptSeen(this@MainActivity)
-        }
-        if (!show.value) return
-
-        val dismiss: (Boolean) -> Unit = { accepted ->
-            show.value = false
-            kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
-                com.whocalled.android.data.Preferences.setNotifPromptSeen(this@MainActivity)
-            }
-            if (accepted) {
-                notifLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
-            }
-        }
-        androidx.compose.material3.AlertDialog(
-            onDismissRequest = { dismiss(false) },
-            icon = { androidx.compose.material3.Text("🛡️", style = androidx.compose.material3.MaterialTheme.typography.headlineMedium) },
-            title = { androidx.compose.material3.Text("Restez protégé") },
-            text = {
-                androidx.compose.material3.Text(
-                    "Who Called vous alerte quand un appel suspect sonne, vous prévient " +
-                        "des appels et SMS bloqués, et vous rappelle le défi du jour. " +
-                        "Sans les notifications, la protection reste silencieuse.",
-                )
-            },
-            confirmButton = {
-                androidx.compose.material3.Button(onClick = { dismiss(true) }) {
-                    androidx.compose.material3.Text("Activer les notifications")
-                }
-            },
-            dismissButton = {
-                androidx.compose.material3.TextButton(onClick = { dismiss(false) }) {
-                    androidx.compose.material3.Text("Plus tard")
-                }
-            },
-        )
     }
 
     override fun onResume() {
         super.onResume()
         refreshRoleState()
+        refreshNotificationState()
         viewModel.refreshCallLogPermission()
         viewModel.refreshSmsState()
     }
@@ -186,21 +140,25 @@ class MainActivity : ComponentActivity() {
         val rm = roleManager()
         isScreeningRole.value =
             rm?.isRoleHeld(RoleManager.ROLE_CALL_SCREENING) == true
-        requestNotifPermissionIfNeeded()
     }
 
-    /**
-     * Ask for POST_NOTIFICATIONS in context: right when the user commits to call
-     * protection (screening role held). No-op below Android 13 or once decided —
-     * the system itself caps how often the dialog can appear.
-     */
-    private fun requestNotifPermissionIfNeeded() {
+    private fun refreshNotificationState() {
+        notificationsGranted.value = if (Build.VERSION.SDK_INT >= 33) {
+            checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) ==
+                PackageManager.PERMISSION_GRANTED
+        } else {
+            true
+        }
+    }
+
+    private fun requestNotificationPermission() {
         if (Build.VERSION.SDK_INT >= 33 &&
-            isScreeningRole.value &&
             checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) !=
             PackageManager.PERMISSION_GRANTED
         ) {
             notifLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+        } else {
+            notificationsGranted.value = true
         }
     }
 

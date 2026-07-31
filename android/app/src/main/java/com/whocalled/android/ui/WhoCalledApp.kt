@@ -16,25 +16,33 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
+import com.whocalled.android.data.Preferences
 import com.whocalled.android.ui.screen.CallDetailScreen
 import com.whocalled.android.ui.screen.CallsScreen
 import com.whocalled.android.ui.screen.DefenseGameScreen
 import com.whocalled.android.ui.screen.GamesScreen
 import com.whocalled.android.ui.screen.HomeScreen
 import com.whocalled.android.ui.screen.LeaderboardScreen
+import com.whocalled.android.ui.screen.ProtectionSetupScreen
 import com.whocalled.android.ui.screen.TraceGameScreen
 import com.whocalled.android.ui.screen.MyReportsScreen
 import com.whocalled.android.ui.screen.StreakScreen
 import com.whocalled.android.ui.screen.ReportScreen
 import com.whocalled.android.ui.screen.SettingsScreen
 import com.whocalled.android.ui.screen.SmsSettingsScreen
+import kotlinx.coroutines.launch
 
 private data class Tab(val route: String, val label: String, val icon: @Composable () -> Unit)
 
@@ -42,10 +50,65 @@ private data class Tab(val route: String, val label: String, val icon: @Composab
 fun WhoCalledApp(
     viewModel: MainViewModel,
     isScreeningRoleHeld: State<Boolean>,
+    notificationsGranted: State<Boolean>,
     onRequestRole: () -> Unit,
+    onRequestNotifications: () -> Unit,
     onSyncNow: () -> Unit,
     onRequestCallLogPermission: () -> Unit,
 ) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val callLogGranted by viewModel.callLogPermission.collectAsState()
+    val stats by viewModel.stats.collectAsState()
+
+    // null = still deciding; true = show first-launch shield tunnel.
+    var showShieldSetup by remember { mutableStateOf<Boolean?>(null) }
+    LaunchedEffect(Unit) {
+        viewModel.loadStats()
+        viewModel.refreshCallLogPermission()
+        if (Preferences.isShieldSetupCompleted(context)) {
+            showShieldSetup = false
+            return@LaunchedEffect
+        }
+        // Grandfather existing installs so the tunnel only hits true first opens.
+        val alreadyUser = Preferences.lastSyncAt(context) > 0L ||
+            Preferences.isNotifPromptSeen(context) ||
+            isScreeningRoleHeld.value ||
+            viewModel.callLogPermission.value
+        if (alreadyUser) {
+            Preferences.setShieldSetupCompleted(context)
+            Preferences.setNotifPromptSeen(context)
+            showShieldSetup = false
+        } else {
+            showShieldSetup = true
+        }
+    }
+
+    if (showShieldSetup == true) {
+        ProtectionSetupScreen(
+            screeningGranted = isScreeningRoleHeld.value,
+            notificationsGranted = notificationsGranted.value,
+            callLogGranted = callLogGranted,
+            coveredNumbers = stats?.coveredNumbers,
+            onRequestScreening = onRequestRole,
+            onRequestNotifications = {
+                scope.launch { Preferences.setNotifPromptSeen(context) }
+                onRequestNotifications()
+            },
+            onRequestCallLog = onRequestCallLogPermission,
+            onFinished = {
+                scope.launch {
+                    Preferences.setShieldSetupCompleted(context)
+                    Preferences.setNotifPromptSeen(context)
+                    showShieldSetup = false
+                }
+            },
+        )
+        return
+    }
+
+    if (showShieldSetup == null) return
+
     val nav = rememberNavController()
     val tabs = listOf(
         Tab("home", "Accueil") { Icon(Icons.Rounded.Home, null) },
@@ -117,7 +180,10 @@ fun WhoCalledApp(
                 HomeScreen(
                     viewModel = viewModel,
                     isScreeningRoleHeld = isScreeningRoleHeld.value,
+                    notificationsGranted = notificationsGranted.value,
                     onRequestRole = onRequestRole,
+                    onRequestNotifications = onRequestNotifications,
+                    onRequestCallLogPermission = onRequestCallLogPermission,
                     onSyncNow = onSyncNow,
                     onSeeAllHistory = { nav.navigate("calls") },
                     onRecentCallClick = { call ->
