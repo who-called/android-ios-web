@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.automirrored.rounded.Message
@@ -33,7 +34,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
@@ -48,11 +48,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.whocalled.android.BuildConfig
 import com.whocalled.android.data.ReportCategory
@@ -62,6 +68,7 @@ import com.whocalled.android.ui.MainViewModel
 import com.whocalled.android.ui.components.AnimatedBanner
 import com.whocalled.android.ui.components.BannerKind
 import com.whocalled.android.ui.components.BorderedCard
+import com.whocalled.android.ui.components.ExpandableSection
 import com.whocalled.android.ui.components.ScoreGauge
 import com.whocalled.android.ui.components.StatusBadge
 import com.whocalled.android.ui.theme.WCColor
@@ -72,6 +79,14 @@ import java.util.Locale
 
 private enum class NumberAction { CALL, SMS }
 
+/**
+ * Number detail.
+ *
+ * Layout priority: the verdict, who the number is, and what the user can DO
+ * about it all fit on the first screenful. Everything explanatory (how the
+ * evaluation is built, the per-call history) lives in collapsed sections — still
+ * one tap away, but no longer pushing the vote buttons below the fold.
+ */
 @Composable
 fun CallDetailScreen(
     viewModel: MainViewModel,
@@ -91,7 +106,10 @@ fun CallDetailScreen(
     val clipboard = LocalClipboardManager.current
     val context = LocalContext.current
     var pendingAction by remember { mutableStateOf<NumberAction?>(null) }
-    var showAllHistory by remember { mutableStateOf(false) }
+    // A caller name can be far longer than one line. It stays ellipsized so the
+    // card keeps its shape, and a tap unfolds it in place — the number right
+    // below keeps its own tap action (copy), so the two never compete.
+    var nameExpanded by remember { mutableStateOf(false) }
 
     val call = if (callId != null) detail?.takeIf { it.id == callId } else null
     val displayedPhone = phone?.takeIf { it.isNotBlank() }
@@ -132,6 +150,7 @@ fun CallDetailScreen(
     val callsLast7Days = recentHistory.count {
         it.timestamp >= System.currentTimeMillis() - 7L * 86_400_000L
     }
+    val isBlocked = rule == "block" || (rule == null && status == "block")
 
     fun launchNumberAction(action: NumberAction) {
         val target = displayedPhone ?: return
@@ -140,6 +159,10 @@ fun CallDetailScreen(
             NumberAction.SMS -> Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:+$target"))
         }
         runCatching { context.startActivity(intent) }
+    }
+
+    fun confirmOrLaunch(action: NumberAction) {
+        if (status == "block" || status == "warn") pendingAction = action else launchNumberAction(action)
     }
 
     pendingAction?.let { action ->
@@ -179,13 +202,13 @@ fun CallDetailScreen(
         Modifier.fillMaxSize().padding(horizontal = 16.dp),
         // The bottom tab bar is hidden on this drill-down screen; a small inset
         // keeps the last button clear of the gesture/navigation area.
-        contentPadding = PaddingValues(top = 16.dp, bottom = 32.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        contentPadding = PaddingValues(top = 8.dp, bottom = 32.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         item {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Retour") }
-                Text("Détail du numéro", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                Text("Détail du numéro", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
             }
         }
 
@@ -194,43 +217,43 @@ fun CallDetailScreen(
             return@LazyColumn
         }
 
+        // 1) Verdict + identity, all in one card: score, name, number, badges and
+        //    the raw community counts on a single line.
         item {
-            // Compact header: the gauge sits beside the number/badges (not stacked
-            // below), so the action buttons stay above the fold without scrolling.
             BorderedCard(accent = statusColor) {
                 Row(
                     Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(14.dp),
                 ) {
                     ScoreGauge(
                         score = lookup?.spamScore ?: call?.spamScore ?: 0,
                         status = status,
-                        diameter = 64.dp,
+                        diameter = 60.dp,
                         stroke = 6.dp,
                     )
                     // weight(1f) bounds the column so a long name ellipsizes instead
                     // of pushing the badges out of the card.
                     Column(
                         Modifier.weight(1f),
-                        verticalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalArrangement = Arrangement.spacedBy(5.dp),
                     ) {
-                        // A known name becomes the headline (single line, ellipsized
-                        // so a long one can't break the layout); the number then
-                        // sits under it so both are always visible together.
+                        // A known name becomes the headline; the number sits under it
+                        // so both are always visible together.
                         identity?.displayName?.let { name ->
                             Text(
                                 name,
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
-                                maxLines = 1,
+                                maxLines = if (nameExpanded) Int.MAX_VALUE else 1,
                                 overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.clickable { nameExpanded = !nameExpanded },
                             )
                         }
                         Text(
                             "+$displayedPhone",
                             style = if (identity != null) {
-                                MaterialTheme.typography.titleSmall
+                                MaterialTheme.typography.bodyMedium
                             } else {
                                 MaterialTheme.typography.titleLarge
                             },
@@ -246,13 +269,16 @@ fun CallDetailScreen(
                                 clipboard.setText(AnnotatedString("+$displayedPhone"))
                             },
                         )
-                        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        FlowRow(
+                            horizontalArrangement = Arrangement.spacedBy(6.dp),
+                            verticalArrangement = Arrangement.spacedBy(6.dp),
+                        ) {
                             StatusBadge(
                                 label = when (status) {
                                     "block" -> "Indésirable"
                                     "warn" -> "Suspect"
                                     "allow" -> "Plutôt légitime"
-                                    else -> "Données insuffisantes"
+                                    else -> "Peu de données"
                                 },
                                 color = statusColor,
                                 icon = when (status) {
@@ -262,177 +288,95 @@ fun CallDetailScreen(
                                     else -> Icons.Rounded.Search
                                 },
                             )
+                            // Identity as a badge, not a paragraph: "Contact" vs
+                            // "Identifié" is the whole distinction worth making.
+                            identity?.let {
+                                if (it.isContact) {
+                                    StatusBadge("Contact", WCColor.Emerald, Icons.Rounded.Person)
+                                } else {
+                                    StatusBadge("Identifié", WCColor.Indigo, Icons.Rounded.PersonSearch)
+                                }
+                            }
                             if (isArcep || hasCommunityData) {
                                 SourceBadge(source, isArcep, hasCommunityData)
                             }
                         }
-                        Text(
-                            verdictExplanation(status, lookup?.confidenceLevel ?: "none"),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
                     }
                 }
-            }
-        }
-
-        // Who this number is, and how sure we are of it. Kept above the actions:
-        // "c'est mon médecin" changes what the user does next.
-        identity?.displayName?.let {
-            item { IdentityCard(isContact = identity.isContact) }
-        }
-
-        item {
-            BorderedCard {
-                Text("Contacter ce numéro", fontWeight = FontWeight.SemiBold)
-                Row(
-                    Modifier.fillMaxWidth().padding(top = 8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    OutlinedButton(
-                        onClick = {
-                            if (status == "block" || status == "warn") {
-                                pendingAction = NumberAction.CALL
-                            } else {
-                                launchNumberAction(NumberAction.CALL)
-                            }
-                        },
-                        modifier = Modifier.weight(1f),
-                    ) {
-                        Icon(Icons.Rounded.Phone, contentDescription = null, modifier = Modifier.padding(end = 6.dp))
-                        Text("Appeler")
-                    }
-                    OutlinedButton(
-                        onClick = {
-                            if (status == "block" || status == "warn") {
-                                pendingAction = NumberAction.SMS
-                            } else {
-                                launchNumberAction(NumberAction.SMS)
-                            }
-                        },
-                        modifier = Modifier.weight(1f),
-                    ) {
-                        Icon(Icons.AutoMirrored.Rounded.Message, contentDescription = null, modifier = Modifier.padding(end = 6.dp))
-                        Text("SMS")
-                    }
+                lookup?.let { stats ->
+                    Text(
+                        communitySummary(stats),
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(top = 10.dp),
+                    )
                 }
-            }
-        }
-
-        // Source explanation
-        item {
-            BorderedCard {
                 Text(
-                    when {
-                        source == "mixed" -> "ARCEP et avis de la communauté"
-                        isArcep -> "Plage officielle ARCEP"
-                        hasCommunityData -> "Avis de la communauté"
-                        else -> "Aucune donnée communautaire"
-                    },
-                    fontWeight = FontWeight.SemiBold,
-                )
-                Text(
-                    if (source == "mixed")
-                        "Ce numéro correspond à une plage ARCEP et possède aussi des avis communautaires. Le verdict tient compte des deux."
-                    else if (isArcep)
-                        "Ce numéro correspond à un préfixe de la liste officielle des démarcheurs (ARCEP / opérateurs)" +
-                            (arcepMatch?.pattern?.let { " : $it" } ?: "") +
-                            ". Cette source est distincte des avis communautaires."
-                    else if (hasCommunityData)
-                        "Le verdict combine les avis récents, leur volume et la réputation des contributeurs."
-                    else
-                        "L’absence d’avis ne signifie pas que ce numéro est fiable. Restez prudent avant de rappeler.",
+                    verdictExplanation(status, lookup?.confidenceLevel ?: "none"),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = 2.dp),
                 )
-                if (isArcep) {
-                    // Play "misleading claims" policy: government info must link
-                    // to its official source, with a non-affiliation disclaimer.
-                    TextButton(
-                        onClick = {
-                            context.startActivity(
-                                Intent(Intent.ACTION_VIEW, Uri.parse(BuildConfig.ARCEP_SOURCE_URL)),
-                            )
-                        },
-                        contentPadding = PaddingValues(0.dp),
+                if (lookupLoading) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(top = 8.dp),
                     ) {
-                        Icon(Icons.AutoMirrored.Rounded.OpenInNew, contentDescription = null, modifier = Modifier.padding(end = 6.dp).size(16.dp))
-                        Text("Source officielle : plan de numérotation (arcep.fr)")
+                        CircularProgressIndicator(Modifier.padding(end = 8.dp).size(14.dp), strokeWidth = 2.dp)
+                        Text("Statistiques…", style = MaterialTheme.typography.bodySmall)
                     }
-                    Text(
-                        "Who Called est une application indépendante, non affiliée à l’ARCEP ni à aucune entité gouvernementale.",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
                 }
             }
         }
 
-        // Compact details — type + date grouped in a single card.
-        call?.let { filteredCall ->
-            item {
-                BorderedCard {
-                    DetailLine("Type d’appel", ReportCategory.fromApi(lookup?.category ?: filteredCall.category)?.label ?: "Inconnu")
-                    DetailLine(
-                        "Filtré le",
-                        DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT, Locale.FRANCE)
-                            .format(Date(filteredCall.timestamp)),
-                    )
+        // 2) Everything the user can do, on one row instead of three cards.
+        item {
+            BorderedCard {
+                Row(Modifier.fillMaxWidth()) {
+                    ActionTile(
+                        Modifier.weight(1f),
+                        Icons.Rounded.Phone,
+                        "Appeler",
+                    ) { confirmOrLaunch(NumberAction.CALL) }
+                    ActionTile(
+                        Modifier.weight(1f),
+                        Icons.AutoMirrored.Rounded.Message,
+                        "SMS",
+                    ) { confirmOrLaunch(NumberAction.SMS) }
+                    ActionTile(
+                        Modifier.weight(1f),
+                        if (isBlocked) Icons.Rounded.LockOpen else Icons.Rounded.Block,
+                        if (isBlocked) "Autoriser" else "Bloquer",
+                        tint = if (isBlocked) WCColor.Emerald else WCColor.Coral,
+                    ) {
+                        if (isBlocked) viewModel.unblock(displayedPhone) else viewModel.block(displayedPhone)
+                    }
+                    ActionTile(
+                        Modifier.weight(1f),
+                        Icons.Rounded.ContentCopy,
+                        "Copier",
+                    ) { clipboard.setText(AnnotatedString("+$displayedPhone")) }
                 }
-            }
-        }
-
-        if (recentHistory.isNotEmpty()) {
-            item {
-                BorderedCard {
-                    Text("Vos appels avec ce numéro", fontWeight = FontWeight.SemiBold)
+                // Only surfaced once a personal rule actually exists — no line of
+                // text just to say "nothing special here".
+                rule?.let {
                     Text(
-                        "${recentHistory.size} appel${if (recentHistory.size > 1) "s" else ""} sur 30 jours" +
-                            " · $callsLast7Days sur 7 jours",
+                        if (it == "allow")
+                            "Toujours autorisé sur cet appareil."
+                        else
+                            "Bloqué sur cet appareil.",
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(top = 2.dp, bottom = 8.dp),
+                        color = if (it == "allow") WCColor.Emerald else WCColor.Coral,
+                        modifier = Modifier.padding(top = 4.dp),
                     )
-                    (if (showAllHistory) recentHistory else recentHistory.take(3)).forEach { event ->
-                        DetailLine(
-                            callHistoryLabel(event.direction, event.durationSeconds),
-                            com.whocalled.android.util.RelativeTime.format(event.timestamp),
-                        )
-                    }
-                    if (recentHistory.size > 3) {
-                        TextButton(onClick = { showAllHistory = !showAllHistory }) {
-                            Text(if (showAllHistory) "Réduire" else "Voir les ${recentHistory.size} appels")
-                        }
-                    }
                 }
             }
         }
 
-        // Community stats (only meaningful when not ARCEP-only)
-        if (lookupLoading) {
-            item {
-                BorderedCard {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        CircularProgressIndicator(Modifier.padding(end = 8.dp), strokeWidth = 2.dp)
-                        Text("Chargement des statistiques…", style = MaterialTheme.typography.bodySmall)
-                    }
-                }
-            }
-        } else {
-            lookup?.let { stats -> item { StatsCard(stats) } }
-        }
-
+        // 3) The contribution ask, kept above the fold.
         item {
             BorderedCard {
                 Text("Votre avis", fontWeight = FontWeight.SemiBold)
-                Text(
-                    "Votre vote améliore l’évaluation communautaire. Il ne bloque pas automatiquement le numéro.",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(top = 2.dp, bottom = 10.dp),
-                )
-                SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
+                SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth().padding(top = 8.dp)) {
                     SegmentedButton(
                         selected = myVote == "spam",
                         onClick = {
@@ -467,106 +411,112 @@ fun CallDetailScreen(
             }
             AnimatedBanner(kind, msg)
         }
-        item {
-            BlockToggle(
-                rule = rule,
-                effectivelyBlocked = rule == "block" || (rule == null && status == "block"),
-                onBlock = { viewModel.block(displayedPhone) },
-                onUnblock = { viewModel.unblock(displayedPhone) },
-            )
+
+        // 4) ARCEP attribution stays expanded, never behind a tap: the Play
+        //    "misleading claims" policy requires the official source link and the
+        //    non-affiliation notice to be visible whenever we lean on that list.
+        if (isArcep) {
+            item {
+                BorderedCard(accent = WCColor.Indigo) {
+                    Text(
+                        "Plage officielle ARCEP" + (arcepMatch?.pattern?.let { " · $it" } ?: ""),
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                    TextButton(
+                        onClick = {
+                            context.startActivity(
+                                Intent(Intent.ACTION_VIEW, Uri.parse(BuildConfig.ARCEP_SOURCE_URL)),
+                            )
+                        },
+                        contentPadding = PaddingValues(0.dp),
+                    ) {
+                        Icon(
+                            Icons.AutoMirrored.Rounded.OpenInNew,
+                            contentDescription = null,
+                            modifier = Modifier.padding(end = 6.dp).size(16.dp),
+                        )
+                        Text("Source officielle : plan de numérotation (arcep.fr)")
+                    }
+                    Text(
+                        "Who Called est indépendante, non affiliée à l’ARCEP.",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
         }
+
+        // 5) The reasoning behind the verdict — useful, but not what the user
+        //    opened the screen for.
         item {
-            OutlinedButton(
-                onClick = { clipboard.setText(AnnotatedString("+$displayedPhone")) },
-                modifier = Modifier.fillMaxWidth(),
+            ExpandableSection(
+                title = "Pourquoi cette évaluation",
+                subtitle = sourceHeadline(source, isArcep, hasCommunityData),
             ) {
-                Icon(Icons.Rounded.ContentCopy, contentDescription = null, modifier = Modifier.padding(end = 8.dp))
-                Text("Copier le numéro")
+                Text(
+                    sourceExplanation(source, isArcep, hasCommunityData, arcepMatch?.pattern),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                lookup?.let { stats -> EvaluationDetail(stats) }
+            }
+        }
+
+        // 6) Local call history + the filtered-call specifics.
+        if (recentHistory.isNotEmpty() || call != null) {
+            item {
+                ExpandableSection(
+                    title = "Vos appels avec ce numéro",
+                    subtitle = if (recentHistory.isEmpty()) null else
+                        "${recentHistory.size} sur 30 jours · $callsLast7Days sur 7 jours",
+                ) {
+                    call?.let { filteredCall ->
+                        DetailLine(
+                            "Type d’appel",
+                            ReportCategory.fromApi(lookup?.category ?: filteredCall.category)?.label ?: "Inconnu",
+                        )
+                        DetailLine(
+                            "Filtré le",
+                            DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT, Locale.FRANCE)
+                                .format(Date(filteredCall.timestamp)),
+                        )
+                    }
+                    recentHistory.forEach { event ->
+                        DetailLine(
+                            callHistoryLabel(event.direction, event.durationSeconds),
+                            com.whocalled.android.util.RelativeTime.format(event.timestamp),
+                        )
+                    }
+                }
             }
         }
     }
 }
 
-/**
- * Caller identity card. Draws a hard line between a name that comes from the
- * user's own address book and one the phone's caller-ID lookup produced — the
- * second one is useful but must never read as "you know this person".
- */
+/** One compact tap target in the actions row (icon over a short label). */
 @Composable
-private fun IdentityCard(isContact: Boolean) {
-    val accent = if (isContact) WCColor.Emerald else WCColor.Indigo
-    BorderedCard(accent = accent) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(
-                if (isContact) Icons.Rounded.Person else Icons.Rounded.PersonSearch,
-                contentDescription = null,
-                tint = accent,
-                modifier = Modifier.padding(end = 8.dp).size(20.dp),
-            )
-            Text(
-                if (isContact) "Dans vos contacts" else "Identifié, hors de vos contacts",
-                fontWeight = FontWeight.SemiBold,
-            )
-        }
-        Text(
-            if (isContact)
-                "Ce nom vient d’une fiche de votre répertoire. Les avis ci-dessous restent ceux de la communauté."
-            else
-                "Ce nom vient de l’identification d’appel de votre téléphone, pas de votre répertoire. À prendre avec prudence.",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(top = 6.dp),
-        )
-    }
-}
-
-/** Personal device rule, intentionally separate from the community vote. */
-@Composable
-fun BlockToggle(
-    rule: String?,
-    effectivelyBlocked: Boolean,
-    onBlock: () -> Unit,
-    onUnblock: () -> Unit,
+private fun ActionTile(
+    modifier: Modifier = Modifier,
+    icon: ImageVector,
+    label: String,
+    tint: Color = MaterialTheme.colorScheme.primary,
+    onClick: () -> Unit,
 ) {
-    val isAllowed = rule == "allow"
-    BorderedCard(
-        accent = when {
-            isAllowed -> WCColor.Emerald
-            effectivelyBlocked -> WCColor.Coral
-            else -> null
-        },
+    Column(
+        modifier
+            .clip(RoundedCornerShape(12.dp))
+            .clickable(onClick = onClick)
+            .padding(vertical = 8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
-        Text("Sur mon téléphone", fontWeight = FontWeight.SemiBold)
+        Icon(icon, contentDescription = null, tint = tint, modifier = Modifier.size(22.dp))
         Text(
-            when {
-                isAllowed -> "Toujours autorisé : ce numéro sonnera normalement."
-                effectivelyBlocked -> "Ce numéro est actuellement bloqué sur cet appareil."
-                else -> "Aucune règle personnelle pour ce numéro."
-            },
-            style = MaterialTheme.typography.bodySmall,
+            label,
+            style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(top = 2.dp, bottom = 8.dp),
+            maxLines = 1,
         )
-        when {
-            isAllowed -> {
-                OutlinedButton(onClick = onBlock, modifier = Modifier.fillMaxWidth()) {
-                    Icon(Icons.Rounded.Block, contentDescription = null, modifier = Modifier.padding(end = 8.dp))
-                    Text("Bloquer sur mon téléphone")
-                }
-            }
-            effectivelyBlocked -> {
-                OutlinedButton(onClick = onUnblock, modifier = Modifier.fillMaxWidth()) {
-                    Icon(Icons.Rounded.LockOpen, contentDescription = null, modifier = Modifier.padding(end = 8.dp))
-                    Text("Toujours autoriser")
-                }
-            }
-            else -> {
-                OutlinedButton(onClick = onBlock, modifier = Modifier.fillMaxWidth()) {
-                    Icon(Icons.Rounded.Block, contentDescription = null, modifier = Modifier.padding(end = 8.dp))
-                    Text("Bloquer sur mon téléphone")
-                }
-            }
-        }
     }
 }
 
@@ -580,67 +530,92 @@ fun SourceBadge(source: String, isArcep: Boolean, hasCommunityData: Boolean) {
     }
 }
 
+/**
+ * The raw community counts and the reliability of the verdict, condensed into one
+ * readable line — this used to be a card with two big numbers and a paragraph.
+ */
+private fun communitySummary(stats: LookupResponse): AnnotatedString = buildAnnotatedString {
+    withStyle(SpanStyle(color = WCColor.Coral, fontWeight = FontWeight.Bold)) {
+        append("${stats.reportCountSpam}")
+    }
+    append(" indésirable${plural(stats.reportCountSpam)}")
+    append("  ·  ")
+    withStyle(SpanStyle(color = WCColor.Emerald, fontWeight = FontWeight.Bold)) {
+        append("${stats.reportCountLegit}")
+    }
+    append(" légitime${plural(stats.reportCountLegit)}")
+    append("  ·  ")
+    append(confidenceSummary(stats.confidenceLevel ?: "none"))
+}
+
+private fun plural(n: Int) = if (n > 1) "s" else ""
+
+/** Everything that was spread over the old stats card, now inside the fold. */
 @Composable
-fun StatsCard(stats: LookupResponse) {
-    val confidenceLevel = stats.confidenceLevel ?: "none"
-    BorderedCard {
-        Text("Avis de la communauté", fontWeight = FontWeight.SemiBold)
-        Row(Modifier.fillMaxWidth().padding(top = 8.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-            Stat("Indésirable", stats.reportCountSpam.toString(), WCColor.Coral)
-            Stat("Légitime", stats.reportCountLegit.toString(), WCColor.Emerald)
+private fun EvaluationDetail(stats: LookupResponse) {
+    val level = stats.confidenceLevel ?: "none"
+    Text(
+        confidenceExplanation(level, stats.confidence),
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier.padding(top = 8.dp),
+    )
+    Text(
+        "Les nombres affichés sont les avis bruts ; le verdict pondère aussi leur récence et la réputation des contributeurs.",
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier.padding(top = 6.dp),
+    )
+
+    // Community "why did it call?" headline — only when we have a known reason.
+    stats.topReason
+        ?.takeIf { it.category != "unknown" && it.count > 0 }
+        ?.let { top ->
+            val label = ReportCategory.fromApi(top.category)?.label ?: top.category
+            Text(
+                "Le plus souvent : $label (${top.share} %)",
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = WCColor.Coral,
+                modifier = Modifier.padding(top = 10.dp),
+            )
         }
-        Text(
-            "Ces nombres sont les avis bruts. Le verdict pondère aussi leur récence et la réputation des contributeurs.",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(top = 8.dp),
-        )
 
-        Text(
-            "Fiabilité de l’évaluation",
-            fontWeight = FontWeight.SemiBold,
-            modifier = Modifier.padding(top = 14.dp),
-        )
-        Text(
-            confidenceTitle(confidenceLevel),
-            color = when (confidenceLevel) {
-                "high", "official" -> WCColor.Emerald
-                "medium" -> WCColor.Amber
-                else -> MaterialTheme.colorScheme.onSurfaceVariant
-            },
-            fontWeight = FontWeight.SemiBold,
-            modifier = Modifier.padding(top = 4.dp),
-        )
-        Text(
-            confidenceExplanation(confidenceLevel, stats.confidence),
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-
-        // Community "why did it call?" headline — only when we have a known reason.
-        stats.topReason
-            ?.takeIf { it.category != "unknown" && it.count > 0 }
-            ?.let { top ->
-                val label = ReportCategory.fromApi(top.category)?.label ?: top.category
-                Text(
-                    "Le plus souvent : $label (${top.share} %)",
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    color = WCColor.Coral,
-                    modifier = Modifier.padding(top = 12.dp),
-                )
-            }
-        val frequency = stats.frequency
-        if (frequency.last1y > 0) {
-            Text("Activité des avis", fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(top = 14.dp))
-            Row(Modifier.fillMaxWidth().padding(top = 8.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-                Stat("24 h", frequency.last24h.toString(), MaterialTheme.colorScheme.primary)
-                Stat("7 j", frequency.last7d.toString(), MaterialTheme.colorScheme.primary)
-                Stat("30 j", frequency.last30d.toString(), MaterialTheme.colorScheme.primary)
-                Stat("1 an", frequency.last1y.toString(), MaterialTheme.colorScheme.primary)
-            }
+    val frequency = stats.frequency
+    if (frequency.last1y > 0) {
+        Text("Activité des avis", fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(top = 12.dp))
+        Row(Modifier.fillMaxWidth().padding(top = 6.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+            Stat("24 h", frequency.last24h.toString(), MaterialTheme.colorScheme.primary)
+            Stat("7 j", frequency.last7d.toString(), MaterialTheme.colorScheme.primary)
+            Stat("30 j", frequency.last30d.toString(), MaterialTheme.colorScheme.primary)
+            Stat("1 an", frequency.last1y.toString(), MaterialTheme.colorScheme.primary)
         }
     }
+}
+
+private fun sourceHeadline(source: String, isArcep: Boolean, hasCommunityData: Boolean): String = when {
+    source == "mixed" -> "ARCEP et avis de la communauté"
+    isArcep -> "Plage officielle ARCEP"
+    hasCommunityData -> "Avis de la communauté"
+    else -> "Aucune donnée communautaire"
+}
+
+private fun sourceExplanation(
+    source: String,
+    isArcep: Boolean,
+    hasCommunityData: Boolean,
+    arcepPattern: String?,
+): String = when {
+    source == "mixed" ->
+        "Ce numéro correspond à une plage ARCEP et possède aussi des avis communautaires. Le verdict tient compte des deux."
+    isArcep ->
+        "Ce numéro correspond à un préfixe de la liste officielle des démarcheurs (ARCEP / opérateurs)" +
+            (arcepPattern?.let { " : $it" } ?: "") +
+            ". Cette source est distincte des avis communautaires."
+    hasCommunityData ->
+        "Le verdict combine les avis récents, leur volume et la réputation des contributeurs."
+    else ->
+        "L’absence d’avis ne signifie pas que ce numéro est fiable. Restez prudent avant de rappeler."
 }
 
 private fun verdictExplanation(status: String, confidenceLevel: String): String = when (status) {
@@ -652,12 +627,13 @@ private fun verdictExplanation(status: String, confidenceLevel: String): String 
     else -> "Pas assez d’éléments pour évaluer ce numéro."
 }
 
-private fun confidenceTitle(level: String): String = when (level) {
-    "official" -> "Source officielle"
-    "high" -> "Élevée"
-    "medium" -> "Moyenne"
-    "low" -> "Faible"
-    else -> "Non évaluée"
+/** Inline form of the reliability label, for the one-line summary. */
+private fun confidenceSummary(level: String): String = when (level) {
+    "official" -> "source officielle"
+    "high" -> "fiabilité élevée"
+    "medium" -> "fiabilité moyenne"
+    "low" -> "fiabilité faible"
+    else -> "fiabilité non évaluée"
 }
 
 private fun confidenceExplanation(level: String, confidence: Int?): String = when (level) {
@@ -683,17 +659,10 @@ private fun callHistoryLabel(direction: CallDirection, durationSeconds: Long): S
 }
 
 @Composable
-private fun Stat(label: String, value: String, color: androidx.compose.ui.graphics.Color) {
+private fun Stat(label: String, value: String, color: Color) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(value, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = color)
+        Text(value, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = color)
         Text(label, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-    }
-}
-
-@Composable
-private fun DetailRow(label: String, value: String) {
-    BorderedCard {
-        DetailLine(label, value)
     }
 }
 
@@ -701,7 +670,7 @@ private fun DetailRow(label: String, value: String) {
 @Composable
 private fun DetailLine(label: String, value: String) {
     Row(
-        Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        Modifier.fillMaxWidth().padding(vertical = 3.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(label, color = MaterialTheme.colorScheme.onSurfaceVariant)
