@@ -7,6 +7,7 @@ import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.runtime.mutableStateOf
@@ -44,6 +45,10 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Edge-to-edge + WindowInsets.safeDrawing (e.g. setup Scaffold) is the
+        // supported pattern on targetSdk 35+ so content never sits under the
+        // status/nav bars or camera cutout.
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         refreshRoleState()
         refreshNotificationState()
