@@ -46,6 +46,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -60,6 +61,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
 import com.whocalled.android.ui.theme.WCColor
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.text.NumberFormat
 
 private enum class SetupStep {
@@ -71,12 +73,9 @@ private enum class SetupStep {
 /**
  * First-launch shield activation tunnel.
  *
- * Fixed (non-scroll) adaptive layout:
- * - [Scaffold] + [WindowInsets.safeDrawing]
- * - top chrome + bottom CTAs take their intrinsic height
- * - middle fills the remainder with [Modifier.weight] and scales down on short screens
- *
- * Every visible step asks for a real system permission/role. Skip is allowed.
+ * Steps are always sequential (1 → 2 → 3). Already-granted permissions are not
+ * skipped silently: the step still appears with a "Continuer" CTA. Fresh grants
+ * via the system dialog auto-advance shortly after.
  */
 @Composable
 fun ProtectionSetupScreen(
@@ -89,7 +88,6 @@ fun ProtectionSetupScreen(
     onRequestCallLog: () -> Unit,
     onFinished: () -> Unit,
 ) {
-    // Forced light surface → dark status/nav icons while this screen is up.
     val view = LocalView.current
     val darkTheme = isSystemInDarkTheme()
     DisposableEffect(darkTheme) {
@@ -118,45 +116,58 @@ fun ProtectionSetupScreen(
         SetupStep.CALL_LOG -> callLogGranted
     }
 
-    fun firstPending(): Int = steps.indexOfFirst { !isGranted(it) }
-
-    var stepIndex by remember {
-        mutableIntStateOf(firstPending().let { if (it < 0) 0 else it })
+    fun bravoFor(step: SetupStep): String = when (step) {
+        SetupStep.SCREENING -> coveredNumbers?.takeIf { it > 0 }?.let {
+            "✓ Filtre activé · ${NumberFormat.getInstance().format(it)} numéros prêts"
+        } ?: "✓ Filtre d’appels activé"
+        SetupStep.NOTIFICATIONS -> "✓ Alertes activées"
+        SetupStep.CALL_LOG -> "✓ Historique autorisé"
     }
+
+    // Always start at step 0 so notifications is never jumped over.
+    var stepIndex by remember { mutableIntStateOf(0) }
     var justUnlocked by remember { mutableStateOf<String?>(null) }
     var completing by remember { mutableStateOf(false) }
+    // Snapshot of grant state when entering a step — distinguishes "already OK"
+    // (show Continuer) from "just granted via system dialog" (auto-advance).
+    // Updated synchronously in goNext to avoid a frame where a pre-granted
+    // notifications step would auto-skip.
+    var grantedOnEnter by remember { mutableStateOf(isGranted(steps[0])) }
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
-        if (firstPending() < 0) onFinished()
+        if (steps.all { isGranted(it) }) onFinished()
     }
 
-    // On grant → next permission ask immediately (bravo as a banner, never a dead step).
-    LaunchedEffect(screeningGranted, notificationsGranted, callLogGranted, stepIndex) {
-        if (completing) return@LaunchedEffect
-        val current = steps.getOrNull(stepIndex) ?: return@LaunchedEffect
-        if (!isGranted(current)) return@LaunchedEffect
-
-        val bravo = when (current) {
-            SetupStep.SCREENING -> coveredNumbers?.takeIf { it > 0 }?.let {
-                "✓ Filtre activé · ${NumberFormat.getInstance().format(it)} numéros prêts"
-            } ?: "✓ Filtre d’appels activé"
-            SetupStep.NOTIFICATIONS -> "✓ Alertes activées"
-            SetupStep.CALL_LOG -> "✓ Historique autorisé"
-        }
-
-        val next = (stepIndex + 1 until steps.size).firstOrNull { !isGranted(steps[it]) }
-        if (next == null) {
+    fun goNext(banner: String?) {
+        if (banner != null) justUnlocked = banner
+        val next = stepIndex + 1
+        if (next >= steps.size) {
             completing = true
-            justUnlocked = bravo
-            delay(900)
-            onFinished()
+            scope.launch {
+                delay(900)
+                onFinished()
+            }
         } else {
-            justUnlocked = bravo
+            grantedOnEnter = isGranted(steps[next])
             stepIndex = next
         }
     }
 
+    // Fresh grant on the current step → brief confirmation, then next step.
+    LaunchedEffect(screeningGranted, notificationsGranted, callLogGranted, stepIndex) {
+        if (completing) return@LaunchedEffect
+        val current = steps.getOrNull(stepIndex) ?: return@LaunchedEffect
+        if (!isGranted(current)) return@LaunchedEffect
+        if (grantedOnEnter) return@LaunchedEffect // already OK on entry — wait for Continuer
+        val banner = bravoFor(current)
+        justUnlocked = banner
+        delay(500)
+        goNext(banner)
+    }
+
     val current = steps.getOrElse(stepIndex) { SetupStep.SCREENING }
+    val currentGranted = isGranted(current)
     val displayStep = (stepIndex + 1).coerceAtMost(steps.size)
     val stepFraction = displayStep / steps.size.toFloat()
     val progress by animateFloatAsState(
@@ -167,8 +178,19 @@ fun ProtectionSetupScreen(
 
     fun skipCurrent() {
         justUnlocked = null
-        val next = stepIndex + 1
-        if (next >= steps.size) onFinished() else stepIndex = next
+        goNext(null)
+    }
+
+    fun onPrimary() {
+        if (currentGranted) {
+            goNext(bravoFor(current))
+            return
+        }
+        when (current) {
+            SetupStep.SCREENING -> onRequestScreening()
+            SetupStep.NOTIFICATIONS -> onRequestNotifications()
+            SetupStep.CALL_LOG -> onRequestCallLog()
+        }
     }
 
     Scaffold(
@@ -181,7 +203,6 @@ fun ProtectionSetupScreen(
                 .padding(innerPadding)
                 .padding(horizontal = 24.dp),
         ) {
-            // —— Top chrome (intrinsic height) ——
             Row(
                 Modifier
                     .fillMaxWidth()
@@ -223,7 +244,6 @@ fun ProtectionSetupScreen(
                 )
             }
 
-            // —— Middle: fills leftover space, never scrolls, never covers chrome ——
             Box(
                 Modifier
                     .weight(1f)
@@ -242,12 +262,14 @@ fun ProtectionSetupScreen(
                         label = "setup-step",
                         modifier = Modifier.fillMaxSize(),
                     ) { step ->
-                        AdaptiveStepBody(step = step)
+                        AdaptiveStepBody(
+                            step = step,
+                            alreadyGranted = isGranted(step),
+                        )
                     }
                 }
             }
 
-            // —— Bottom CTAs (intrinsic height, always above nav inset) ——
             if (!completing) {
                 Column(
                     Modifier
@@ -255,21 +277,19 @@ fun ProtectionSetupScreen(
                         .padding(bottom = 8.dp, top = 4.dp),
                 ) {
                     Button(
-                        onClick = {
-                            when (current) {
-                                SetupStep.SCREENING -> onRequestScreening()
-                                SetupStep.NOTIFICATIONS -> onRequestNotifications()
-                                SetupStep.CALL_LOG -> onRequestCallLog()
-                            }
-                        },
+                        onClick = ::onPrimary,
                         modifier = Modifier.fillMaxWidth().height(52.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = WCColor.Blue,
+                            containerColor = if (currentGranted) WCColor.Emerald else WCColor.Blue,
                             contentColor = WCColor.Cloud,
                         ),
                         shape = RoundedCornerShape(14.dp),
                     ) {
-                        Text(copy.cta, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+                        Text(
+                            if (currentGranted) "Continuer" else copy.cta,
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 16.sp,
+                        )
                     }
                     TextButton(
                         onClick = ::skipCurrent,
@@ -330,12 +350,11 @@ private fun CompletionPane(coveredNumbers: Long?) {
     }
 }
 
-/**
- * Middle pane sized to the available height: smaller glyph/type on short
- * devices, more air on tall ones — no scrolling.
- */
 @Composable
-private fun AdaptiveStepBody(step: SetupStep) {
+private fun AdaptiveStepBody(
+    step: SetupStep,
+    alreadyGranted: Boolean,
+) {
     val copy = stepCopy(step)
     BoxWithConstraints(Modifier.fillMaxSize()) {
         val compact = maxHeight < 360.dp
@@ -343,7 +362,6 @@ private fun AdaptiveStepBody(step: SetupStep) {
         val glyphSize = if (compact) 32.dp else 44.dp
         val titleSize = if (compact) 20.sp else 24.sp
         val bodySize = if (compact) 14.sp else 16.sp
-        val bodyLines = if (compact) 22.sp else 22.sp
 
         Column(
             Modifier
@@ -356,19 +374,29 @@ private fun AdaptiveStepBody(step: SetupStep) {
                 Modifier
                     .size(iconSize)
                     .clip(CircleShape)
-                    .background(copy.accent.copy(alpha = 0.12f)),
+                    .background(
+                        (if (alreadyGranted) WCColor.Emerald else copy.accent).copy(alpha = 0.12f),
+                    ),
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
-                    copy.icon,
+                    if (alreadyGranted) Icons.Rounded.CheckCircle else copy.icon,
                     contentDescription = null,
-                    tint = copy.accent,
+                    tint = if (alreadyGranted) WCColor.Emerald else copy.accent,
                     modifier = Modifier.size(glyphSize),
                 )
             }
             Spacer(Modifier.height(if (compact) 14.dp else 22.dp))
             Text(
-                copy.title,
+                if (alreadyGranted) {
+                    when (step) {
+                        SetupStep.SCREENING -> "Protection déjà activée"
+                        SetupStep.NOTIFICATIONS -> "Alertes déjà activées"
+                        SetupStep.CALL_LOG -> "Historique déjà autorisé"
+                    }
+                } else {
+                    copy.title
+                },
                 fontSize = titleSize,
                 fontWeight = FontWeight.Bold,
                 color = WCColor.Ink,
@@ -377,11 +405,15 @@ private fun AdaptiveStepBody(step: SetupStep) {
                 overflow = TextOverflow.Ellipsis,
             )
             Text(
-                copy.body,
+                if (alreadyGranted) {
+                    "Cette autorisation est déjà en place. Continuez pour l’étape suivante."
+                } else {
+                    copy.body
+                },
                 fontSize = bodySize,
                 color = WCColor.Muted,
                 textAlign = TextAlign.Center,
-                lineHeight = bodyLines,
+                lineHeight = 22.sp,
                 maxLines = if (compact) 5 else 6,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.padding(top = if (compact) 8.dp else 12.dp, start = 4.dp, end = 4.dp),

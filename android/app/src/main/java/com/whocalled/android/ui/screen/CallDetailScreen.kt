@@ -2,6 +2,7 @@ package com.whocalled.android.ui.screen
 
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
@@ -200,7 +201,14 @@ fun CallDetailScreen(
                         stroke = 6.dp,
                     )
                     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                        Text("+$displayedPhone", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                        Text(
+                            "+$displayedPhone",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.clickable {
+                                clipboard.setText(AnnotatedString("+$displayedPhone"))
+                            },
+                        )
                         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             StatusBadge(
                                 label = when (status) {
