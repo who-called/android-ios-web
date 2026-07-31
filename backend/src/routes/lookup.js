@@ -1,9 +1,9 @@
 import { Router } from "express";
 import { prisma } from "../db.js";
 import { normalizePhone } from "../phone.js";
-import { REPORT_CATEGORIES } from "../categories.js";
+import { REPORT_CATEGORIES, categoryFromSiaId } from "../categories.js";
 import { config } from "../config.js";
-import { scoreFromReports, siaPrior, displayedReportCounts } from "../scoring.js";
+import { capSiaCount, scoreFromReports, siaPrior, displayedReportCounts } from "../scoring.js";
 import { reportsWithWeights } from "../reportWeights.js";
 import {
   confidenceLevel,
@@ -86,10 +86,20 @@ lookupRouter.get("/:phone", async (req, res) => {
   );
   const { frequency, firstReportedAt, lastReportedAt } = evidenceTimeline(allReports, seed, now);
 
+  // `sia_seed.category` carries the Go ingester's own vocabulary (it still says
+  // "legit"/"other"); categories.js is the single source of truth, so always
+  // re-derive from the raw SIA id.
+  const seedCategory = seed ? categoryFromSiaId(seed.categoryId) : null;
+
   // Community "why did this number call?" breakdown over the spam evidence.
   // Counts per canonical category (see categories.js) + the dominant reason
   // (topReason) for a plain-text headline like "le plus souvent : démarchage".
-  const reasons = reasonBreakdown(REPORT_CATEGORIES, spamReports, seed);
+  const reasons = reasonBreakdown(
+    REPORT_CATEGORIES,
+    spamReports,
+    seed ? capSiaCount(seed.neg) : 0,
+    seedCategory,
+  );
 
   const reasonTotal = Object.values(reasons).reduce((s, c) => s + c, 0);
   const ranked = Object.entries(reasons)
@@ -122,7 +132,7 @@ lookupRouter.get("/:phone", async (req, res) => {
     : officialOnly
       ? (number?.spamScore ?? (status === "block" ? 100 : 70))
       : 0;
-  const category = [number?.category, seed?.category, officialPattern?.category]
+  const category = [number?.category, seedCategory, officialPattern?.category]
     .find((c) => c && c !== "unknown") ?? "unknown";
 
   return res.json({

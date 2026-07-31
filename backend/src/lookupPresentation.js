@@ -69,21 +69,23 @@ export function evidenceTimeline(reports, seed, now = Date.now()) {
  * seed's single category so the breakdown always adds up to the displayed spam
  * count instead of silently dropping the external votes.
  *
+ * `seedCategory` must already be canonical — resolve it with
+ * `categoryFromSiaId(seed.categoryId)` rather than reading `sia_seed.category`,
+ * whose strings come from the Go ingester's own older vocabulary.
+ *
  * @param {string[]} categories       canonical category list
  * @param {Array<{category?:string|null}>} spamReports  our spam reports only
- * @param {{neg:number, category?:string}|null} seed
+ * @param {number} seedSpam           SIA negative votes (already capped)
+ * @param {string|null} seedCategory  canonical category for those votes
  */
-export function reasonBreakdown(categories, spamReports, seed) {
+export function reasonBreakdown(categories, spamReports, seedSpam = 0, seedCategory = null) {
   const reasons = Object.fromEntries(categories.map((c) => [c, 0]));
   const bump = (category, by) => {
     const key = category && category in reasons ? category : "unknown";
     reasons[key] += by;
   };
   for (const r of spamReports) bump(r.category, 1);
-  if (seed) {
-    const seedSpam = capSiaCount(seed.neg);
-    if (seedSpam > 0) bump(seed.category, seedSpam);
-  }
+  if (seedSpam > 0) bump(seedCategory, seedSpam);
   return reasons;
 }
 

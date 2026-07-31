@@ -60,17 +60,14 @@ test("evidenceTimeline has no history without any evidence", () => {
 });
 
 test("reasonBreakdown folds the SIA negative aggregate into its category", () => {
-  const reasons = reasonBreakdown(
-    REPORT_CATEGORIES,
-    [{ category: "scam" }],
-    { neg: 4, category: "telemarketing" },
-  );
+  const reasons = reasonBreakdown(REPORT_CATEGORIES, [{ category: "scam" }], 4, "telemarketing");
   assert.equal(reasons.scam, 1);
   assert.equal(reasons.telemarketing, 4);
   // A seed with no negative votes must not invent a reason.
-  assert.equal(reasonBreakdown(REPORT_CATEGORIES, [], { neg: 0, category: "scam" }).scam, 0);
-  // Unknown/absent categories collapse into the catch-all bucket.
-  assert.equal(reasonBreakdown(REPORT_CATEGORIES, [{ category: null }], null).unknown, 1);
+  assert.equal(reasonBreakdown(REPORT_CATEGORIES, [], 0, "scam").scam, 0);
+  // Absent or non-canonical categories collapse into the catch-all bucket.
+  assert.equal(reasonBreakdown(REPORT_CATEGORIES, [{ category: null }]).unknown, 1);
+  assert.equal(reasonBreakdown(REPORT_CATEGORIES, [], 3, "legit").unknown, 3);
 });
 
 test("confidenceLevel uses stable cross-platform thresholds", () => {
