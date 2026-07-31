@@ -1,6 +1,7 @@
 package com.whocalled.android.util
 
 import com.whocalled.android.data.CallLogEntity
+import com.whocalled.android.data.MyReportEntity
 import java.util.Calendar
 import kotlin.math.abs
 
@@ -16,13 +17,27 @@ data class CallEvent(
     val spamScore: Int,
     val category: String,
     val timestamp: Long,
+    val direction: CallDirection = CallDirection.INCOMING,
+    val contactName: String? = null,
+    val durationSeconds: Long = 0,
     val attempts: Int = 1,
 )
 
 enum class CallEventAction {
     BLOCKED,
     WARNED,
+    REPORTED_SPAM,
+    LEGITIMATE,
+    CONTACT,
     UNKNOWN,
+}
+
+enum class CallDirection {
+    INCOMING,
+    MISSED,
+    OUTGOING,
+    REJECTED,
+    BLOCKED,
 }
 
 /** A titled section of the calls screen ("Aujourd'hui", "Hier", …). */
@@ -44,22 +59,23 @@ private const val DUPLICATE_WINDOW_MS = 2 * 60_000L
 private const val RECENT_CALL_MAX_AGE_MS = 24 * 60 * 60 * 1_000L
 
 // CallLog.Calls values kept here so this merge stays a plain JVM-testable function.
-private val incomingCallTypes = setOf(1, 3, 5, 6) // incoming, missed, rejected, blocked
+private val visibleCallTypes = setOf(1, 2, 3, 5, 6) // incoming, outgoing, missed, rejected, blocked
 
 /**
  * Merge the app's filtered-call journal with Android's system call log.
  *
  * WARN calls normally exist in both sources. Calls close in time with the same
- * normalized number collapse into the richer Room event. Contacts and outgoing
- * calls are intentionally excluded: this screen is about unknown/filtered calls,
- * not a replacement for the system Phone app.
+ * normalized number collapse into the richer Room event. Other system calls
+ * keep their direction/contact context and are decorated with the user's vote.
  */
 fun mergeCallEvents(
     filteredCalls: List<CallLogEntity>,
     systemCalls: List<PhoneCall>,
+    myReports: List<MyReportEntity> = emptyList(),
 ): List<CallEvent> {
     val filtered = filteredCalls.sortedByDescending { it.timestamp }
     val unmatchedFiltered = filtered.indices.toMutableSet()
+    val voteByPhone = myReports.associate { it.phone to it.vote }
     val result = filtered.map { call ->
         CallEvent(
             key = "filtered:${call.id}",
@@ -69,13 +85,13 @@ fun mergeCallEvents(
             spamScore = call.spamScore,
             category = call.category,
             timestamp = call.timestamp,
+            direction = if (call.action == "blocked") CallDirection.BLOCKED else CallDirection.INCOMING,
         )
     }.toMutableList()
 
     systemCalls
         .asSequence()
-        .filter { it.type in incomingCallTypes }
-        .filterNot { it.isContact }
+        .filter { it.type in visibleCallTypes }
         .forEach { call ->
             val phone = call.normalizedPhone ?: return@forEach
             val duplicate = unmatchedFiltered
@@ -86,20 +102,45 @@ fun mergeCallEvents(
 
             if (duplicate != null) {
                 unmatchedFiltered.remove(duplicate)
+                result[duplicate] = result[duplicate].copy(
+                    direction = directionOf(call.type),
+                    contactName = call.contactName,
+                    durationSeconds = call.durationSeconds,
+                )
             } else {
+                val action = when (voteByPhone[phone]) {
+                    "spam" -> CallEventAction.REPORTED_SPAM
+                    "legit" -> CallEventAction.LEGITIMATE
+                    else -> when {
+                        directionOf(call.type) == CallDirection.BLOCKED -> CallEventAction.BLOCKED
+                        call.isContact -> CallEventAction.CONTACT
+                        else -> CallEventAction.UNKNOWN
+                    }
+                }
                 result += CallEvent(
                     key = "system:${call.systemId}",
                     callLogId = null,
                     phone = phone,
-                    action = CallEventAction.UNKNOWN,
+                    action = action,
                     spamScore = 0,
                     category = "unknown",
                     timestamp = call.timestamp,
+                    direction = directionOf(call.type),
+                    contactName = call.contactName,
+                    durationSeconds = call.durationSeconds,
                 )
             }
         }
 
     return result.sortedByDescending { it.timestamp }
+}
+
+private fun directionOf(type: Int): CallDirection = when (type) {
+    2 -> CallDirection.OUTGOING
+    3 -> CallDirection.MISSED
+    5 -> CallDirection.REJECTED
+    6 -> CallDirection.BLOCKED
+    else -> CallDirection.INCOMING
 }
 
 /** Newest event eligible for the Home prompt, bounded to the last 24 hours. */
@@ -111,6 +152,8 @@ fun findRecentCallPrompt(
     val cutoff = now - RECENT_CALL_MAX_AGE_MS
     return events
         .asSequence()
+        .filter { it.direction != CallDirection.OUTGOING }
+        .filter { it.action !in setOf(CallEventAction.CONTACT, CallEventAction.LEGITIMATE) }
         .filter { it.timestamp > handledAt && it.timestamp >= cutoff }
         .maxByOrNull { it.timestamp }
 }

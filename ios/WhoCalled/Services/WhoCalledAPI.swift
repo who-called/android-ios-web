@@ -67,6 +67,7 @@ struct LookupResponseDTO: Codable {
   let source: String?
   let reportCountSpam: Int?
   let reportCountLegit: Int?
+  let userVote: String?
   let frequency: LookupFrequencyDTO?
   let topReason: TopReasonDTO?
   let firstReportedAt: String?
@@ -193,7 +194,11 @@ struct WhoCalledAPI {
   }
 
   func lookup(_ phone: String) async throws -> LookupResponseDTO {
-    guard let url = URL(string: "\(AppConstants.apiLookupURL)/\(phone)") else {
+    var components = URLComponents(string: "\(AppConstants.apiLookupURL)/\(phone)")
+    components?.queryItems = [
+      URLQueryItem(name: "deviceId", value: SharedStore.deviceId())
+    ]
+    guard let url = components?.url else {
       throw APIError.invalidURL
     }
     return try await get(url)

@@ -67,8 +67,11 @@ class WhoCalledApi(
     }
 
     /** Live lookup for a single number. */
-    fun lookup(phone: String): LookupResponse {
-        val url = URL("$baseUrl/lookup/${URLEncoder.encode(phone, "UTF-8")}")
+    fun lookup(phone: String, deviceId: String): LookupResponse {
+        val url = URL(
+            "$baseUrl/lookup/${URLEncoder.encode(phone, "UTF-8")}" +
+                "?deviceId=${URLEncoder.encode(deviceId, "UTF-8")}",
+        )
         return request(url, "GET", null, LookupResponse::class.java)
     }
 

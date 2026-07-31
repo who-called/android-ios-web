@@ -54,34 +54,14 @@ import com.whocalled.android.ui.components.GradientHeader
 @Composable
 fun ReportScreen(
     viewModel: MainViewModel,
-    onRequestCallLogPermission: () -> Unit,
-    onOpenNumber: (String) -> Unit = {},
+    onOpenCalls: () -> Unit,
     onOpenMyReports: () -> Unit = {},
 ) {
     var phone by remember { mutableStateOf("") }
     var isSpam by remember { mutableStateOf(true) }
     var category by remember { mutableStateOf(ReportCategory.TELEMARKETING) }
     val report by viewModel.report.collectAsState()
-    val systemCalls by viewModel.systemCalls.collectAsState()
-    val hasPermission by viewModel.callLogPermission.collectAsState()
     val sharedPhone by viewModel.sharedPhone.collectAsState()
-
-    val myReports by viewModel.myReports.collectAsState()
-    val reportedPhones = remember(myReports) { myReports.map { it.phone }.toSet() }
-
-    // Default: hide known contacts so only unidentified numbers (the ones worth
-    // reporting) are shown. Anonymous/withheld calls (no number) are always dropped.
-    var hideContacts by remember { mutableStateOf(true) }
-    val identifiableCalls = remember(systemCalls) {
-        systemCalls.filter { !it.rawNumber.isBlank() && it.normalizedPhone != null }
-    }
-    val displayedCalls = remember(identifiableCalls, hideContacts) {
-        if (hideContacts) identifiableCalls.filter { !it.isContact } else identifiableCalls
-    }
-    val hiddenContactsCount = remember(identifiableCalls) { identifiableCalls.count { it.isContact } }
-
-    // Re-check the permission whenever this screen is shown (covers the grant flow).
-    LaunchedEffect(Unit) { viewModel.refreshCallLogPermission() }
 
     // Pre-fill from the share sheet / trending tap (one-shot, then cleared).
     LaunchedEffect(sharedPhone) {
@@ -106,6 +86,16 @@ fun ReportScreen(
             ) {
                 Icon(Icons.AutoMirrored.Rounded.ListAlt, contentDescription = null, modifier = Modifier.padding(end = 8.dp))
                 Text("Voir mes signalements")
+            }
+        }
+
+        item {
+            OutlinedButton(
+                onClick = onOpenCalls,
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+            ) {
+                Icon(Icons.Rounded.History, contentDescription = null, modifier = Modifier.padding(end = 8.dp))
+                Text("Choisir dans mes appels récents")
             }
         }
 
@@ -179,117 +169,6 @@ fun ReportScreen(
                 },
                 modifier = Modifier.padding(horizontal = 16.dp),
             )
-        }
-
-        item {
-            Text(
-                "Depuis vos appels récents",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
-            )
-        }
-
-        // Filter: hide contacts by default (only unidentified numbers shown).
-        if (hasPermission && hiddenContactsCount > 0) {
-            item {
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(
-                        if (hideContacts) "Mes contacts masqués ($hiddenContactsCount)" else "Mes contacts affichés",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.weight(1f),
-                    )
-                    TextButton(onClick = { hideContacts = !hideContacts }) {
-                        Text(if (hideContacts) "Tout afficher" else "Masquer les contacts")
-                    }
-                }
-            }
-        }
-
-        if (!hasPermission) {
-            item {
-                BorderedCard(Modifier.padding(horizontal = 16.dp)) {
-                    Text("Autorisez l’accès au journal d’appels pour signaler en un geste.", style = MaterialTheme.typography.bodyMedium)
-                    TextButton(onClick = onRequestCallLogPermission) { Text("Autoriser") }
-                }
-            }
-        } else if (displayedCalls.isEmpty()) {
-            item {
-                EmptyState(
-                    icon = Icons.Rounded.History,
-                    title = if (hiddenContactsCount > 0) "Aucun numéro inconnu" else "Aucun appel récent",
-                    subtitle = if (hiddenContactsCount > 0)
-                        "Tous vos appels récents proviennent de contacts connus. Touchez « Tout afficher » pour les voir."
-                    else "Vos appels récents s’afficheront ici pour les signaler en un geste.",
-                )
-            }
-        } else {
-            items(displayedCalls) { call ->
-                val reported = call.normalizedPhone in reportedPhones
-                BorderedCard(
-                    Modifier
-                        .padding(horizontal = 16.dp)
-                        .clickable { call.normalizedPhone?.let(onOpenNumber) },
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Column(Modifier.weight(1f).padding(end = 8.dp)) {
-                            // Show the contact name when known, the number underneath.
-                            Text(call.contactName ?: call.rawNumber, fontWeight = FontWeight.Bold)
-                            Text(
-                                (if (call.contactName != null) "${call.rawNumber} · " else "") +
-                                    com.whocalled.android.util.RelativeTime.format(call.timestamp),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                        Icon(
-                            Icons.Rounded.ChevronRight,
-                            contentDescription = "Voir le détail",
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
-                    if (reported) {
-                        // Reactive: after a tap, the report lands in myReports and the
-                        // row flips to this confirmation — clear feedback, no re-tap.
-                        Row(
-                            Modifier.padding(top = 10.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Icon(Icons.Rounded.CheckCircle, contentDescription = null, tint = WCColor.Emerald, modifier = Modifier.size(18.dp))
-                            Text(
-                                "  Déjà signalé — merci 😊",
-                                color = WCColor.Emerald,
-                                fontWeight = FontWeight.SemiBold,
-                                style = MaterialTheme.typography.bodySmall,
-                            )
-                        }
-                    } else {
-                        Row(
-                            Modifier.fillMaxWidth().padding(top = 10.dp),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        ) {
-                            OutlinedButton(
-                                onClick = { viewModel.submitReport(call.rawNumber, isSpam = true, ReportCategory.OTHER.api) },
-                                modifier = Modifier.weight(1f),
-                            ) {
-                                Icon(Icons.Rounded.Block, contentDescription = null, tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(18.dp))
-                                Text("  Indésirable")
-                            }
-                            OutlinedButton(
-                                onClick = { viewModel.submitReport(call.rawNumber, isSpam = false) },
-                                modifier = Modifier.weight(1f),
-                            ) {
-                                Icon(Icons.Rounded.CheckCircle, contentDescription = null, tint = WCColor.Emerald, modifier = Modifier.size(18.dp))
-                                Text("  Légitime")
-                            }
-                        }
-                    }
-                }
-            }
         }
 
         item { Text("", modifier = Modifier.padding(8.dp)) }

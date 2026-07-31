@@ -73,6 +73,7 @@ data class LookupResponse(
     val source: String? = null, // none | community | arcep | mixed
     val reportCountSpam: Int = 0,
     val reportCountLegit: Int = 0,
+    val userVote: String? = null,
     val frequency: LookupFrequency = LookupFrequency(),
     val topReason: TopReason? = null,
     val firstReportedAt: String? = null,

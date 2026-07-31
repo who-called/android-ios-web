@@ -2,6 +2,9 @@ import SwiftUI
 
 struct NumberDetailView: View {
   @EnvironmentObject private var viewModel: MainViewModel
+  @Environment(\.openURL) private var openURL
+  @State private var pendingContactURL: URL?
+  @State private var showRiskWarning = false
   let number: ScoredNumber
 
   private var status: String { viewModel.lookup?.status ?? number.status }
@@ -21,7 +24,8 @@ struct NumberDetailView: View {
       (viewModel.lookup?.reportCountLegit ?? 0) > 0
   }
   private var myVote: String? {
-    viewModel.myReports.first(where: { $0.phone == number.phone })?.vote
+    viewModel.lookup?.userVote ??
+      viewModel.myReports.first(where: { $0.phone == number.phone })?.vote
   }
   private var verdictLabel: String {
     switch status {
@@ -98,6 +102,27 @@ struct NumberDetailView: View {
           .frame(maxWidth: .infinity)
         }
 
+        BorderedCard {
+          VStack(alignment: .leading, spacing: 8) {
+            Text("Contacter ce numéro").font(.subheadline.weight(.semibold))
+            HStack(spacing: 8) {
+              Button {
+                requestContact(scheme: "tel")
+              } label: {
+                Label("Appeler", systemImage: "phone.fill").frame(maxWidth: .infinity)
+              }
+              .buttonStyle(.bordered)
+
+              Button {
+                requestContact(scheme: "sms")
+              } label: {
+                Label("SMS", systemImage: "message.fill").frame(maxWidth: .infinity)
+              }
+              .buttonStyle(.bordered)
+            }
+          }
+        }
+
         // Source explanation
         BorderedCard {
           VStack(alignment: .leading, spacing: 2) {
@@ -166,9 +191,28 @@ struct NumberDetailView: View {
     }
     .navigationTitle("Détail")
     .navigationBarTitleDisplayMode(.inline)
+    .alert("Numéro à risque", isPresented: $showRiskWarning) {
+      Button("Annuler", role: .cancel) { pendingContactURL = nil }
+      Button("Continuer") {
+        if let pendingContactURL { openURL(pendingContactURL) }
+        pendingContactURL = nil
+      }
+    } message: {
+      Text("Ce numéro est signalé comme indésirable ou suspect. Voulez-vous continuer ?")
+    }
     .onAppear {
       viewModel.reportBanner = nil // no stale banner from a previous action
       viewModel.loadLookup(phone: number.phone)
+    }
+  }
+
+  private func requestContact(scheme: String) {
+    guard let url = URL(string: "\(scheme):+\(number.phone)") else { return }
+    if status == "block" || status == "warn" {
+      pendingContactURL = url
+      showRiskWarning = true
+    } else {
+      openURL(url)
     }
   }
 

@@ -151,9 +151,8 @@ fun WhoCalledApp(
             }
             composable("report") {
                 ReportScreen(
-                    viewModel,
-                    onRequestCallLogPermission,
-                    onOpenNumber = { phone -> nav.navigate("number/$phone") },
+                    viewModel = viewModel,
+                    onOpenCalls = { nav.navigate("calls") },
                     onOpenMyReports = { nav.navigate("myreports") },
                 )
             }

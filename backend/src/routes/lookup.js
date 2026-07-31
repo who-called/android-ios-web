@@ -26,12 +26,22 @@ lookupRouter.get("/:phone", async (req, res) => {
   if (!phone) {
     return res.status(400).json({ error: "invalid_phone" });
   }
+  const deviceId =
+    typeof req.query.deviceId === "string" && req.query.deviceId.length >= 8
+      ? req.query.deviceId
+      : null;
 
-  const [number, patterns] = await Promise.all([
+  const [number, patterns, userReport] = await Promise.all([
     prisma.number.findUnique({ where: { phone } }),
     prisma.pattern.findMany({
       select: { pattern: true, status: true, category: true, source: true, name: true },
     }),
+    deviceId
+      ? prisma.report.findFirst({
+          where: { phone, deviceId },
+          select: { vote: true },
+        })
+      : null,
   ]);
   const officialPattern = findMatchingPattern(
     phone,
@@ -130,6 +140,7 @@ lookupRouter.get("/:phone", async (req, res) => {
     category,
     reportCountSpam: number?.reportCountSpam ?? 0,
     reportCountLegit: number?.reportCountLegit ?? 0,
+    userVote: userReport?.vote ?? null,
     frequency: {
       last24h: within(1),
       last7d: within(7),

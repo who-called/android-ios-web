@@ -1,8 +1,10 @@
 package com.whocalled.android
 
 import com.whocalled.android.data.CallLogEntity
+import com.whocalled.android.data.MyReportEntity
 import com.whocalled.android.util.CallEvent
 import com.whocalled.android.util.CallEventAction
+import com.whocalled.android.util.CallDirection
 import com.whocalled.android.util.PhoneCall
 import com.whocalled.android.util.findRecentCallPrompt
 import com.whocalled.android.util.groupCallHistory
@@ -103,19 +105,41 @@ class CallHistoryGroupingTest {
     }
 
     @Test
-    fun unknownIncomingCallIsAddedButContactsAndOutgoingCallsAreHidden() {
+    fun fullHistoryKeepsUnknownContactsAndOutgoingCalls() {
         val system = listOf(
             PhoneCall(1, "+33611111111", "33611111111", now, 3),
             PhoneCall(2, "+33622222222", "33622222222", now - 1_000, 1, contactName = "Alice"),
             PhoneCall(3, "+33633333333", "33633333333", now - 2_000, 2),
+            PhoneCall(4, "+33644444444", "33644444444", now - 3_000, 6),
         )
 
         val merged = mergeCallEvents(emptyList(), system)
 
-        assertEquals(1, merged.size)
-        assertEquals("33611111111", merged.single().phone)
-        assertEquals(CallEventAction.UNKNOWN, merged.single().action)
-        assertEquals("system:1", merged.single().key)
+        assertEquals(4, merged.size)
+        assertEquals(CallEventAction.UNKNOWN, merged.first { it.phone == "33611111111" }.action)
+        assertEquals(CallEventAction.CONTACT, merged.first { it.phone == "33622222222" }.action)
+        assertEquals(CallDirection.OUTGOING, merged.first { it.phone == "33633333333" }.direction)
+        assertEquals(CallEventAction.BLOCKED, merged.first { it.phone == "33644444444" }.action)
+    }
+
+    @Test
+    fun personalLegitimateVoteDecoratesRecentCall() {
+        val system = listOf(PhoneCall(1, "+33611111111", "33611111111", now, 3))
+        val reports = listOf(
+            MyReportEntity(
+                phone = "33611111111",
+                vote = "legit",
+                category = null,
+                createdAt = now,
+                updatedAt = now,
+                syncState = "synced",
+            ),
+        )
+
+        val merged = mergeCallEvents(emptyList(), system, reports)
+
+        assertEquals(CallEventAction.LEGITIMATE, merged.single().action)
+        assertEquals(null, findRecentCallPrompt(merged, handledAt = 0, now = now))
     }
 
     @Test

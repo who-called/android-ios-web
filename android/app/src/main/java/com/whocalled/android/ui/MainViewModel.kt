@@ -85,10 +85,10 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     private val _systemCalls = MutableStateFlow<List<PhoneCall>>(emptyList())
     val systemCalls: StateFlow<List<PhoneCall>> = _systemCalls
 
-    /** Unknown system calls + calls blocked/warned by Who Called, newest first. */
+    /** Complete local call history enriched with filtering and personal votes. */
     val callEvents: StateFlow<List<com.whocalled.android.util.CallEvent>> =
-        combine(filteredCalls, systemCalls) { filtered, system ->
-            com.whocalled.android.util.mergeCallEvents(filtered, system)
+        combine(filteredCalls, systemCalls, myReports) { filtered, system, reports ->
+            com.whocalled.android.util.mergeCallEvents(filtered, system, reports)
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     val groupedCallEvents: StateFlow<List<com.whocalled.android.util.CallHistorySection>> =

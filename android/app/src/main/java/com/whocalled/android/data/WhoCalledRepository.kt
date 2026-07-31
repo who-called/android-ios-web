@@ -101,7 +101,7 @@ class WhoCalledRepository(
 
     /** Fetch enriched stats for one number from the server. */
     suspend fun lookup(phone: String): Result<LookupResponse> = guarded {
-        api.lookup(phone)
+        api.lookup(phone, Preferences.deviceId(context))
     }
 
     /** Fetch the "numéros qui montent" trending list. */

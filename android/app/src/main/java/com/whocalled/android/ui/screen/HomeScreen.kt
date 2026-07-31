@@ -327,6 +327,21 @@ private fun RecentCallCard(
             "L’appel a sonné avec une alerte.",
             WCColor.Amber,
         )
+        CallEventAction.REPORTED_SPAM -> Triple(
+            "Numéro signalé indésirable",
+            "Vous aviez déjà marqué ce numéro comme indésirable.",
+            WCColor.Coral,
+        )
+        CallEventAction.LEGITIMATE -> Triple(
+            "Numéro marqué légitime",
+            "Vous aviez indiqué que ce numéro est légitime.",
+            WCColor.Emerald,
+        )
+        CallEventAction.CONTACT -> Triple(
+            "Appel d’un contact",
+            "Ce numéro figure dans vos contacts.",
+            WCColor.Slate,
+        )
         CallEventAction.UNKNOWN -> Triple(
             "Un numéro inconnu vous a appelé",
             "Vérifiez ce numéro avant de rappeler.",

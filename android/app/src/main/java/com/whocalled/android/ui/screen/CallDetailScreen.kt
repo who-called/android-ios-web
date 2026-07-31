@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.automirrored.rounded.Message
 import androidx.compose.material.icons.automirrored.rounded.OpenInNew
 import androidx.compose.material.icons.rounded.Block
 import androidx.compose.material.icons.rounded.CheckCircle
@@ -21,8 +22,10 @@ import androidx.compose.material.icons.rounded.ContentCopy
 import androidx.compose.material.icons.rounded.Gavel
 import androidx.compose.material.icons.rounded.Group
 import androidx.compose.material.icons.rounded.LockOpen
+import androidx.compose.material.icons.rounded.Phone
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.WarningAmber
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -37,6 +40,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
@@ -55,9 +61,12 @@ import com.whocalled.android.ui.components.BorderedCard
 import com.whocalled.android.ui.components.ScoreGauge
 import com.whocalled.android.ui.components.StatusBadge
 import com.whocalled.android.ui.theme.WCColor
+import com.whocalled.android.util.CallDirection
 import java.text.DateFormat
 import java.util.Date
 import java.util.Locale
+
+private enum class NumberAction { CALL, SMS }
 
 @Composable
 fun CallDetailScreen(
@@ -74,8 +83,11 @@ fun CallDetailScreen(
     val rule by viewModel.detailRule.collectAsState()
     val detailPhone by viewModel.detailPhone.collectAsState()
     val myReports by viewModel.myReports.collectAsState()
+    val allCallEvents by viewModel.callEvents.collectAsState()
     val clipboard = LocalClipboardManager.current
     val context = LocalContext.current
+    var pendingAction by remember { mutableStateOf<NumberAction?>(null) }
+    var showAllHistory by remember { mutableStateOf(false) }
 
     val call = if (callId != null) detail?.takeIf { it.id == callId } else null
     val displayedPhone = phone?.takeIf { it.isNotBlank() }
@@ -89,7 +101,60 @@ fun CallDetailScreen(
     val hasCommunityData = source == "community" || source == "mixed" ||
         (lookup?.reportCountSpam ?: 0) > 0 ||
         (lookup?.reportCountLegit ?: 0) > 0
-    val myVote = myReports.firstOrNull { it.phone == displayedPhone }?.vote
+    val myVote = lookup?.userVote ?: myReports.firstOrNull { it.phone == displayedPhone }?.vote
+    val status = when {
+        call?.action == "blocked" -> "block"
+        call?.action == "warned" -> "warn"
+        else -> lookup?.status ?: "unknown"
+    }
+    val statusColor = when (status) {
+        "block" -> WCColor.Coral
+        "warn" -> WCColor.Amber
+        "allow" -> WCColor.Emerald
+        else -> WCColor.Blue
+    }
+    val recentHistory = remember(allCallEvents, displayedPhone) {
+        val cutoff = System.currentTimeMillis() - 30L * 86_400_000L
+        allCallEvents
+            .filter { it.phone == displayedPhone && it.timestamp >= cutoff }
+            .sortedByDescending { it.timestamp }
+    }
+    val callsLast7Days = recentHistory.count {
+        it.timestamp >= System.currentTimeMillis() - 7L * 86_400_000L
+    }
+
+    fun launchNumberAction(action: NumberAction) {
+        val target = displayedPhone ?: return
+        val intent = when (action) {
+            NumberAction.CALL -> Intent(Intent.ACTION_DIAL, Uri.parse("tel:+$target"))
+            NumberAction.SMS -> Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:+$target"))
+        }
+        runCatching { context.startActivity(intent) }
+    }
+
+    pendingAction?.let { action ->
+        AlertDialog(
+            onDismissRequest = { pendingAction = null },
+            title = { Text(if (status == "block") "Numéro indésirable" else "Numéro suspect") },
+            text = {
+                Text(
+                    if (action == NumberAction.CALL)
+                        "Ce numéro présente un risque. Voulez-vous vraiment ouvrir le composeur ?"
+                    else
+                        "Ce numéro présente un risque. Voulez-vous vraiment préparer un SMS ?",
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    pendingAction = null
+                    launchNumberAction(action)
+                }) { Text("Continuer") }
+            },
+            dismissButton = {
+                TextButton(onClick = { pendingAction = null }) { Text("Annuler") }
+            },
+        )
+    }
 
     LaunchedEffect(callId, phone) {
         if (callId != null) {
@@ -117,18 +182,6 @@ fun CallDetailScreen(
         if (displayedPhone == null) {
             item { Text("Chargement…") }
             return@LazyColumn
-        }
-
-        val status = when {
-            call?.action == "blocked" -> "block"
-            call?.action == "warned" -> "warn"
-            else -> lookup?.status ?: "unknown"
-        }
-        val statusColor = when (status) {
-            "block" -> WCColor.Coral
-            "warn" -> WCColor.Amber
-            "allow" -> WCColor.Emerald
-            else -> WCColor.Blue
         }
 
         item {
@@ -172,6 +225,43 @@ fun CallDetailScreen(
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
+                    }
+                }
+            }
+        }
+
+        item {
+            BorderedCard {
+                Text("Contacter ce numéro", fontWeight = FontWeight.SemiBold)
+                Row(
+                    Modifier.fillMaxWidth().padding(top = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    OutlinedButton(
+                        onClick = {
+                            if (status == "block" || status == "warn") {
+                                pendingAction = NumberAction.CALL
+                            } else {
+                                launchNumberAction(NumberAction.CALL)
+                            }
+                        },
+                        modifier = Modifier.weight(1f),
+                    ) {
+                        Icon(Icons.Rounded.Phone, contentDescription = null, modifier = Modifier.padding(end = 6.dp))
+                        Text("Appeler")
+                    }
+                    OutlinedButton(
+                        onClick = {
+                            if (status == "block" || status == "warn") {
+                                pendingAction = NumberAction.SMS
+                            } else {
+                                launchNumberAction(NumberAction.SMS)
+                            }
+                        },
+                        modifier = Modifier.weight(1f),
+                    ) {
+                        Icon(Icons.AutoMirrored.Rounded.Message, contentDescription = null, modifier = Modifier.padding(end = 6.dp))
+                        Text("SMS")
                     }
                 }
             }
@@ -237,6 +327,32 @@ fun CallDetailScreen(
                         DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT, Locale.FRANCE)
                             .format(Date(filteredCall.timestamp)),
                     )
+                }
+            }
+        }
+
+        if (recentHistory.isNotEmpty()) {
+            item {
+                BorderedCard {
+                    Text("Vos appels avec ce numéro", fontWeight = FontWeight.SemiBold)
+                    Text(
+                        "${recentHistory.size} appel${if (recentHistory.size > 1) "s" else ""} sur 30 jours" +
+                            " · $callsLast7Days sur 7 jours",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(top = 2.dp, bottom = 8.dp),
+                    )
+                    (if (showAllHistory) recentHistory else recentHistory.take(3)).forEach { event ->
+                        DetailLine(
+                            callHistoryLabel(event.direction, event.durationSeconds),
+                            com.whocalled.android.util.RelativeTime.format(event.timestamp),
+                        )
+                    }
+                    if (recentHistory.size > 3) {
+                        TextButton(onClick = { showAllHistory = !showAllHistory }) {
+                            Text(if (showAllHistory) "Réduire" else "Voir les ${recentHistory.size} appels")
+                        }
+                    }
                 }
             }
         }
@@ -465,6 +581,20 @@ private fun confidenceExplanation(level: String, confidence: Int?): String = whe
     "medium" -> "Plusieurs avis existent, mais davantage de recul est utile (${confidence ?: 0} %)."
     "low" -> "Trop peu d’avis pondérés pour conclure avec assurance (${confidence ?: 0} %)."
     else -> "Aucun avis pondéré exploitable pour le moment."
+}
+
+private fun callHistoryLabel(direction: CallDirection, durationSeconds: Long): String {
+    val directionLabel = when (direction) {
+        CallDirection.INCOMING -> "Entrant"
+        CallDirection.MISSED -> "Manqué"
+        CallDirection.OUTGOING -> "Sortant"
+        CallDirection.REJECTED -> "Refusé"
+        CallDirection.BLOCKED -> "Bloqué"
+    }
+    if (durationSeconds <= 0) return directionLabel
+    val minutes = durationSeconds / 60
+    val seconds = durationSeconds % 60
+    return "$directionLabel · ${minutes}m ${seconds}s"
 }
 
 @Composable

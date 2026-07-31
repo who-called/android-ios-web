@@ -8,6 +8,7 @@ import { getDict } from "@/i18n/dictionaries";
 import { alternatesFor, toDictLocale, urlLocales } from "@/i18n/locales";
 import { ShieldIcon, CheckCircleIcon, BlockIcon, BellIcon, ListIcon } from "@/components/Icons";
 import { NumberVote } from "@/components/NumberVote";
+import { NumberContactActions } from "@/components/NumberContactActions";
 
 // Pre-render the quality pages at build; others render on-demand (and noindex).
 export async function generateStaticParams() {
@@ -231,6 +232,15 @@ export default async function NumberPage({
               )}
             </div>
           </div>
+
+          <NumberContactActions
+            phone={phone}
+            risky={status === "block" || status === "warn"}
+            title={t.contactNumber}
+            callLabel={t.callNumber}
+            smsLabel={t.smsNumber}
+            warning={t.riskyContactWarning}
+          />
 
           <div className="grid gap-4 sm:grid-cols-2">
             <section className="rounded-2xl border border-hair p-5">

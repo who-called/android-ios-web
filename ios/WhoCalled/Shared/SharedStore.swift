@@ -1,5 +1,6 @@
 import Foundation
 import OSLog
+import Security
 
 /// Shared storage between the main app and the Call Directory extension.
 ///
@@ -49,13 +50,36 @@ enum SharedStore {
 
   // MARK: - Anonymous device id
 
-  /// Random UUID generated once. Only identifier sent to the backend — no PII.
+  /// Anonymous Keychain id. Keychain survives a normal reinstall, so the backend
+  /// replaces this device's previous vote instead of counting it twice.
   static func deviceId() -> String {
-    let d = defaults()
-    if let existing = d?.string(forKey: AppConstants.Keys.deviceId) {
+    let service = "com.whocalled.app.anonymous-device"
+    let account = "report-voter"
+    let query: [String: Any] = [
+      kSecClass as String: kSecClassGenericPassword,
+      kSecAttrService as String: service,
+      kSecAttrAccount as String: account,
+      kSecReturnData as String: true,
+      kSecMatchLimit as String: kSecMatchLimitOne,
+    ]
+    var result: CFTypeRef?
+    if SecItemCopyMatching(query as CFDictionary, &result) == errSecSuccess,
+       let data = result as? Data,
+       let existing = String(data: data, encoding: .utf8)
+    {
       return existing
     }
-    let id = UUID().uuidString
+
+    let d = defaults()
+    let id = d?.string(forKey: AppConstants.Keys.deviceId) ?? "ios-\(UUID().uuidString)"
+    let add: [String: Any] = [
+      kSecClass as String: kSecClassGenericPassword,
+      kSecAttrService as String: service,
+      kSecAttrAccount as String: account,
+      kSecValueData as String: Data(id.utf8),
+      kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly,
+    ]
+    SecItemAdd(add as CFDictionary, nil)
     d?.set(id, forKey: AppConstants.Keys.deviceId)
     return id
   }

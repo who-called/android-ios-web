@@ -12,6 +12,7 @@ data class PhoneCall(
     val normalizedPhone: String?,
     val timestamp: Long,
     val type: Int, // CallLog.Calls.INCOMING_TYPE, MISSED_TYPE, ...
+    val durationSeconds: Long = 0,
     val contactName: String? = null, // dialer-cached name (null = not in contacts)
 ) {
     /** True when the number matches one of the user's contacts (has a cached name). */
@@ -31,7 +32,7 @@ object CallLogReader {
         ) == PackageManager.PERMISSION_GRANTED
 
     /** Returns recent calls, most recent first. Empty if permission is missing. */
-    fun recentCalls(context: Context, limit: Int = 50): List<PhoneCall> {
+    fun recentCalls(context: Context, limit: Int = 200): List<PhoneCall> {
         if (!hasPermission(context)) return emptyList()
 
         val projection = arrayOf(
@@ -39,6 +40,7 @@ object CallLogReader {
             CallLog.Calls.NUMBER,
             CallLog.Calls.DATE,
             CallLog.Calls.TYPE,
+            CallLog.Calls.DURATION,
             CallLog.Calls.CACHED_NAME, // contact name cached by the dialer (no READ_CONTACTS)
         )
 
@@ -55,6 +57,7 @@ object CallLogReader {
                 val numberIdx = cursor.getColumnIndexOrThrow(CallLog.Calls.NUMBER)
                 val dateIdx = cursor.getColumnIndexOrThrow(CallLog.Calls.DATE)
                 val typeIdx = cursor.getColumnIndexOrThrow(CallLog.Calls.TYPE)
+                val durationIdx = cursor.getColumnIndexOrThrow(CallLog.Calls.DURATION)
                 val nameIdx = cursor.getColumnIndex(CallLog.Calls.CACHED_NAME)
 
                 while (cursor.moveToNext() && calls.size < limit) {
@@ -66,6 +69,7 @@ object CallLogReader {
                             normalizedPhone = PhoneNormalizer.normalize(raw),
                             timestamp = cursor.getLong(dateIdx),
                             type = cursor.getInt(typeIdx),
+                            durationSeconds = cursor.getLong(durationIdx),
                             contactName = if (nameIdx >= 0) cursor.getString(nameIdx) else null,
                         ),
                     )

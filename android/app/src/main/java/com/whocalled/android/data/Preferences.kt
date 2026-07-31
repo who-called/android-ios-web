@@ -1,6 +1,7 @@
 package com.whocalled.android.data
 
 import android.content.Context
+import android.provider.Settings
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
@@ -9,6 +10,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.first
+import java.security.MessageDigest
 import java.util.UUID
 
 private val Context.dataStore by preferencesDataStore(name = "who-called-prefs")
@@ -16,8 +18,9 @@ private val Context.dataStore by preferencesDataStore(name = "who-called-prefs")
 /**
  * App preferences (DataStore).
  *
- * Privacy: `deviceId` is a random UUID generated once on-device. It is the ONLY
- * identifier sent to the backend — 100% anonymous, no account, no PII.
+ * Privacy: `deviceId` is a one-way hash of Android's app-scoped identifier. It
+ * survives reinstall for the same signing key/user/device, but is neither a
+ * hardware id nor shared with other developers.
  */
 object Preferences {
     private val KEY_DEVICE_ID = stringPreferencesKey("device_id")
@@ -64,12 +67,22 @@ object Preferences {
     /** Consecutive unanswered reminders before the nudge auto-mutes (anti-spam). */
     const val REMINDER_IGNORED_LIMIT = 3
 
-    /** Returns the anonymous device id, creating it on first access. */
+    /**
+     * Stable anonymous id used to replace (not duplicate) a vote after reinstall.
+     * ANDROID_ID is app-signing-key/user/device scoped on Android 8+ (minSdk 29).
+     */
     suspend fun deviceId(context: Context): String {
         val prefs = context.dataStore.data.first()
-        prefs[KEY_DEVICE_ID]?.let { return it }
-        val id = UUID.randomUUID().toString()
-        context.dataStore.edit { it[KEY_DEVICE_ID] = id }
+        val androidId = Settings.Secure.getString(
+            context.contentResolver,
+            Settings.Secure.ANDROID_ID,
+        )
+        val id = stableAnonymousDeviceId(context.packageName, androidId)
+            ?: prefs[KEY_DEVICE_ID]
+            ?: UUID.randomUUID().toString()
+        if (prefs[KEY_DEVICE_ID] != id) {
+            context.dataStore.edit { it[KEY_DEVICE_ID] = id }
+        }
         return id
     }
 
@@ -324,4 +337,12 @@ object Preferences {
             val day = parts.getOrNull(0)?.toLongOrNull() ?: return@mapNotNull null
             LocalDay(day, parts.getOrNull(1)?.toIntOrNull() ?: 0, parts.getOrNull(2)?.toIntOrNull() ?: 0)
         }.sortedByDescending { it.day }
+}
+
+internal fun stableAnonymousDeviceId(packageName: String, androidId: String?): String? {
+    if (androidId.isNullOrBlank() || androidId == "9774d56d682e549c") return null
+    val digest = MessageDigest.getInstance("SHA-256")
+        .digest("$packageName:$androidId".toByteArray())
+        .joinToString("") { "%02x".format(it) }
+    return "android-${digest.take(32)}"
 }

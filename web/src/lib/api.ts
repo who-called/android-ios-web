@@ -26,6 +26,7 @@ export type LookupResult = {
   source?: "none" | "community" | "arcep" | "mixed";
   reportCountSpam?: number;
   reportCountLegit?: number;
+  userVote?: "spam" | "legit" | null;
   frequency?: { last24h: number; last7d: number; last30d: number; last1y: number };
   reasons?: Record<ReasonCategory, number>;
   topReason?: TopReason | null;
