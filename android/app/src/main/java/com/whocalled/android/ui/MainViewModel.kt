@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.whocalled.android.data.CallLogEntity
 import com.whocalled.android.data.MyReportEntity
+import com.whocalled.android.data.RepoError
 import com.whocalled.android.data.WhoCalledDatabase
 import com.whocalled.android.data.WhoCalledRepository
 import com.whocalled.android.util.CallLogReader
@@ -286,9 +287,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
                         else "Mise à jour terminée 📥 $it numéro(s) actualisé(s).",
                     )
                 },
-                onFailure = {
-                    _sync.value = LoadState.Error("Mise à jour impossible. Vérifiez votre connexion et réessayez.")
-                },
+                onFailure = { _sync.value = LoadState.Error(syncErrorMessage(it)) },
             )
         }
     }
@@ -306,14 +305,29 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
                         else "Mise à jour terminée 📥 $it numéro(s) actualisé(s).",
                     )
                 },
-                onFailure = {
-                    _sync.value = LoadState.Error("Mise à jour impossible. Vérifiez votre connexion et réessayez.")
-                },
+                onFailure = { _sync.value = LoadState.Error(syncErrorMessage(it)) },
             )
         }
     }
 
     private var lastReportedPhone: String? = null
+
+    /**
+     * Why the sync failed, in the user's terms. Blaming the connection for a 429
+     * sent people chasing a network problem that wasn't there — the API test in
+     * Réglages hits /health, which is never rate-limited, so it stayed green
+     * while the list endpoint was refusing requests.
+     */
+    private fun syncErrorMessage(error: Throwable): String = when {
+        error is RepoError.Server && error.code == 429 ->
+            "Trop de mises à jour depuis ce réseau. Patientez quelques minutes puis réessayez."
+        error is RepoError.Server ->
+            "Le serveur a refusé la mise à jour (erreur ${error.code}). Réessayez plus tard."
+        error is RepoError.Network ->
+            "Mise à jour impossible. Vérifiez votre connexion et réessayez."
+        else ->
+            "Mise à jour impossible. Réessayez dans un instant."
+    }
 
     fun submitReport(phone: String, isSpam: Boolean, category: String? = null) {
         viewModelScope.launch {

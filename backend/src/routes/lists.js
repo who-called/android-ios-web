@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { prisma } from "../db.js";
+import { config } from "../config.js";
 import { rateLimit } from "../middleware/rateLimit.js";
 import { issueListToken, verifyListToken, LIST_TOKEN_TTL_S } from "../listToken.js";
 
@@ -14,7 +15,7 @@ export const listsRouter = Router();
  */
 listsRouter.get(
   "/access",
-  rateLimit({ windowMs: 3_600_000, max: 30 }),
+  rateLimit({ windowMs: 3_600_000, max: config.lists.accessMaxPerHour }),
   (_req, res) => {
     const { token } = issueListToken();
     return res.json({ token, expiresIn: LIST_TOKEN_TTL_S });
@@ -34,7 +35,7 @@ listsRouter.get(
  * Returns both exact `numbers` (community + ARCEP exacts) and wildcard `patterns`
  * (ARCEP/operator ranges, e.g. "33899######"). Apps cache results locally.
  */
-listsRouter.get("/", rateLimit({ windowMs: 3_600_000, max: 1200 }), async (req, res) => {
+listsRouter.get("/", rateLimit({ windowMs: 3_600_000, max: config.lists.pageMaxPerHour }), async (req, res) => {
   if (!verifyListToken(String(req.query.token ?? ""))) {
     return res.status(401).json({ error: "invalid_or_expired_token" });
   }

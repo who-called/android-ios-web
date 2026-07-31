@@ -57,7 +57,11 @@ class WhoCalledApi(
      * `country` = E.164 dial code (e.g. "33") to scope the list; null/blank = worldwide.
      * `token` = short-lived token from [listsAccess].
      */
-    fun fetchList(since: String?, country: String? = null, limit: Int = 5000, token: String): ListResponse {
+    // 20 000 rows/page (server hard max is 50 000). A country scope can hold
+    // millions of numbers, so paging at 5 000 meant ~1 000 requests for a single
+    // full sync — enough to trip the server's hourly budget on its own. Kept
+    // below the max so one response stays a couple of MB to parse.
+    fun fetchList(since: String?, country: String? = null, limit: Int = 20_000, token: String): ListResponse {
         val sinceParam = since?.let { "&since=${URLEncoder.encode(it, "UTF-8")}" } ?: ""
         val countryParam = country?.takeIf { it.isNotBlank() }
             ?.let { "&country=${URLEncoder.encode(it, "UTF-8")}" } ?: ""

@@ -34,6 +34,22 @@ export const config = {
       10
     ),
   },
+  lists: {
+    // Hourly per-IP budgets for the delta-sync endpoints.
+    //
+    // These MUST comfortably exceed one full sync: a worldwide/US scope is
+    // millions of rows, so a client paginating at 5 000 rows issues ~1 000
+    // requests for a single sync. The old 1 200 cap was consumed by one sync,
+    // and since the limiter keys on req.ip, every device behind one NAT (a
+    // household, or a whole carrier behind CGNAT) shares that budget — the
+    // second device to sync got a 429 halfway through.
+    //
+    // They are not the anti-scraping control and were never able to be: one
+    // valid token already allows 50 000 rows per request. The short-lived token
+    // gate (see listToken.js) is what bounds bulk access.
+    accessMaxPerHour: parseInt(process.env.LIST_ACCESS_MAX_PER_HOUR ?? "120", 10),
+    pageMaxPerHour: parseInt(process.env.LIST_PAGE_MAX_PER_HOUR ?? "20000", 10),
+  },
   // Comma-separated list of web origins allowed to call the API (the website).
   // Apps don't need CORS; this is for the browser widget on who-called.com.
   corsOrigins: (process.env.CORS_ORIGINS ?? "http://localhost:3000,https://www.who-called.com")
