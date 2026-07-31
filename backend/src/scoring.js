@@ -111,13 +111,31 @@ export function scoreFromReports(reports, opts = {}) {
 export function siaPrior(seed, opts = {}) {
   const now = opts.now ?? Date.now();
   const c = config.sia;
-  const cap = (n) => Math.min(Math.max(n ?? 0, 0), c.maxCount);
   const ageDays = Math.max(0, (now - new Date(seed.importedAt).getTime()) / 86_400_000);
   const decay = Math.pow(0.5, ageDays / c.halfLifeDays);
   const f = c.trust * decay;
   return {
-    weightedSpam: round2(f * cap(seed.neg)),
-    weightedLegit: round2(f * (cap(seed.pos) + c.neutralWeight * cap(seed.neu))),
+    weightedSpam: round2(f * capSiaCount(seed.neg)),
+    weightedLegit: round2(f * (capSiaCount(seed.pos) + c.neutralWeight * capSiaCount(seed.neu))),
+  };
+}
+
+/** Cap a SIA aggregate count (byte-saturated source). */
+export function capSiaCount(n) {
+  return Math.min(Math.max(n ?? 0, 0), config.sia.maxCount);
+}
+
+/**
+ * Option B display counts: fold SIA pos/neg into the shown report counters so a
+ * first community vote never replaces a seed-only history with "1".
+ *
+ * @param {{spam?:number, legit?:number}} scored  community (or raw) counts
+ * @param {{pos?:number, neg?:number}|null|undefined} seed
+ */
+export function displayedReportCounts(scored, seed) {
+  return {
+    spam: (scored.spam ?? 0) + (seed ? capSiaCount(seed.neg) : 0),
+    legit: (scored.legit ?? 0) + (seed ? capSiaCount(seed.pos) : 0),
   };
 }
 

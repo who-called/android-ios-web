@@ -17,12 +17,9 @@
  */
 import { fileURLToPath } from "node:url";
 import { prisma } from "../db.js";
-import { config } from "../config.js";
-import { scoreFromReports, siaPrior } from "../scoring.js";
+import { scoreFromReports, siaPrior, displayedReportCounts, capSiaCount } from "../scoring.js";
 import { reportsWithWeights } from "../reportWeights.js";
 import { categoryFromSiaId } from "../categories.js";
-
-const cap = (n) => Math.min(Math.max(n ?? 0, 0), config.sia.maxCount);
 
 /** Upsert a batch of materialized rows into `numbers` in one statement. */
 async function flushNumbers(rows) {
@@ -87,14 +84,15 @@ export async function runScoreJob({ now = Date.now(), batchSize = 2000 } = {}) {
     const seed = await prisma.siaSeed.findUnique({ where: { phone } });
     const prior = seed ? siaPrior(seed, { now }) : undefined;
     const scored = scoreFromReports(reports, { now, prior });
+    const counts = displayedReportCounts(scored, seed); // option B
     await push({
       phone,
       spamScore: scored.score,
       status: scored.status,
       category: resolveCategory(reports, seed),
       source: seed ? "mixed" : "community",
-      spam: scored.spam + (seed ? cap(seed.neg) : 0), // option B
-      legit: scored.legit + (seed ? cap(seed.pos) : 0),
+      spam: counts.spam,
+      legit: counts.legit,
     });
   }
 
@@ -120,8 +118,8 @@ export async function runScoreJob({ now = Date.now(), batchSize = 2000 } = {}) {
         status: scored.status,
         category: categoryFromSiaId(seed.categoryId),
         source: "sia",
-        spam: cap(seed.neg),
-        legit: cap(seed.pos),
+        spam: capSiaCount(seed.neg),
+        legit: capSiaCount(seed.pos),
       });
     }
   }

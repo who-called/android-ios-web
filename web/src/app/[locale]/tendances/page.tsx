@@ -51,6 +51,8 @@ export default async function TendancesPage({
               base={base}
               t={t}
               cats={cats}
+              risk={dict.tool.risk}
+              riskLevels={dict.tool.riskLevels}
             />
           ))}
         </ol>
@@ -67,14 +69,19 @@ function TrendingRow({
   base,
   t,
   cats,
+  risk,
+  riskLevels,
 }: {
   n: TrendingNumber;
   rank: number;
   base: string;
   t: ReturnType<typeof getDict>["trends"];
   cats: ReturnType<typeof getDict>["tool"]["cats"];
+  risk: string;
+  riskLevels: ReturnType<typeof getDict>["tool"]["riskLevels"];
 }) {
   const blocked = n.status === "block";
+  const status = (n.status in riskLevels ? n.status : "warn") as keyof typeof riskLevels;
   const color = blocked ? "text-coral" : n.status === "warn" ? "text-amber" : "text-night/70";
   const Icon = blocked ? BlockIcon : BellIcon;
   const reason =
@@ -109,8 +116,11 @@ function TrendingRow({
           )}
         </div>
       </div>
-      <span className={`shrink-0 text-2xl font-extrabold ${blocked ? "text-coral" : "text-amber"}`}>
-        {n.spamScore}
+      <span className={`shrink-0 text-right text-sm font-bold tracking-wide ${blocked ? "text-coral" : "text-amber"}`}>
+        {riskLevels[status]}
+        <span className="mt-0.5 block text-[10px] font-medium uppercase tracking-wide text-night/40">
+          {risk}
+        </span>
       </span>
     </li>
   );

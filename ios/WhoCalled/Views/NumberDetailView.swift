@@ -86,7 +86,10 @@ struct NumberDetailView: View {
         // below), so the action buttons stay above the fold without scrolling.
         BorderedCard(accent: statusColor) {
           HStack(spacing: 16) {
-            ScoreGauge(score: viewModel.lookup?.spamScore ?? number.spamScore, diameter: 72)
+            ScoreGauge(
+              score: viewModel.lookup?.spamScore ?? number.spamScore,
+              status: status,
+              diameter: 72)
             VStack(alignment: .leading, spacing: 6) {
               Text("+\(number.phone)").font(.title3.bold())
               HStack(spacing: 8) {

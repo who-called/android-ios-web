@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { scoreFromReports, updateReputation, siaPrior } from "../src/scoring.js";
+import { scoreFromReports, updateReputation, siaPrior, displayedReportCounts } from "../src/scoring.js";
 
 const DAY = 86_400_000;
 const now = Date.now();
@@ -136,4 +136,16 @@ test("fresh community legit votes override a stale SIA spam prior", () => {
   );
   const r = scoreFromReports(reps(8, "legit"), { now, prior: stalePrior });
   assert.equal(r.status, "allow", `status=${r.status} score=${r.score}`);
+});
+
+test("displayedReportCounts folds SIA aggregates into community votes", () => {
+  const counts = displayedReportCounts({ spam: 1, legit: 0 }, { pos: 0, neg: 31 });
+  assert.equal(counts.spam, 32);
+  assert.equal(counts.legit, 0);
+});
+
+test("displayedReportCounts without seed keeps community counts only", () => {
+  const counts = displayedReportCounts({ spam: 1, legit: 2 }, null);
+  assert.equal(counts.spam, 1);
+  assert.equal(counts.legit, 2);
 });

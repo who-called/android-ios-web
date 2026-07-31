@@ -8,6 +8,7 @@
 import { fileURLToPath } from "node:url";
 import { prisma } from "../db.js";
 import { config } from "../config.js";
+import { displayedReportCounts } from "../scoring.js";
 
 export async function runRetention(now = Date.now()) {
   const cutoff = new Date(now - config.retention.reportDays * 86_400_000);
@@ -28,17 +29,19 @@ export async function runRetention(now = Date.now()) {
   for (const phone of phones) {
     const spam = await prisma.report.count({ where: { phone, vote: "spam" } });
     const legit = await prisma.report.count({ where: { phone, vote: "legit" } });
+    const seed = await prisma.siaSeed.findUnique({ where: { phone } });
 
-    if (spam + legit === 0) {
+    if (spam + legit === 0 && !seed) {
       // No reports left → drop the community number (keep ARCEP ones).
       const res = await prisma.number.deleteMany({
         where: { phone, source: "community" },
       });
       removed += res.count;
     } else {
+      const counts = displayedReportCounts({ spam, legit }, seed);
       await prisma.number.updateMany({
         where: { phone },
-        data: { reportCountSpam: spam, reportCountLegit: legit },
+        data: { reportCountSpam: counts.spam, reportCountLegit: counts.legit },
       });
       rescored += 1;
     }

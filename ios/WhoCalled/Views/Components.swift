@@ -78,16 +78,27 @@ struct StatusBadge: View {
   }
 }
 
-/// Signature element: circular spam-score gauge, color shifts with severity.
+/// Risk gauge: arc follows the internal score; center shows Faible / Modéré / Élevé.
 struct ScoreGauge: View {
   let score: Int
+  var status: String = "unknown"
   var diameter: CGFloat = 132
 
   private var color: Color {
-    switch score {
-    case 85...: return WhoCalledColors.coral
-    case 60..<85: return WhoCalledColors.amber
-    default: return WhoCalledColors.emerald
+    switch status {
+    case "block": return WhoCalledColors.coral
+    case "warn": return WhoCalledColors.amber
+    case "allow": return WhoCalledColors.emerald
+    default: return WhoCalledColors.blue
+    }
+  }
+
+  private var riskLabel: String {
+    switch status {
+    case "block": "Élevé"
+    case "warn": "Modéré"
+    case "allow": "Faible"
+    default: "—"
     }
   }
 
@@ -102,9 +113,16 @@ struct ScoreGauge: View {
         .stroke(color, style: StrokeStyle(lineWidth: 12, lineCap: .round))
         .rotationEffect(.degrees(135))
         .animation(.easeOut(duration: 0.9), value: score)
-      Text("\(score)")
-        .font(.system(size: diameter * 0.27, weight: .bold))
-        .foregroundStyle(color)
+      VStack(spacing: 1) {
+        Text(riskLabel)
+          .font(.system(size: diameter * 0.16, weight: .bold))
+          .foregroundStyle(color)
+          .minimumScaleFactor(0.7)
+          .lineLimit(1)
+        Text("Risque")
+          .font(.system(size: diameter * 0.1, weight: .medium))
+          .foregroundStyle(WhoCalledColors.muted)
+      }
     }
     .frame(width: diameter, height: diameter)
   }

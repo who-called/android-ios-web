@@ -2,6 +2,7 @@ import { Router } from "express";
 import { z } from "zod";
 import { prisma } from "../db.js";
 import { normalizePhone } from "../phone.js";
+import { displayedReportCounts } from "../scoring.js";
 
 export const privacyRouter = Router();
 
@@ -46,12 +47,15 @@ privacyRouter.delete("/device/:deviceId", async (req, res) => {
     await tx.gameScore.deleteMany({ where: { deviceId } }); // RGPD: drop game scores too
 
     // Recompute counters for affected numbers (best-effort, counts only).
+    // Keep folding SIA aggregates (option B) so a device wipe never zeros a seed.
     for (const phone of phones) {
       const spam = await tx.report.count({ where: { phone, vote: "spam" } });
       const legit = await tx.report.count({ where: { phone, vote: "legit" } });
+      const seed = await tx.siaSeed.findUnique({ where: { phone } });
+      const counts = displayedReportCounts({ spam, legit }, seed);
       await tx.number.updateMany({
         where: { phone },
-        data: { reportCountSpam: spam, reportCountLegit: legit },
+        data: { reportCountSpam: counts.spam, reportCountLegit: counts.legit },
       });
     }
 

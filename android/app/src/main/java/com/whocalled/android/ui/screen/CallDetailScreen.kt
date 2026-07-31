@@ -195,6 +195,7 @@ fun CallDetailScreen(
                 ) {
                     ScoreGauge(
                         score = lookup?.spamScore ?: call?.spamScore ?: 0,
+                        status = status,
                         diameter = 64.dp,
                         stroke = 6.dp,
                     )

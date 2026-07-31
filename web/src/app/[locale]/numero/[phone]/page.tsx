@@ -114,7 +114,6 @@ export default async function NumberPage({
 
   const spamCount = lookup?.reportCountSpam ?? number?.reportCountSpam ?? 0;
   const legitCount = lookup?.reportCountLegit ?? number?.reportCountLegit ?? 0;
-  const spamScore = lookup?.spamScore ?? number?.spamScore ?? 0;
   const confidenceLevel = lookup?.confidenceLevel ?? (isArcep ? "official" : "none");
   const confidence = lookup?.confidence;
 
@@ -196,17 +195,22 @@ export default async function NumberPage({
 
               <div className="mt-5 flex flex-wrap items-end gap-x-8 gap-y-4">
                 <div>
-                  <div className="flex items-baseline gap-1.5">
-                    <span className={`text-4xl font-extrabold leading-none sm:text-5xl ${statusColor}`}>
-                      {spamScore}
-                    </span>
-                    <span className="text-sm text-night/40">/ 100</span>
+                  <div className={`text-4xl font-extrabold leading-none sm:text-5xl ${statusColor}`}>
+                    {d.tool.riskLevels[status]}
                   </div>
                   <div className="mt-1 text-xs font-medium uppercase tracking-wide text-night/40">
                     {d.tool.risk}
                   </div>
                 </div>
-
+                {(spamCount > 0 || legitCount > 0) && (
+                  <div className="text-sm text-night/60">
+                    <span className="font-semibold text-coral">{spamCount}</span>
+                    {" "}{t.spamReports.toLowerCase()}
+                    <span className="mx-1.5 text-night/30">·</span>
+                    <span className="font-semibold text-emerald">{legitCount}</span>
+                    {" "}{t.legitReports.toLowerCase()}
+                  </div>
+                )}
               </div>
 
               <p className="mt-4 text-sm text-night/60">

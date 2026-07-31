@@ -44,7 +44,7 @@ class CallDirectoryHandler: CXCallDirectoryProvider {
       if isBlock {
         context.addBlockingEntry(withNextSequentialPhoneNumber: value)
       } else if warnEnabled && number.status == "warn" {
-        let label = "⚠️ who-called · spam \(number.spamScore)%"
+        let label = "⚠️ Who Called · risque modéré"
         context.addIdentificationEntry(withNextSequentialPhoneNumber: value, label: label)
       }
     }

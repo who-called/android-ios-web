@@ -2,10 +2,11 @@ import { Router } from "express";
 import { z } from "zod";
 import { prisma } from "../db.js";
 import { config } from "../config.js";
-import { scoreFromReports, updateReputation } from "../scoring.js";
+import { scoreFromReports, updateReputation, siaPrior, displayedReportCounts } from "../scoring.js";
 import { reportsWithWeights } from "../reportWeights.js";
 import { normalizePhone } from "../phone.js";
 import { REPORT_CATEGORIES } from "../categories.js";
+import { resolveCategory } from "../jobs/scoreJob.js";
 
 export const reportsRouter = Router();
 
@@ -71,10 +72,16 @@ reportsRouter.post("/", async (req, res) => {
       select: { id: true, vote: true },
     });
 
+    // SIA seed must participate in both consensus (reputation) and the
+    // materialized counters — otherwise a first community vote would wipe the
+    // seed-only history (e.g. 31 → 1) until the next score job.
+    const seed = await tx.siaSeed.findUnique({ where: { phone } });
+    const prior = seed ? siaPrior(seed) : undefined;
+
     // Load existing reports (with each device's reputation) to compute consensus
     // BEFORE this new vote — used for the anti-poisoning reputation update.
     const priorReports = await reportsWithWeights(tx, phone);
-    const priorScore = scoreFromReports(priorReports);
+    const priorScore = scoreFromReports(priorReports, { prior });
 
     // Update this device's reputation based on agreement with prior consensus.
     const newWeight = updateReputation(
@@ -103,17 +110,20 @@ reportsRouter.post("/", async (req, res) => {
       },
     });
 
-    // Recompute the number's score from ALL reports (including this one).
+    // Recompute the number's score from ALL reports + SIA prior (option B counts).
     const allReports = await reportsWithWeights(tx, phone);
-    const scored = scoreFromReports(allReports);
+    const scored = scoreFromReports(allReports, { prior });
+    const counts = displayedReportCounts(scored, seed);
 
     return tx.number.update({
       where: { phone },
       data: {
-        reportCountSpam: scored.spam,
-        reportCountLegit: scored.legit,
+        reportCountSpam: counts.spam,
+        reportCountLegit: counts.legit,
         spamScore: scored.score,
         status: scored.status,
+        category: resolveCategory(allReports, seed),
+        source: seed ? "mixed" : "community",
       },
     });
   });
