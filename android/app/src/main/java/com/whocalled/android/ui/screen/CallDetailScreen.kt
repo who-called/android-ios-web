@@ -23,6 +23,8 @@ import androidx.compose.material.icons.rounded.ContentCopy
 import androidx.compose.material.icons.rounded.Gavel
 import androidx.compose.material.icons.rounded.Group
 import androidx.compose.material.icons.rounded.LockOpen
+import androidx.compose.material.icons.rounded.Person
+import androidx.compose.material.icons.rounded.PersonSearch
 import androidx.compose.material.icons.rounded.Phone
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.WarningAmber
@@ -50,6 +52,7 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.whocalled.android.BuildConfig
 import com.whocalled.android.data.ReportCategory
@@ -113,6 +116,12 @@ fun CallDetailScreen(
         "warn" -> WCColor.Amber
         "allow" -> WCColor.Emerald
         else -> WCColor.Blue
+    }
+    // Most recent call that carried a caller name, so the screen can show WHO the
+    // number is — and whether that name is an actual contact of the user or only
+    // the phone's caller-ID lookup (see CallerNameSource).
+    val identity = remember(allCallEvents, displayedPhone) {
+        allCallEvents.firstOrNull { it.phone == displayedPhone && it.displayName != null }
     }
     val recentHistory = remember(allCallEvents, displayedPhone) {
         val cutoff = System.currentTimeMillis() - 30L * 86_400_000L
@@ -200,11 +209,39 @@ fun CallDetailScreen(
                         diameter = 64.dp,
                         stroke = 6.dp,
                     )
-                    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    // weight(1f) bounds the column so a long name ellipsizes instead
+                    // of pushing the badges out of the card.
+                    Column(
+                        Modifier.weight(1f),
+                        verticalArrangement = Arrangement.spacedBy(6.dp),
+                    ) {
+                        // A known name becomes the headline (single line, ellipsized
+                        // so a long one can't break the layout); the number then
+                        // sits under it so both are always visible together.
+                        identity?.displayName?.let { name ->
+                            Text(
+                                name,
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                        }
                         Text(
                             "+$displayedPhone",
-                            style = MaterialTheme.typography.titleLarge,
+                            style = if (identity != null) {
+                                MaterialTheme.typography.titleSmall
+                            } else {
+                                MaterialTheme.typography.titleLarge
+                            },
                             fontWeight = FontWeight.Bold,
+                            color = if (identity != null) {
+                                MaterialTheme.colorScheme.onSurfaceVariant
+                            } else {
+                                MaterialTheme.colorScheme.onSurface
+                            },
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
                             modifier = Modifier.clickable {
                                 clipboard.setText(AnnotatedString("+$displayedPhone"))
                             },
@@ -237,6 +274,12 @@ fun CallDetailScreen(
                     }
                 }
             }
+        }
+
+        // Who this number is, and how sure we are of it. Kept above the actions:
+        // "c'est mon médecin" changes what the user does next.
+        identity?.displayName?.let {
+            item { IdentityCard(isContact = identity.isContact) }
         }
 
         item {
@@ -441,6 +484,39 @@ fun CallDetailScreen(
                 Text("Copier le numéro")
             }
         }
+    }
+}
+
+/**
+ * Caller identity card. Draws a hard line between a name that comes from the
+ * user's own address book and one the phone's caller-ID lookup produced — the
+ * second one is useful but must never read as "you know this person".
+ */
+@Composable
+private fun IdentityCard(isContact: Boolean) {
+    val accent = if (isContact) WCColor.Emerald else WCColor.Indigo
+    BorderedCard(accent = accent) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                if (isContact) Icons.Rounded.Person else Icons.Rounded.PersonSearch,
+                contentDescription = null,
+                tint = accent,
+                modifier = Modifier.padding(end = 8.dp).size(20.dp),
+            )
+            Text(
+                if (isContact) "Dans vos contacts" else "Identifié, hors de vos contacts",
+                fontWeight = FontWeight.SemiBold,
+            )
+        }
+        Text(
+            if (isContact)
+                "Ce nom vient d’une fiche de votre répertoire. Les avis ci-dessous restent ceux de la communauté."
+            else
+                "Ce nom vient de l’identification d’appel de votre téléphone, pas de votre répertoire. À prendre avec prudence.",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(top = 6.dp),
+        )
     }
 }
 

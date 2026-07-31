@@ -35,13 +35,14 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.whocalled.android.ui.MainViewModel
 import com.whocalled.android.ui.components.BorderedCard
 import com.whocalled.android.ui.components.EmptyState
 import com.whocalled.android.ui.components.GradientHeader
 import com.whocalled.android.ui.components.ScrollableScreen
-import com.whocalled.android.ui.components.StatusBadge
+import com.whocalled.android.ui.components.StatusDot
 import com.whocalled.android.ui.theme.WCColor
 import com.whocalled.android.util.CallEvent
 import com.whocalled.android.util.CallEventAction
@@ -200,18 +201,26 @@ private fun CallRow(
         CallEventAction.CONTACT -> Triple("Contact", WCColor.Slate, Icons.Rounded.Person)
         CallEventAction.UNKNOWN -> Triple("Non évalué", WCColor.Blue, Icons.Rounded.Search)
     }
+    val name = event.displayName
     BorderedCard(
         Modifier
             .padding(horizontal = 16.dp)
             .combinedClickable(onClick = onClick, onLongClick = onLongClick),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
+            // weight(1f) + single-line ellipsis: a long contact name or a long
+            // "+3312… · Entrant · il y a 3 j" never wraps onto a second line.
             Column(Modifier.weight(1f)) {
-                Text(event.contactName ?: "+${event.phone}", fontWeight = FontWeight.Bold)
+                Text(
+                    name ?: "+${event.phone}",
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
                 val attempts = if (event.attempts > 1) " · ${event.attempts} appels" else ""
                 Text(
                     buildString {
-                        if (event.contactName != null) append("+${event.phone} · ")
+                        if (name != null) append("+${event.phone} · ")
                         append(directionLabel(event.direction))
                         append(" · ")
                         append(com.whocalled.android.util.RelativeTime.format(event.timestamp))
@@ -219,13 +228,16 @@ private fun CallRow(
                     },
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
-            StatusBadge(
+            // Icon + colour only — the wording lives on the detail screen.
+            StatusDot(
                 label = label,
                 color = color,
                 icon = icon,
-                modifier = Modifier.padding(end = 4.dp),
+                modifier = Modifier.padding(start = 8.dp, end = 2.dp),
             )
             Icon(
                 Icons.Rounded.ChevronRight,

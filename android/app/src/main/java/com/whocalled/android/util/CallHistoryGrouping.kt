@@ -19,9 +19,17 @@ data class CallEvent(
     val timestamp: Long,
     val direction: CallDirection = CallDirection.INCOMING,
     val contactName: String? = null,
+    /** Origin of [contactName] — address book vs. the phone's caller-ID lookup. */
+    val nameSource: CallerNameSource = CallerNameSource.CONTACT,
     val durationSeconds: Long = 0,
     val attempts: Int = 1,
-)
+) {
+    /** A name we can display, whatever its origin. */
+    val displayName: String? get() = contactName?.takeIf { it.isNotBlank() }
+
+    /** True only when the name comes from the user's own contacts. */
+    val isContact: Boolean get() = displayName != null && nameSource == CallerNameSource.CONTACT
+}
 
 enum class CallEventAction {
     BLOCKED,
@@ -105,6 +113,7 @@ fun mergeCallEvents(
                 result[duplicate] = result[duplicate].copy(
                     direction = directionOf(call.type),
                     contactName = call.contactName,
+                    nameSource = call.nameSource,
                     durationSeconds = call.durationSeconds,
                 )
             } else {
@@ -127,6 +136,7 @@ fun mergeCallEvents(
                     timestamp = call.timestamp,
                     direction = directionOf(call.type),
                     contactName = call.contactName,
+                    nameSource = call.nameSource,
                     durationSeconds = call.durationSeconds,
                 )
             }

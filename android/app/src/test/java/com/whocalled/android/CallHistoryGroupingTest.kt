@@ -5,6 +5,7 @@ import com.whocalled.android.data.MyReportEntity
 import com.whocalled.android.util.CallEvent
 import com.whocalled.android.util.CallEventAction
 import com.whocalled.android.util.CallDirection
+import com.whocalled.android.util.CallerNameSource
 import com.whocalled.android.util.PhoneCall
 import com.whocalled.android.util.findRecentCallPrompt
 import com.whocalled.android.util.groupCallHistory
@@ -120,6 +121,28 @@ class CallHistoryGroupingTest {
         assertEquals(CallEventAction.CONTACT, merged.first { it.phone == "33622222222" }.action)
         assertEquals(CallDirection.OUTGOING, merged.first { it.phone == "33633333333" }.direction)
         assertEquals(CallEventAction.BLOCKED, merged.first { it.phone == "33644444444" }.action)
+    }
+
+    @Test
+    fun callerIdNameIsShownButNotTreatedAsAContact() {
+        val system = listOf(
+            PhoneCall(
+                systemId = 1,
+                rawNumber = "+33655555555",
+                normalizedPhone = "33655555555",
+                timestamp = now,
+                type = 1,
+                contactName = "Pharmacie du Centre",
+                nameSource = CallerNameSource.DIRECTORY,
+            ),
+        )
+
+        val event = mergeCallEvents(emptyList(), system).single()
+
+        assertEquals("Pharmacie du Centre", event.displayName)
+        assertEquals(false, event.isContact)
+        // Not in the address book → still a number worth reviewing.
+        assertEquals(CallEventAction.UNKNOWN, event.action)
     }
 
     @Test

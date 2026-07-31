@@ -127,6 +127,27 @@ fun StatusBadge(label: String, color: Color, icon: ImageVector, modifier: Modifi
     }
 }
 
+/**
+ * Icon-only variant of [StatusBadge] — same tinted disc, no label. Used in dense
+ * lists (the calls history) where a worded pill ("Non évalué", "Indésirable")
+ * would eat the row's width and push the number onto a second line. The label
+ * still ships as the content description, so the status stays available to
+ * TalkBack and reads out exactly like the full badge.
+ */
+@Composable
+fun StatusDot(label: String, color: Color, icon: ImageVector, modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier
+            .size(30.dp)
+            .clip(RoundedCornerShape(50))
+            .background(color.copy(alpha = 0.08f))
+            .border(BorderStroke(1.dp, color.copy(alpha = 0.35f)), RoundedCornerShape(50)),
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(icon, contentDescription = label, tint = color, modifier = Modifier.size(17.dp))
+    }
+}
+
 /** Vivid blue → navy gradient header band; modest rounding at the bottom. */
 @Composable
 fun GradientHeader(

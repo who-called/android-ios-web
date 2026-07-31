@@ -3,17 +3,17 @@ import { prisma } from "../db.js";
 import { normalizePhone } from "../phone.js";
 import { REPORT_CATEGORIES } from "../categories.js";
 import { config } from "../config.js";
-import { scoreFromReports, siaPrior } from "../scoring.js";
+import { scoreFromReports, siaPrior, displayedReportCounts } from "../scoring.js";
 import { reportsWithWeights } from "../reportWeights.js";
 import {
   confidenceLevel,
+  evidenceTimeline,
   findMatchingPattern,
   presentationSource,
+  reasonBreakdown,
 } from "../lookupPresentation.js";
 
 export const lookupRouter = Router();
-
-const DAY = 86_400_000;
 
 /**
  * GET /api/v1/lookup/:phone
@@ -31,7 +31,7 @@ lookupRouter.get("/:phone", async (req, res) => {
       ? req.query.deviceId
       : null;
 
-  const [number, patterns, userReport] = await Promise.all([
+  const [number, patterns, userReport, seed] = await Promise.all([
     prisma.number.findUnique({ where: { phone } }),
     prisma.pattern.findMany({
       select: { pattern: true, status: true, category: true, source: true, name: true },
@@ -42,6 +42,7 @@ lookupRouter.get("/:phone", async (req, res) => {
           select: { vote: true },
         })
       : null,
+    prisma.siaSeed.findUnique({ where: { phone } }),
   ]);
   const officialPattern = findMatchingPattern(
     phone,
@@ -50,22 +51,20 @@ lookupRouter.get("/:phone", async (req, res) => {
 
   // All reports for frequency (spam + legit — the chart shows total activity,
   // consistent with firstReportedAt/lastReportedAt which also cover all votes).
-  const allReports = number
-    ? await prisma.report.findMany({
-        where: { phone },
-        select: { createdAt: true, vote: true, category: true },
-      })
-    : [];
+  const allReports =
+    number || seed
+      ? await prisma.report.findMany({
+          where: { phone },
+          select: { createdAt: true, vote: true, category: true },
+        })
+      : [];
 
   // Recompute confidence at lookup time so time decay and device reputation are
   // reflected immediately. The materialized Number row remains the fast list source.
+  const prior = seed ? siaPrior(seed) : undefined;
   let liveScore = null;
-  if (number) {
-    const [weightedReports, seed] = await Promise.all([
-      reportsWithWeights(prisma, phone),
-      prisma.siaSeed.findUnique({ where: { phone } }),
-    ]);
-    const prior = seed ? siaPrior(seed) : undefined;
+  if (number || seed) {
+    const weightedReports = await reportsWithWeights(prisma, phone);
     if (weightedReports.length > 0 || prior) {
       liveScore = scoreFromReports(weightedReports, { prior });
     }
@@ -75,25 +74,22 @@ lookupRouter.get("/:phone", async (req, res) => {
   const spamReports = allReports.filter((r) => r.vote === "spam");
 
   const now = Date.now();
-  const within = (days) =>
-    allReports.filter((r) => now - new Date(r.createdAt).getTime() <= days * DAY).length;
 
-  // Community "why did this number call?" breakdown over the spam reports.
+  // Displayed counts are derived here from live evidence (our reports + the SIA
+  // aggregate) instead of read back from `numbers` — the materialized row is a
+  // cache that any write path could leave momentarily SIA-less, which is exactly
+  // how a seed-backed history used to collapse to "0 / 1" after a single vote
+  // from the web or the app.
+  const counts = displayedReportCounts(
+    { spam: spamReports.length, legit: allReports.length - spamReports.length },
+    seed,
+  );
+  const { frequency, firstReportedAt, lastReportedAt } = evidenceTimeline(allReports, seed, now);
+
+  // Community "why did this number call?" breakdown over the spam evidence.
   // Counts per canonical category (see categories.js) + the dominant reason
   // (topReason) for a plain-text headline like "le plus souvent : démarchage".
-  const reasons = Object.fromEntries(REPORT_CATEGORIES.map((c) => [c, 0]));
-  for (const r of spamReports) {
-    const key = r.category && r.category in reasons ? r.category : "unknown";
-    reasons[key] += 1;
-  }
-
-  // No individual spam reports (e.g. SIA-seeded aggregate) but we still have
-  // a category + count on the Number row → synthesize a catch-all entry so
-  // the category breakdown is never empty when we actually know something.
-  if (spamReports.length === 0 && (number?.reportCountSpam ?? 0) > 0) {
-    const cat = number.category && number.category in reasons ? number.category : "unknown";
-    reasons[cat] = number.reportCountSpam;
-  }
+  const reasons = reasonBreakdown(REPORT_CATEGORIES, spamReports, seed);
 
   const reasonTotal = Object.values(reasons).reduce((s, c) => s + c, 0);
   const ranked = Object.entries(reasons)
@@ -104,8 +100,8 @@ lookupRouter.get("/:phone", async (req, res) => {
     ? { category: top[0], count: top[1], share: Math.round((top[1] / reasonTotal) * 100) }
     : null;
 
-  const totalReports = (number?.reportCountSpam ?? 0) + (number?.reportCountLegit ?? 0);
-  const hasStatisticalEvidence = !!number && (totalReports > 0 || liveScore !== null);
+  const totalReports = counts.spam + counts.legit;
+  const hasStatisticalEvidence = !!(number || seed) && (totalReports > 0 || liveScore !== null);
   const hasOfficialPattern = officialPattern !== null || number?.source === "arcep";
   const source = presentationSource({ hasStatisticalEvidence, hasOfficialPattern });
   const officialOnly = hasOfficialPattern && !hasStatisticalEvidence;
@@ -119,16 +115,15 @@ lookupRouter.get("/:phone", async (req, res) => {
       ? (liveScore?.confidence ?? fallbackConfidence)
       : 0;
   const status = hasStatisticalEvidence
-    ? (liveScore?.status ?? number.status)
+    ? (liveScore?.status ?? number?.status ?? "unknown")
     : (officialPattern?.status ?? number?.status ?? "unknown");
   const spamScore = hasStatisticalEvidence
-    ? (liveScore?.score ?? number.spamScore)
+    ? (liveScore?.score ?? number?.spamScore ?? 0)
     : officialOnly
       ? (number?.spamScore ?? (status === "block" ? 100 : 70))
       : 0;
-  const category = number?.category && number.category !== "unknown"
-    ? number.category
-    : (officialPattern?.category ?? "unknown");
+  const category = [number?.category, seed?.category, officialPattern?.category]
+    .find((c) => c && c !== "unknown") ?? "unknown";
 
   return res.json({
     phone,
@@ -138,19 +133,14 @@ lookupRouter.get("/:phone", async (req, res) => {
     confidenceLevel: confidenceLevel(confidence, officialOnly),
     source,
     category,
-    reportCountSpam: number?.reportCountSpam ?? 0,
-    reportCountLegit: number?.reportCountLegit ?? 0,
+    reportCountSpam: counts.spam,
+    reportCountLegit: counts.legit,
     userVote: userReport?.vote ?? null,
-    frequency: {
-      last24h: within(1),
-      last7d: within(7),
-      last30d: within(30),
-      last1y: within(365),
-    },
+    frequency,
     reasons,
     topReason,
-    firstReportedAt: allReports.length > 0 ? number?.firstReportedAt : null,
-    lastReportedAt: allReports.length > 0 ? number?.lastReportedAt : null,
+    firstReportedAt,
+    lastReportedAt,
     officialPattern: officialPattern
       ? {
           pattern: officialPattern.pattern,
