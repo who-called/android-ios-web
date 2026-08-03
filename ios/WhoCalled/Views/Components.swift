@@ -79,6 +79,8 @@ struct StatusBadge: View {
 }
 
 /// Risk gauge: arc follows the internal score; center shows Faible / Modéré / Élevé.
+/// Stroke and type scale with diameter so the compact detail size (≈72) never
+/// clips "Modéré" over the arc.
 struct ScoreGauge: View {
   let score: Int
   var status: String = "unknown"
@@ -102,27 +104,47 @@ struct ScoreGauge: View {
     }
   }
 
+  private var stroke: CGFloat { max(4, min(12, diameter * 0.09)) }
+  private var hole: CGFloat { max(18, diameter - (stroke + 3) * 2) }
+  private var labelSize: CGFloat {
+    let long = riskLabel.count >= 5
+    switch diameter {
+    case ..<56: return 8
+    case ..<64: return long ? 9 : 10
+    case ..<72: return long ? 10 : 11
+    case ..<88: return long ? 12 : 13
+    default: return 16
+    }
+  }
+  private var captionSize: CGFloat { max(7, labelSize * 0.7) }
+  private var showCaption: Bool { diameter >= 56 }
+
   var body: some View {
     ZStack {
       Circle()
         .trim(from: 0, to: 0.75)
-        .stroke(Color.gray.opacity(0.15), style: StrokeStyle(lineWidth: 12, lineCap: .round))
+        .stroke(Color.gray.opacity(0.15), style: StrokeStyle(lineWidth: stroke, lineCap: .round))
         .rotationEffect(.degrees(135))
       Circle()
         .trim(from: 0, to: 0.75 * CGFloat(min(max(score, 0), 100)) / 100)
-        .stroke(color, style: StrokeStyle(lineWidth: 12, lineCap: .round))
+        .stroke(color, style: StrokeStyle(lineWidth: stroke, lineCap: .round))
         .rotationEffect(.degrees(135))
         .animation(.easeOut(duration: 0.9), value: score)
       VStack(spacing: 1) {
         Text(riskLabel)
-          .font(.system(size: diameter * 0.16, weight: .bold))
+          .font(.system(size: labelSize, weight: .bold))
           .foregroundStyle(color)
-          .minimumScaleFactor(0.7)
+          .minimumScaleFactor(0.6)
           .lineLimit(1)
-        Text("Risque")
-          .font(.system(size: diameter * 0.1, weight: .medium))
-          .foregroundStyle(WhoCalledColors.muted)
+          .frame(maxWidth: hole)
+        if showCaption {
+          Text("Risque")
+            .font(.system(size: captionSize, weight: .medium))
+            .foregroundStyle(WhoCalledColors.muted)
+            .lineLimit(1)
+        }
       }
+      .frame(width: hole, height: hole)
     }
     .frame(width: diameter, height: diameter)
   }

@@ -229,7 +229,7 @@ fun CallDetailScreen(
                     ScoreGauge(
                         score = lookup?.spamScore ?: call?.spamScore ?: 0,
                         status = status,
-                        diameter = 60.dp,
+                        diameter = 68.dp,
                         stroke = 6.dp,
                     )
                     // weight(1f) bounds the column so a long name ellipsizes instead
