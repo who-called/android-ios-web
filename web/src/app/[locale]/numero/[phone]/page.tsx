@@ -163,7 +163,8 @@ export default async function NumberPage({
     <article className="mx-auto max-w-5xl px-4 py-8 sm:py-12">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        // Escape "<" so no user-influenced value can close the script tag.
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
       />
 
       <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">
@@ -394,6 +395,8 @@ export default async function NumberPage({
             legitLabel={t.legitReports}
             savedMessage={t.voteSaved}
             errorMessage={t.voteError}
+            rateLimitMessage={d.tool.reportLimit}
+            invalidMessage={d.tool.reportInvalid}
           />
 
           {/* Advice CTA */}

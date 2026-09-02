@@ -15,12 +15,20 @@ export function PhoneInput({
   onValueChange,
   onCountryChange,
   placeholder,
+  countryAriaLabel = "Choisir le pays",
+  phoneAriaLabel = "Numéro de téléphone",
+  searchPlaceholder = "Rechercher un pays…",
+  emptyLabel = "Aucun pays trouvé.",
 }: {
   value: string;
   country: Country;
   onValueChange: (v: string) => void;
   onCountryChange: (c: Country) => void;
   placeholder?: string;
+  countryAriaLabel?: string;
+  phoneAriaLabel?: string;
+  searchPlaceholder?: string;
+  emptyLabel?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -68,7 +76,7 @@ export function PhoneInput({
         type="button"
         onClick={() => setOpen((o) => !o)}
         className="flex items-center gap-1.5 rounded-l-xl border-r border-hair px-3 py-3 text-sm hover:bg-night/[0.03]"
-        aria-label="Choisir le pays"
+        aria-label={countryAriaLabel}
       >
         <span className="text-lg leading-none">{country.flag}</span>
         <span className="text-night/70">+{country.dial}</span>
@@ -85,7 +93,7 @@ export function PhoneInput({
         onChange={(e) => onValueChange(e.target.value)}
         placeholder={placeholder ?? "6 12 34 56 78"}
         className="w-0 min-w-0 flex-1 rounded-r-xl px-4 py-3 text-lg outline-none"
-        aria-label="Numéro de téléphone"
+        aria-label={phoneAriaLabel}
       />
 
       {/* Dropdown */}
@@ -96,7 +104,7 @@ export function PhoneInput({
               autoFocus
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Rechercher un pays…"
+              placeholder={searchPlaceholder}
               className="w-full rounded-lg border border-hair px-3 py-2 text-sm outline-none focus:border-night"
             />
           </div>
@@ -121,7 +129,7 @@ export function PhoneInput({
               </li>
             ))}
             {filtered.length === 0 && (
-              <li className="px-3 py-3 text-sm text-night/50">Aucun pays trouvé.</li>
+              <li className="px-3 py-3 text-sm text-night/50">{emptyLabel}</li>
             )}
           </ul>
         </div>

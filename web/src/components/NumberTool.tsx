@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
+  ApiError,
   lookupNumber,
   normalizePhone,
   reportNumber,
@@ -48,7 +50,7 @@ export function NumberTool({
   const [vote, setVote] = useState<"spam" | "legit">("spam");
   const [loading, setLoading] = useState(false);
   const [lastReported, setLastReported] = useState<string | null>(null);
-  const [message, setMessage] = useState<{ kind: "ok" | "err"; text: string } | null>(null);
+  const [message, setMessage] = useState<{ kind: "ok" | "err"; text: string; link?: string } | null>(null);
 
   // Switching tabs clears the previous message so the old feedback doesn't
   // linger under the other mode.
@@ -97,11 +99,19 @@ export function NumberTool({
         locale,
       });
       // Playful nudge if they re-report the same number (clicking again is fine).
-      setMessage({ kind: "ok", text: n === lastReported ? t.reportOkAgain : t.reportOk });
+      setMessage({
+        kind: "ok",
+        text: n === lastReported ? t.reportOkAgain : t.reportOk,
+        link: `/${locale}/numero/${n}`,
+      });
       setLastReported(n);
       setPhone("");
-    } catch {
-      setMessage({ kind: "err", text: t.reportErr });
+    } catch (err) {
+      const status = err instanceof ApiError ? err.status : 0;
+      setMessage({
+        kind: "err",
+        text: status === 429 ? t.reportLimit : status === 400 ? t.reportInvalid : t.reportErr,
+      });
     } finally {
       setLoading(false);
     }
@@ -134,6 +144,11 @@ export function NumberTool({
           country={country}
           onValueChange={setPhone}
           onCountryChange={setCountry}
+          placeholder={t.placeholder}
+          countryAriaLabel={t.countryAria}
+          phoneAriaLabel={t.phoneAria}
+          searchPlaceholder={t.countrySearch}
+          emptyLabel={t.countryEmpty}
         />
 
         {mode === "report" && (
@@ -195,6 +210,14 @@ export function NumberTool({
           }`}
         >
           {message.text}
+          {message.link && (
+            <Link
+              href={message.link}
+              className="mt-1.5 block font-semibold underline hover:text-night-dark"
+            >
+              {t.seeNumber}
+            </Link>
+          )}
         </div>
       )}
     </div>

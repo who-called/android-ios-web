@@ -51,7 +51,7 @@ export default async function GuidePage({
 
   return (
     <article className="mx-auto max-w-2xl px-4 py-12">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
       <Link href={`${base}/guides`} className="text-sm text-night/60 hover:text-night">
         ← {t.guides.indexTitle}
       </Link>

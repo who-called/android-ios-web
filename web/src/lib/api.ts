@@ -10,6 +10,16 @@ export type ReasonCategory =
   | "survey"
   | "unknown";
 
+/** API error carrying the HTTP status so callers can show dedicated messages. */
+export class ApiError extends Error {
+  status: number;
+  constructor(message: string, status: number) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+  }
+}
+
 export type TopReason = {
   category: ReasonCategory;
   count: number;
@@ -86,7 +96,7 @@ export async function reportNumber(input: {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ ...input, locale: input.locale ?? "fr" }),
   });
-  if (!res.ok) throw new Error(`report failed: ${res.status}`);
+  if (!res.ok) throw new ApiError(`report failed: ${res.status}`, res.status);
 }
 
 /** Numbers ramping up right now ("ça monte"), ranked by recent velocity. */
@@ -186,13 +196,22 @@ export async function fetchPrefix(intl: string): Promise<{
 }
 
 /** Anonymous web device id (localStorage). No PII. */
+let memoryDeviceId: string | null = null;
+
 export function webDeviceId(): string {
   if (typeof window === "undefined") return "web-anon";
   const key = "wc_device_id";
-  let id = localStorage.getItem(key);
-  if (!id) {
-    id = "web-" + crypto.randomUUID();
-    localStorage.setItem(key, id);
+  try {
+    let id = localStorage.getItem(key);
+    if (!id) {
+      id = "web-" + crypto.randomUUID();
+      localStorage.setItem(key, id);
+    }
+    return id;
+  } catch {
+    // localStorage blocked (Safari "block all cookies", private/embedded
+    // contexts) — fall back to a per-session in-memory id.
+    if (!memoryDeviceId) memoryDeviceId = "web-" + crypto.randomUUID();
+    return memoryDeviceId;
   }
-  return id;
 }

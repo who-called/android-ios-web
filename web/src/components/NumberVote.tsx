@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { reportNumber, webDeviceId } from "@/lib/api";
+import { ApiError, reportNumber, webDeviceId } from "@/lib/api";
 
 type Vote = "spam" | "legit";
 
@@ -15,6 +15,8 @@ export function NumberVote({
   legitLabel,
   savedMessage,
   errorMessage,
+  rateLimitMessage,
+  invalidMessage,
 }: {
   phone: string;
   locale: string;
@@ -24,6 +26,8 @@ export function NumberVote({
   legitLabel: string;
   savedMessage: string;
   errorMessage: string;
+  rateLimitMessage?: string;
+  invalidMessage?: string;
 }) {
   const router = useRouter();
   const storageKey = `wc_vote_${phone}`;
@@ -32,8 +36,12 @@ export function NumberVote({
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
 
   useEffect(() => {
-    const stored = localStorage.getItem(storageKey);
-    if (stored === "spam" || stored === "legit") setSelected(stored);
+    // localStorage can throw (Safari "block all cookies", private/embedded
+    // contexts) — the vote memory just won't persist there.
+    try {
+      const stored = localStorage.getItem(storageKey);
+      if (stored === "spam" || stored === "legit") setSelected(stored);
+    } catch {}
   }, [storageKey]);
 
   async function vote(next: Vote) {
@@ -47,12 +55,23 @@ export function NumberVote({
         category: next === "spam" ? "unknown" : null,
         locale,
       });
-      localStorage.setItem(storageKey, next);
+      try {
+        localStorage.setItem(storageKey, next);
+      } catch {}
       setSelected(next);
       setMessage({ ok: true, text: savedMessage });
       router.refresh();
-    } catch {
-      setMessage({ ok: false, text: errorMessage });
+    } catch (err) {
+      const status = err instanceof ApiError ? err.status : 0;
+      setMessage({
+        ok: false,
+        text:
+          status === 429
+            ? (rateLimitMessage ?? errorMessage)
+            : status === 400
+              ? (invalidMessage ?? errorMessage)
+              : errorMessage,
+      });
     } finally {
       setLoading(null);
     }
