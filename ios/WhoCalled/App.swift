@@ -4,6 +4,7 @@ import UserNotifications
 @main
 struct WhoCalledApp: App {
   @StateObject private var viewModel = MainViewModel()
+  @Environment(\.scenePhase) private var scenePhase
 
   var body: some Scene {
     WindowGroup {
@@ -17,9 +18,15 @@ struct WhoCalledApp: App {
           viewModel.refresh()
           // First time: fetch the live list right away — no button tap needed.
           if firstLaunch { viewModel.syncNow() }
+          // Re-push any report that never reached the server.
+          viewModel.retryPendingReports()
           // Route reminder taps to the Games hub + keep the opt-in reminder scheduled.
           UNUserNotificationCenter.current().delegate = GameNotificationDelegate.shared
           if SharedStore.gameReminderEnabled { GameReminders.schedule() }
+        }
+        .onChange(of: scenePhase) { phase in
+          // Back to the foreground: re-push any report that never reached the server.
+          if phase == .active { viewModel.retryPendingReports() }
         }
     }
   }

@@ -43,6 +43,15 @@ struct MyReportsView: View {
                     }
                   }
                   .buttonStyle(.plain)
+                  if report.syncState == "failed" {
+                    Button("Renvoyer") {
+                      viewModel.retryReport(report)
+                    }
+                    .font(.caption.weight(.semibold))
+                    .buttonStyle(.plain)
+                    .foregroundStyle(WhoCalledColors.indigo)
+                    .padding(.trailing, 12)
+                  }
                   Button {
                     viewModel.flipReport(report)
                   } label: {

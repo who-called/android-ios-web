@@ -32,6 +32,11 @@ enum MyReportsStore {
     save(all().filter { $0.phone != phone })
   }
 
+  /// Wipe everything (RGPD erase — the server copy is gone too).
+  static func clear() {
+    save([])
+  }
+
   private static func save(_ list: [MyReport]) {
     if let data = try? JSONEncoder().encode(list) {
       SharedStore.defaults()?.set(data, forKey: key)

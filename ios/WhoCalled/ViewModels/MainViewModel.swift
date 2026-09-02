@@ -123,6 +123,8 @@ final class MainViewModel: ObservableObject {
       privacyBanner = nil
       do {
         try await api.eraseDevice(SharedStore.deviceId())
+        MyReportsStore.clear()  // server wiped — mirror locally
+        refresh()
         privacyBanner = (.success, "Vos signalements ont été supprimés.")
       } catch {
         privacyBanner = (.error, "Échec de la suppression. Réessayez.")
@@ -158,6 +160,7 @@ final class MainViewModel: ObservableObject {
       syncBanner = nil
       do {
         try await listService.update { count in Task { @MainActor in self.syncProgress = count } }
+        await reportService.retryPending()  // network is up — re-push unsent reports too
         refresh()
         syncBanner = (.success, "Liste à jour ✓")
       } catch {
@@ -214,6 +217,10 @@ final class MainViewModel: ObservableObject {
           : (.success, "Merci ! Signalement enregistré 🛡️")
         if let submittedPhone { loadLookup(phone: submittedPhone) }
         reportPhone = ""
+      } catch ReportError.invalidPhone {
+        reportBanner = (.error, "Numéro invalide — vérifiez le format.")
+      } catch APIError.http(429) {
+        reportBanner = (.error, "Limite quotidienne de signalements atteinte — votre avis sera renvoyé automatiquement.")
       } catch {
         reportBanner = (.error, "Enregistré localement. Envoi au serveur échoué.")
       }
@@ -229,10 +236,34 @@ final class MainViewModel: ObservableObject {
     }
   }
 
+  /// Flip a report spam ↔ legit, keeping its original category when it goes
+  /// back to spam — without touching the Signaler form.
   func flipReport(_ report: MyReport) {
-    reportPhone = report.phone
-    reportIsSpam = report.vote != "spam"
-    submitReport()
+    Task {
+      let toSpam = report.vote != "spam"
+      // No fallback to .other: a nil category lets the service keep whatever
+      // reason the row already holds (and the server accepts a missing one).
+      try? await reportService.report(
+        rawPhone: report.phone, isSpam: toSpam,
+        category: toSpam ? ReportCategory.from(report.category) : nil)
+      refresh()
+    }
+  }
+
+  /// Re-push one unsent report (the "Renvoyer" action in Mes signalements).
+  func retryReport(_ report: MyReport) {
+    Task {
+      await reportService.retry(report)
+      refresh()
+    }
+  }
+
+  /// Best-effort re-push of every unsent report (app start / back to foreground).
+  func retryPendingReports() {
+    Task {
+      await reportService.retryPending()
+      refresh()
+    }
   }
 }
 
