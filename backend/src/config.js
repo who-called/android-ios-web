@@ -17,6 +17,12 @@ export const config = {
     // moves a device's weight, and the minimum weighted volume before consensus counts.
     reputationStep: parseFloat(process.env.REPUTATION_STEP ?? "0.1"),
     consensusMinWeight: parseFloat(process.env.CONSENSUS_MIN_WEIGHT ?? "3"),
+
+    // Uncontradicted spam evidence needed before a number is shown as "warn"
+    // (below the warn score band). 1.5 ≈ two fresh devices at default
+    // reputation: a single anonymous report is displayed as "1 signalement"
+    // but no longer flags someone's number for every user.
+    minWeightForWarn: parseFloat(process.env.MIN_WEIGHT_FOR_WARN ?? "1.5"),
   },
   // SIA seed harmonization: imported aggregates enter scoring as a decaying
   // prior. `trust` (α) discounts external data vs our own; `halfLifeDays` makes
@@ -33,6 +39,15 @@ export const config = {
       process.env.MAX_REPORTS_PER_DEVICE_PER_DAY ?? "50",
       10
     ),
+    // Brand-new deviceIds one IP may register per day (anti-Sybil). Known
+    // devices are exempt, so shared NATs only feel it on fresh installs.
+    maxNewDevicesPerIpPerDay: parseInt(process.env.MAX_NEW_DEVICES_PER_IP_PER_DAY ?? "20", 10),
+  },
+  privacy: {
+    // Bearer token required by DELETE /privacy/number/:phone (third-party
+    // erasure, handled by the operator after an email request). Unset = the
+    // endpoint is disabled: an open one let spammers purge their own history.
+    adminToken: process.env.PRIVACY_ADMIN_TOKEN ?? "",
   },
   lists: {
     // Hourly per-IP budgets for the delta-sync endpoints.

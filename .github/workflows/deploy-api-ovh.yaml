@@ -88,6 +88,21 @@ jobs:
           kubectl -n "$NS" patch secret whocalled-api-secret --type merge \
             -p "{\"stringData\":{\"LIST_TOKEN_SECRET\":\"${LIST_TOKEN_SECRET}\"}}"
 
+      # Operator token for third-party number erasure (DELETE /privacy/number).
+      # Optional: when the GitHub secret is unset the API keeps that endpoint
+      # disabled (404), which is the safe default.
+      - name: Sync PRIVACY_ADMIN_TOKEN into whocalled-api-secret
+        env:
+          PRIVACY_ADMIN_TOKEN: ${{ secrets.PRIVACY_ADMIN_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "${PRIVACY_ADMIN_TOKEN}" ]; then
+            echo "PRIVACY_ADMIN_TOKEN not set — number-erasure endpoint stays disabled."
+            exit 0
+          fi
+          kubectl -n "$NS" patch secret whocalled-api-secret --type merge \
+            -p "{\"stringData\":{\"PRIVACY_ADMIN_TOKEN\":\"${PRIVACY_ADMIN_TOKEN}\"}}"
+
       - name: Deploy whocalled-api + scoring cronjob
         run: |
           set -euo pipefail

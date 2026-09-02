@@ -38,12 +38,26 @@ test("legit majority → allow", () => {
   assert.equal(r.status, "allow");
 });
 
-test("single uncontradicted spam report → warn (potential spam, not unknown)", () => {
-  // 1 spam, 0 legit → low confidence → score < 60, but a negative signal exists.
+test("single uncontradicted spam report → counted but NOT yet warn (1-vote defamation guard)", () => {
+  // 1 spam, 0 legit → low confidence → score < 60; the report shows as a count
+  // but one anonymous voice can't flag a number for every user.
   const r = scoreFromReports(reps(1, "spam"), { now });
   assert.ok(r.score < 60, `score=${r.score}`);
-  assert.equal(r.status, "warn");
+  assert.equal(r.status, "unknown");
+  assert.equal(r.spam, 1);
   assert.ok(r.confidence > 0 && r.confidence < 100, `confidence=${r.confidence}`);
+});
+
+test("two uncontradicted spam reports → warn (potential spam, not unknown)", () => {
+  const r = scoreFromReports(reps(2, "spam"), { now });
+  assert.ok(r.score < 60, `score=${r.score}`);
+  assert.equal(r.status, "warn");
+});
+
+test("two stale uncontradicted spam reports decay back to unknown", () => {
+  // ~2 half-lives old → weight ≈ 0.5 → below the warn floor.
+  const r = scoreFromReports(reps(2, "spam", 60), { now });
+  assert.equal(r.status, "unknown");
 });
 
 test("confidence reflects weighted evidence volume", () => {

@@ -20,7 +20,12 @@ data:
   SCORE_INTERVAL_MS: "21600000"
   REPORT_RETENTION_DAYS: "365"
   MAX_REPORTS_PER_DEVICE_PER_DAY: "50"
+  # Anti-Sybil: brand-new device ids one IP may register per day.
+  MAX_NEW_DEVICES_PER_IP_PER_DAY: "20"
+  # Uncontradicted spam weight before "warn" (≈ two fresh devices).
+  MIN_WEIGHT_FOR_WARN: "1.5"
   # TTL (s) of the short-lived /lists download tokens. The signing secret
-  # (LIST_TOKEN_SECRET) is NOT here: it comes from the whocalled-api-secret
+  # (LIST_TOKEN_SECRET) and the operator token for third-party number erasure
+  # (PRIVACY_ADMIN_TOKEN) are NOT here: they come from the whocalled-api-secret
   # k8s secret, synced from GitHub Actions at deploy time.
   LIST_TOKEN_TTL_S: "900"

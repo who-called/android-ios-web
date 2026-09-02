@@ -36,6 +36,7 @@ ServiceAccount kubeconfig — no cluster-admin on the box).
 |--------|-------|
 | `DATABASE_URL` | `postgresql://whocalled_app:<PASSWORD>@sides-postgres-rw.db-prod:5432/whocalled?sslmode=require` |
 | `LIST_TOKEN_SECRET` | random string (`openssl rand -hex 32`) — signs the short-lived `/lists` download tokens |
+| `PRIVACY_ADMIN_TOKEN` | *(optional)* random string — Bearer token for `DELETE /api/v1/privacy/number/:phone` (third-party erasure requests received at privacy@who-called.com). Unset → endpoint disabled |
 | `GHCR_PULL_TOKEN` | GitHub PAT (classic) with `read:packages` — lets the cluster pull the GHCR images |
 
 `GITHUB_TOKEN` is automatic (used to push images during the build job).

@@ -1,23 +1,39 @@
 import { Router } from "express";
 import { z } from "zod";
+import { timingSafeEqual } from "node:crypto";
 import { prisma } from "../db.js";
+import { config } from "../config.js";
 import { normalizePhone } from "../phone.js";
-import { displayedReportCounts } from "../scoring.js";
+import { rescoreNumber } from "../rescore.js";
 
 export const privacyRouter = Router();
 
 /**
  * RGPD / privacy endpoints.
  *
- * DELETE /api/v1/privacy/number/:phone
+ * DELETE /api/v1/privacy/number/:phone   (operator only — Bearer PRIVACY_ADMIN_TOKEN)
  *   Right to erasure for a third party: removes a number and all its reports
  *   from the community database. (ARCEP patterns are official ranges, untouched.)
+ *   Requests arrive by email (privacy@who-called.com) and are executed by the
+ *   operator; left open, this let any spammer wipe their own community history.
  *
  * DELETE /api/v1/privacy/device/:deviceId
  *   Lets a user erase all reports they made from a device, and the device record.
  */
 
+function isOperator(req) {
+  const expected = config.privacy.adminToken;
+  if (!expected) return false;
+  const given = (req.headers.authorization ?? "").replace(/^Bearer\s+/i, "");
+  const a = Buffer.from(given);
+  const b = Buffer.from(expected);
+  return a.length === b.length && timingSafeEqual(a, b);
+}
+
 privacyRouter.delete("/number/:phone", async (req, res) => {
+  if (!config.privacy.adminToken) return res.status(404).json({ error: "not_found" });
+  if (!isOperator(req)) return res.status(401).json({ error: "unauthorized" });
+
   const phone = normalizePhone(req.params.phone);
   if (!phone) return res.status(400).json({ error: "invalid_phone" });
 
@@ -46,18 +62,9 @@ privacyRouter.delete("/device/:deviceId", async (req, res) => {
     await tx.device.deleteMany({ where: { deviceId } });
     await tx.gameScore.deleteMany({ where: { deviceId } }); // RGPD: drop game scores too
 
-    // Recompute counters for affected numbers (best-effort, counts only).
-    // Keep folding SIA aggregates (option B) so a device wipe never zeros a seed.
-    for (const phone of phones) {
-      const spam = await tx.report.count({ where: { phone, vote: "spam" } });
-      const legit = await tx.report.count({ where: { phone, vote: "legit" } });
-      const seed = await tx.siaSeed.findUnique({ where: { phone } });
-      const counts = displayedReportCounts({ spam, legit }, seed);
-      await tx.number.updateMany({
-        where: { phone },
-        data: { reportCountSpam: counts.spam, reportCountLegit: counts.legit },
-      });
-    }
+    // Full re-score (status + score, not just counts) so a number this device
+    // alone pushed to block/warn is released now, not at the next 6 h job.
+    for (const phone of phones) await rescoreNumber(tx, phone);
 
     return { removedReports: removed.count, affectedNumbers: phones.length };
   });

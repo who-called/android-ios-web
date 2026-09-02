@@ -146,9 +146,11 @@ function deriveStatus(score, weightedTotal, weightedSpam, weightedLegit) {
   }
   if (score >= s.warnThreshold) return "warn";
   if (weightedLegit > weightedSpam) return "allow";
-  // Any uncontradicted spam signal is at least "potential spam" — don't mask a
-  // negative report behind "unknown" (which is reserved for truly no data).
-  if (weightedSpam > 0 && weightedLegit === 0) return "warn";
+  // Uncontradicted spam evidence is "potential spam" — don't mask it behind
+  // "unknown" (reserved for truly no data). But it takes more than ONE
+  // anonymous voice (minWeightForWarn ≈ two fresh devices): a lone report
+  // stays visible as a count without flagging the number for everyone.
+  if (weightedSpam >= s.minWeightForWarn && weightedLegit === 0) return "warn";
   return "unknown";
 }
 

@@ -2,11 +2,12 @@ import { Router } from "express";
 import { z } from "zod";
 import { prisma } from "../db.js";
 import { config } from "../config.js";
-import { scoreFromReports, updateReputation, siaPrior, displayedReportCounts } from "../scoring.js";
+import { scoreFromReports, updateReputation, siaPrior } from "../scoring.js";
 import { reportsWithWeights } from "../reportWeights.js";
+import { rescoreNumber } from "../rescore.js";
 import { normalizePhone } from "../phone.js";
 import { REPORT_CATEGORIES } from "../categories.js";
-import { resolveCategory } from "../jobs/scoreJob.js";
+import { fixedWindowCounter } from "../middleware/rateLimit.js";
 
 export const reportsRouter = Router();
 
@@ -18,6 +19,16 @@ const reportSchema = z.object({
   // send category:null when voting "legit").
   category: z.enum(REPORT_CATEGORIES).nullish(),
   locale: z.string().default("fr"),
+});
+
+// Anti-Sybil: `deviceId` is free-form, so one IP could mint N fresh ids and
+// vote a number straight into "block". Bound how many NEW devices a single IP
+// may create per day; devices already known are never affected, so a
+// household or carrier NAT keeps working — only the (N+1)th brand-new install
+// of the day waits until tomorrow for its first report.
+const newDevicesPerIp = fixedWindowCounter({
+  windowMs: 86_400_000,
+  max: config.antiAbuse.maxNewDevicesPerIpPerDay,
 });
 
 /**
@@ -42,16 +53,24 @@ reportsRouter.post("/", async (req, res) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  const device = await prisma.device.upsert({
-    where: { deviceId },
-    create: { deviceId, reportsToday: 0, lastReportDate: today },
-    update: {},
-  });
+  let device = await prisma.device.findUnique({ where: { deviceId } });
+  if (!device) {
+    const { allowed, retryAfterSec } = newDevicesPerIp.hit(req.ip ?? "unknown");
+    if (!allowed) {
+      res.setHeader("Retry-After", String(retryAfterSec));
+      return res.status(429).json({ error: "rate_limited" });
+    }
+    device = await prisma.device.upsert({
+      where: { deviceId },
+      create: { deviceId, reportsToday: 0, lastReportDate: today },
+      update: {},
+    });
+  }
 
   const lastDate = new Date(device.lastReportDate);
   lastDate.setHours(0, 0, 0, 0);
-  const reportsToday =
-    lastDate.getTime() === today.getTime() ? device.reportsToday : 0;
+  const sameDay = lastDate.getTime() === today.getTime();
+  const reportsToday = sameDay ? device.reportsToday : 0;
 
   if (reportsToday >= config.antiAbuse.maxReportsPerDevicePerDay) {
     return res.status(429).json({ error: "rate_limited" });
@@ -71,24 +90,24 @@ reportsRouter.post("/", async (req, res) => {
       where: { phone, deviceId },
       select: { id: true, vote: true },
     });
+    const voteChanged = !existingVote || existingVote.vote !== vote;
 
-    // SIA seed must participate in both consensus (reputation) and the
-    // materialized counters — otherwise a first community vote would wipe the
-    // seed-only history (e.g. 31 → 1) until the next score job.
-    const seed = await tx.siaSeed.findUnique({ where: { phone } });
-    const prior = seed ? siaPrior(seed) : undefined;
-
-    // Load existing reports (with each device's reputation) to compute consensus
-    // BEFORE this new vote — used for the anti-poisoning reputation update.
-    const priorReports = await reportsWithWeights(tx, phone);
-    const priorScore = scoreFromReports(priorReports, { prior });
-
-    // Update this device's reputation based on agreement with prior consensus.
-    const newWeight = updateReputation(
-      device.reputationWeight,
-      vote,
-      { weightedSpam: priorScore.weightedSpam, weightedLegit: priorScore.weightedLegit }
-    );
+    // Reputation moves only when the device takes a (new) position. A re-vote
+    // that repeats the same opinion is free server-side, so without this guard
+    // it was a farming loop: agree once, re-send 10× → weight 2.0.
+    let newWeight = device.reputationWeight;
+    if (voteChanged) {
+      // SIA seed participates in the consensus like in the score job.
+      const seed = await tx.siaSeed.findUnique({ where: { phone } });
+      const prior = seed ? siaPrior(seed) : undefined;
+      // Consensus BEFORE this vote drives the anti-poisoning update.
+      const priorReports = await reportsWithWeights(tx, phone);
+      const priorScore = scoreFromReports(priorReports, { prior });
+      newWeight = updateReputation(device.reputationWeight, vote, {
+        weightedSpam: priorScore.weightedSpam,
+        weightedLegit: priorScore.weightedLegit,
+      });
+    }
 
     if (existingVote) {
       // Replace the device's previous vote for this number (no duplicate, no
@@ -104,28 +123,16 @@ reportsRouter.post("/", async (req, res) => {
       where: { deviceId },
       data: {
         // Re-votes don't consume the daily quota; only brand-new reports do.
-        reportsToday: existingVote ? reportsToday : reportsToday + 1,
+        // Relative increment, so two concurrent reports can't overwrite each
+        // other's count (the read above happens outside this transaction).
+        reportsToday: existingVote ? undefined : sameDay ? { increment: 1 } : 1,
         lastReportDate: today,
         reputationWeight: newWeight,
       },
     });
 
-    // Recompute the number's score from ALL reports + SIA prior (option B counts).
-    const allReports = await reportsWithWeights(tx, phone);
-    const scored = scoreFromReports(allReports, { prior });
-    const counts = displayedReportCounts(scored, seed);
-
-    return tx.number.update({
-      where: { phone },
-      data: {
-        reportCountSpam: counts.spam,
-        reportCountLegit: counts.legit,
-        spamScore: scored.score,
-        status: scored.status,
-        category: resolveCategory(allReports, seed),
-        source: seed ? "mixed" : "community",
-      },
-    });
+    // Recompute the number's score from ALL reports + SIA prior.
+    return rescoreNumber(tx, phone);
   });
 
   return res.status(201).json({

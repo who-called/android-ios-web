@@ -8,7 +8,7 @@
 import { fileURLToPath } from "node:url";
 import { prisma } from "../db.js";
 import { config } from "../config.js";
-import { displayedReportCounts } from "../scoring.js";
+import { rescoreNumber } from "../rescore.js";
 
 export async function runRetention(now = Date.now()) {
   const cutoff = new Date(now - config.retention.reportDays * 86_400_000);
@@ -38,11 +38,9 @@ export async function runRetention(now = Date.now()) {
       });
       removed += res.count;
     } else {
-      const counts = displayedReportCounts({ spam, legit }, seed);
-      await prisma.number.updateMany({
-        where: { phone },
-        data: { reportCountSpam: counts.spam, reportCountLegit: counts.legit },
-      });
+      // Full re-score: purging the reports that held a number in block/warn
+      // must release it now, not leave a stale status until the next job.
+      await rescoreNumber(prisma, phone, { now });
       rescored += 1;
     }
   }
