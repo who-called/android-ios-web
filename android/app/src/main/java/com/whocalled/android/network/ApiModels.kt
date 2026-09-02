@@ -6,7 +6,8 @@ data class ReportRequest(
     val deviceId: String,
     val vote: String, // spam | legit
     val category: String? = null,
-    val locale: String = "fr",
+    // The device language, so server-side provenance stats aren't all "fr".
+    val locale: String = java.util.Locale.getDefault().language.ifEmpty { "fr" },
 )
 
 /** A scored number returned by GET /lists. */

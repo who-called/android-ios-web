@@ -80,6 +80,10 @@ fun SettingsScreen(viewModel: MainViewModel) {
     var funCustomTitles by remember { mutableStateOf(setOf<String>()) }
     var newFunTitle by remember { mutableStateOf("") }
     var gameReminder by remember { mutableStateOf(false) }
+    // Anti-spam pause state of the reminder — surfaced so "toggle ON but
+    // silent" is never a mystery (the historic invisible-mute bug).
+    var reminderIgnored by remember { mutableStateOf(0) }
+    var reminderSnoozedUntil by remember { mutableStateOf(0L) }
     var threshold by remember { mutableFloatStateOf(85f) }
     var countryDial by remember { mutableStateOf("") }
     var showCountryDialog by remember { mutableStateOf(false) }
@@ -135,8 +139,10 @@ fun SettingsScreen(viewModel: MainViewModel) {
         gameReminder = true
         scope.launch {
             Preferences.setGameReminderEnabled(context, true)
-            // Re-enabling by hand also un-mutes the ignored-reminders kill-switch.
+            // Re-enabling by hand also lifts the ignored-reminders pause.
             Preferences.resetReminderIgnored(context)
+            reminderIgnored = 0
+            reminderSnoozedUntil = 0L
         }
         GameReminderWorker.schedule(context)
     }
@@ -185,6 +191,8 @@ fun SettingsScreen(viewModel: MainViewModel) {
         funCustomTitles = Preferences.funCustomTitles(context)
         notifsEnabled = NotificationManagerCompat.from(context).areNotificationsEnabled()
         gameReminder = Preferences.isGameReminderEnabled(context)
+        reminderIgnored = Preferences.reminderIgnoredCount(context)
+        reminderSnoozedUntil = Preferences.reminderSnoozedUntilDay(context)
         threshold = Preferences.blockThreshold(context).toFloat()
         countryDial = Preferences.countryDial(context)
     }
@@ -367,7 +375,7 @@ fun SettingsScreen(viewModel: MainViewModel) {
             BorderedCard(Modifier.padding(horizontal = 16.dp)) {
                 ToggleRow(
                     title = "Rappel quotidien pour jouer 🎮",
-                    description = "Un rappel bienveillant entre 18h30 et 20h30, jamais si vous avez déjà joué. Il se met en pause tout seul si vous l'ignorez plusieurs jours de suite.",
+                    description = "Un rappel bienveillant entre 18h30 et 20h30, jamais si vous avez déjà joué. Ignoré ${Preferences.REMINDER_IGNORED_LIMIT} soirs de suite, il se met en pause ${Preferences.REMINDER_SNOOZE_DAYS} jours puis réessaie.",
                     checked = gameReminder,
                 ) { on ->
                     if (on) {
@@ -380,6 +388,35 @@ fun SettingsScreen(viewModel: MainViewModel) {
                         gameReminder = false
                         scope.launch { Preferences.setGameReminderEnabled(context, false) }
                         GameReminderWorker.cancel(context)
+                    }
+                }
+                // The pause used to be invisible (toggle ON, zero reminders) —
+                // show it, with a one-tap way out.
+                if (gameReminder && reminderIgnored >= Preferences.REMINDER_IGNORED_LIMIT) {
+                    HorizontalDivider(Modifier.padding(vertical = 8.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Column(Modifier.weight(1f).padding(end = 8.dp)) {
+                            Text("Rappels en pause", fontWeight = FontWeight.SemiBold)
+                            val until = reminderSnoozedUntil
+                            Text(
+                                if (until > 0L) {
+                                    val date = java.time.LocalDate.ofEpochDay(until).format(
+                                        java.time.format.DateTimeFormatter.ofPattern("d MMMM", java.util.Locale.FRENCH),
+                                    )
+                                    "Plusieurs rappels sont restés sans réponse — reprise automatique le $date."
+                                } else {
+                                    "Plusieurs rappels sont restés sans réponse — reprise automatique dans quelques jours."
+                                },
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                        TextButton(onClick = {
+                            scope.launch { Preferences.resetReminderIgnored(context) }
+                            reminderIgnored = 0
+                            reminderSnoozedUntil = 0L
+                            GameReminderWorker.schedule(context)
+                        }) { Text("Reprendre") }
                     }
                 }
             }
@@ -605,7 +642,7 @@ fun SettingsScreen(viewModel: MainViewModel) {
                         NotificationHelper.showBlockedCall(context, "+33612345678", null, funMode = true, customTitles = funCustomTitles)
                     }) { Text("Appel bloqué (fun)") }
                     androidx.compose.material3.OutlinedButton(onClick = {
-                        NotificationHelper.showWarning(context, "+33612345678", 72, null)
+                        NotificationHelper.showWarning(context, "+33612345678", 72, "telemarketing", null)
                     }) { Text("Alerte WARN (score 72)") }
                     androidx.compose.material3.OutlinedButton(onClick = {
                         NotificationHelper.showBlockedSms(context, "36777")

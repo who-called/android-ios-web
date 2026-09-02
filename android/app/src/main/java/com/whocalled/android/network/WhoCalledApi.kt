@@ -128,12 +128,6 @@ class WhoCalledApi(
         request(url, "DELETE", null, Map::class.java)
     }
 
-    /** RGPD: request erasure of a specific number from the community database. */
-    fun eraseNumber(phone: String) {
-        val url = URL("$baseUrl/privacy/number/${URLEncoder.encode(phone, "UTF-8")}")
-        request(url, "DELETE", null, Map::class.java)
-    }
-
     private fun <T> request(url: URL, method: String, body: String?, type: Class<T>): T {
         val conn = (url.openConnection() as HttpURLConnection).apply {
             requestMethod = method

@@ -380,11 +380,10 @@ fun CallDetailScreen(
                     SegmentedButton(
                         selected = myVote == "spam",
                         onClick = {
-                            viewModel.submitReport(
-                                displayedPhone,
-                                isSpam = true,
-                                ReportCategory.OTHER.api,
-                            )
+                            // No category yet — the chips below refine it; a
+                            // hard-coded "unknown" starved the community's
+                            // "pourquoi ce numéro appelle" statistics.
+                            viewModel.submitReport(displayedPhone, isSpam = true)
                         },
                         enabled = report !is LoadState.Loading,
                         shape = SegmentedButtonDefaults.itemShape(0, 2),
@@ -398,6 +397,29 @@ fun CallDetailScreen(
                         shape = SegmentedButtonDefaults.itemShape(1, 2),
                     ) {
                         Text("Légitime")
+                    }
+                }
+                // One optional tap: why is this number unwanted? A re-vote is
+                // free server-side, so the chip just refines the same report.
+                if (myVote == "spam") {
+                    val myCategory = myReports.firstOrNull { it.phone == displayedPhone }?.category
+                    Text(
+                        "Pourquoi ? (facultatif)",
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.padding(top = 10.dp),
+                    )
+                    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        ReportCategory.entries.filter { it != ReportCategory.OTHER }.forEach { c ->
+                            androidx.compose.material3.FilterChip(
+                                selected = myCategory == c.api,
+                                onClick = {
+                                    viewModel.submitReport(displayedPhone, isSpam = true, c.api)
+                                },
+                                enabled = report !is LoadState.Loading,
+                                label = { Text(c.label) },
+                            )
+                        }
                     }
                 }
             }

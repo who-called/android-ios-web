@@ -98,17 +98,28 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     private val _recentCallHandledAt = MutableStateFlow<Long?>(null)
+    private val _recentCallSeenAt = MutableStateFlow<Long?>(null)
+
+    // Minute tick so the 24 h / freshness windows keep moving while the app
+    // stays foregrounded (the flows would otherwise only re-emit on new data).
+    private val minuteTick = kotlinx.coroutines.flow.flow {
+        while (true) {
+            emit(Unit)
+            kotlinx.coroutines.delay(60_000L)
+        }
+    }
 
     /**
-     * The newest unhandled call stays on Home for up to 24 hours. A nullable
-     * handled timestamp prevents a brief stale prompt while DataStore loads.
+     * The newest unhandled call headlines Home for up to 24 hours — unless a
+     * previous session already showed it (then only while < 1 h old). Nullable
+     * timestamps prevent a brief stale prompt while DataStore loads.
      */
-    val recentCallPrompt: StateFlow<com.whocalled.android.util.CallEvent?> =
-        combine(callEvents, _recentCallHandledAt) { calls, handledAt ->
-            if (handledAt == null) {
+    val recentCallPrompt: StateFlow<com.whocalled.android.util.RecentCallPrompt?> =
+        combine(callEvents, _recentCallHandledAt, _recentCallSeenAt, minuteTick) { calls, handledAt, seenAt, _ ->
+            if (handledAt == null || seenAt == null) {
                 null
             } else {
-                com.whocalled.android.util.findRecentCallPrompt(calls, handledAt)
+                com.whocalled.android.util.buildRecentCallPrompt(calls, handledAt, seenAt)
             }
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
@@ -120,7 +131,12 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch {
             _recentCallHandledAt.value =
                 com.whocalled.android.data.Preferences.recentCallHandledAt(getApplication())
+            _recentCallSeenAt.value =
+                com.whocalled.android.data.Preferences.recentCallSeenAt(getApplication())
         }
+        // Push any report that failed to sync (offline at the time) — the
+        // local-first design exists exactly for this, but nothing called it.
+        viewModelScope.launch { repo.retryPendingReports() }
     }
 
     // Async states
@@ -253,6 +269,20 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         markRecentCallHandledAt(call.timestamp)
     }
 
+    /**
+     * Called when the app leaves the foreground: whatever the Home card was
+     * showing counts as "seen but not acted on" — next session it only
+     * re-headlines while still fresh (the call stays in the Calls tab).
+     */
+    fun commitRecentCallSeen() {
+        val shown = recentCallPrompt.value?.call ?: return
+        val seenAt = maxOf(_recentCallSeenAt.value ?: 0L, shown.timestamp)
+        _recentCallSeenAt.value = seenAt
+        viewModelScope.launch {
+            com.whocalled.android.data.Preferences.setRecentCallSeenAt(getApplication(), seenAt)
+        }
+    }
+
     private fun markRecentCallHandledAt(timestamp: Long) {
         val handledAt = maxOf(_recentCallHandledAt.value ?: 0L, timestamp)
         _recentCallHandledAt.value = handledAt
@@ -310,7 +340,9 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    private var lastReportedPhone: String? = null
+    // Last (normalized phone, vote, category) sent, so a change of mind or a
+    // category refinement is acknowledged instead of "pas besoin d'insister".
+    private var lastReport: Triple<String, String, String?>? = null
 
     /**
      * Why the sync failed, in the user's terms. Blaming the connection for a 429
@@ -332,27 +364,44 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     fun submitReport(phone: String, isSpam: Boolean, category: String? = null) {
         viewModelScope.launch {
             _report.value = LoadState.Loading
-            val isRepeat = phone.trim() == lastReportedPhone
-            lastReportedPhone = phone.trim()
+            val normalized = com.whocalled.android.util.PhoneNormalizer.normalize(phone)
+            val vote = if (isSpam) "spam" else "legit"
+            val prev = lastReport?.takeIf { normalized != null && it.first == normalized }
+            val isRepeat = prev != null && prev.second == vote && prev.third == category
+            val isFlip = prev != null && prev.second != vote
+            val isRefine = prev != null && prev.second == vote && prev.third != category
+            lastReport = normalized?.let { Triple(it, vote, category) }
             repo.submitReport(phone, isSpam, category).fold(
                 onSuccess = {
                     _report.value = LoadState.Success(
-                        if (isRepeat) "C'est bien noté 😊 Pas besoin d'insister — un signalement suffit !"
-                        else "Merci ! Signalement enregistré 🛡️",
+                        when {
+                            isRepeat -> "C'est bien noté 😊 Pas besoin d'insister — un signalement suffit !"
+                            isFlip -> "Avis mis à jour ✓"
+                            isRefine -> "Merci, précision enregistrée ✓"
+                            else -> "Merci ! Signalement enregistré 🛡️"
+                        },
                     )
-                    val normalized = com.whocalled.android.util.PhoneNormalizer.normalize(phone)
                     if (normalized != null && normalized == _detailPhone.value) {
                         fetchLookup(normalized)
                     }
                 },
-                onFailure = {
-                    // Stored locally even if the network failed → make that clear.
-                    _report.value = LoadState.Error(
-                        "Enregistré localement. Envoi au serveur échoué : ${it.message}",
-                    )
-                },
+                onFailure = { _report.value = LoadState.Error(reportErrorMessage(it)) },
             )
         }
+    }
+
+    /**
+     * Report failures in the user's terms. "Enregistré localement" is only
+     * true for network/server failures (the row was saved before the push) —
+     * an invalid number saves NOTHING and must say so.
+     */
+    private fun reportErrorMessage(error: Throwable): String = when {
+        error is RepoError.InvalidPhone ->
+            "Numéro invalide — vérifiez le format."
+        error is RepoError.Server && error.code == 429 ->
+            "Limite quotidienne de signalements atteinte. Votre avis est gardé sur l'appareil et sera renvoyé automatiquement."
+        else ->
+            "Enregistré localement. Envoi au serveur échoué : ${error.message}"
     }
 
     fun deleteReport(phone: String) {
@@ -379,16 +428,6 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
             repo.eraseMyData().fold(
                 onSuccess = { _privacy.value = LoadState.Success("Vos signalements ont été supprimés.") },
                 onFailure = { _privacy.value = LoadState.Error("Échec de la suppression. Réessayez.") },
-            )
-        }
-    }
-
-    fun eraseNumber(phone: String) {
-        viewModelScope.launch {
-            _privacy.value = LoadState.Loading
-            repo.eraseNumber(phone).fold(
-                onSuccess = { _privacy.value = LoadState.Success("Demande de suppression envoyée.") },
-                onFailure = { _privacy.value = LoadState.Error("Numéro invalide ou échec.") },
             )
         }
     }
@@ -520,6 +559,18 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
 
     fun requestOpenGames() { _openGames.value = true }
     fun consumeOpenGames() { _openGames.value = false }
+
+    /** One-shot deep link from a notification → a number's page (e.g. SMS sender). */
+    private val _openPhone = MutableStateFlow<String?>(null)
+    val openPhone: StateFlow<String?> = _openPhone
+
+    fun requestOpenPhone(phone: String) { _openPhone.value = phone }
+
+    fun consumeOpenPhone(): String? {
+        val v = _openPhone.value
+        _openPhone.value = null
+        return v
+    }
 
     // Diagnostics: API "mode test" (double-tap on the version row in Settings).
     private val _apiTest = MutableStateFlow<ApiTestState>(ApiTestState.Idle)

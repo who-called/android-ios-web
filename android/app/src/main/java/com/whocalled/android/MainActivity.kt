@@ -55,6 +55,7 @@ class MainActivity : ComponentActivity() {
         handleShareIntent(intent)
         handleOpenCallIntent(intent)
         handleOpenGamesIntent(intent)
+        handleOpenPhoneIntent(intent)
 
         setContent {
             WhoCalledTheme {
@@ -92,12 +93,28 @@ class MainActivity : ComponentActivity() {
         viewModel.refreshSmsState()
     }
 
+    override fun onStop() {
+        super.onStop()
+        // Leaving the app seals the session: the Home card shown during it
+        // becomes "seen" and stops headlining old news on the next open.
+        viewModel.commitRecentCallSeen()
+    }
+
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
         handleShareIntent(intent)
         handleOpenCallIntent(intent)
         handleOpenGamesIntent(intent)
+        handleOpenPhoneIntent(intent)
+    }
+
+    /** A notification tap carries a number → open that number's page. */
+    private fun handleOpenPhoneIntent(intent: Intent?) {
+        val phone = intent?.getStringExtra(
+            com.whocalled.android.service.NotificationHelper.EXTRA_OPEN_PHONE,
+        )
+        if (!phone.isNullOrBlank()) viewModel.requestOpenPhone(phone)
     }
 
     /** A notification tap carries a call-log id → open that call's detail. */

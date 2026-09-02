@@ -21,6 +21,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -44,13 +45,17 @@ fun MyReportsScreen(
     onOpenNumber: (String) -> Unit = {},
 ) {
     val reports by viewModel.myReports.collectAsState()
+    val reportState by viewModel.report.collectAsState()
     var pendingDelete by remember { mutableStateOf<String?>(null) }
+
+    // A stale success/error from another screen must not greet the user here.
+    LaunchedEffect(Unit) { viewModel.clearReportState() }
 
     pendingDelete?.let { phone ->
         AlertDialog(
             onDismissRequest = { pendingDelete = null },
             title = { Text("Supprimer ce signalement ?") },
-            text = { Text("Le signalement de +$phone sera retiré (localement et de nos serveurs). Cette action est irréversible.") },
+            text = { Text("Le signalement de +$phone sera retiré de cet appareil. S'il avait été envoyé, un vote correctif préviendra nos serveurs. Cette action est irréversible.") },
             confirmButton = {
                 TextButton(onClick = {
                     viewModel.deleteReport(phone)
@@ -85,6 +90,18 @@ fun MyReportsScreen(
                 modifier = Modifier.padding(horizontal = 16.dp),
             )
         }
+        // Feedback for flips/retries done from this screen — silence looked
+        // like success even when the push failed.
+        item {
+            val (kind, msg) = when (val s = reportState) {
+                is com.whocalled.android.ui.LoadState.Error ->
+                    com.whocalled.android.ui.components.BannerKind.Error to s.message
+                is com.whocalled.android.ui.LoadState.Success ->
+                    com.whocalled.android.ui.components.BannerKind.Success to s.message
+                else -> com.whocalled.android.ui.components.BannerKind.Info to null
+            }
+            com.whocalled.android.ui.components.AnimatedBanner(kind, msg, Modifier.padding(horizontal = 16.dp))
+        }
 
         if (reports.isEmpty()) {
             item {
@@ -116,10 +133,20 @@ fun MyReportsScreen(
                                 style = MaterialTheme.typography.bodySmall,
                                 color = if (report.syncState == "failed") MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
                             )
+                            if (report.syncState == "failed") {
+                                TextButton(onClick = { viewModel.retryPending() }) {
+                                    Text("Renvoyer maintenant")
+                                }
+                            }
                         }
-                        // Change one's mind: flip the vote.
+                        // Change one's mind: flip the vote (the repository
+                        // keeps the original category across flips).
                         IconButton(onClick = {
-                            viewModel.submitReport(report.phone, isSpam = report.vote != "spam")
+                            viewModel.submitReport(
+                                report.phone,
+                                isSpam = report.vote != "spam",
+                                category = report.category,
+                            )
                         }) {
                             Icon(Icons.Rounded.SwapHoriz, contentDescription = "Changer d’avis")
                         }

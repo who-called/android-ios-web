@@ -22,7 +22,11 @@ class ListSyncWorker(
     override suspend fun doWork(): Result {
         val repo = WhoCalledRepository(applicationContext)
         return repo.syncList().fold(
-            onSuccess = { Result.success() },
+            onSuccess = {
+                // The network is up — piggy-back the queue of unsent reports.
+                repo.retryPendingReports()
+                Result.success()
+            },
             onFailure = { Result.retry() },
         )
     }

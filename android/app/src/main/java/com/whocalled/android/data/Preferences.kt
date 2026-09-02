@@ -8,12 +8,22 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
+import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
+import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.first
 import java.security.MessageDigest
 import java.util.UUID
 
-private val Context.dataStore by preferencesDataStore(name = "who-called-prefs")
+// A corrupted prefs file (power loss mid-write, full disk) would otherwise throw
+// on EVERY read — including inside the call-screening service, i.e. each
+// incoming call — and make the app unlaunchable. Start over with defaults
+// instead: nothing here is irreplaceable (the device id is re-derived from
+// ANDROID_ID, so even the user's votes stay attached to the same identity).
+private val Context.dataStore by preferencesDataStore(
+    name = "who-called-prefs",
+    corruptionHandler = ReplaceFileCorruptionHandler { emptyPreferences() },
+)
 
 /**
  * App preferences (DataStore).
@@ -63,10 +73,16 @@ object Preferences {
     private val KEY_NOTIF_PROMPT_SEEN = booleanPreferencesKey("notif_prompt_seen")
     private val KEY_SHIELD_SETUP_COMPLETED = booleanPreferencesKey("shield_setup_completed")
     private val KEY_REMINDER_IGNORED = intPreferencesKey("game_reminder_ignored_count")
+    private val KEY_REMINDER_SNOOZED_UNTIL = longPreferencesKey("game_reminder_snoozed_until_day")
+    private val KEY_REMINDER_LAST_SHOWN_DAY = longPreferencesKey("game_reminder_last_shown_day")
     private val KEY_RECENT_CALL_HANDLED_AT = longPreferencesKey("recent_call_handled_at")
+    private val KEY_RECENT_CALL_SEEN_AT = longPreferencesKey("recent_call_seen_at")
 
-    /** Consecutive unanswered reminders before the nudge auto-mutes (anti-spam). */
+    /** Consecutive unanswered reminders before the nudge pauses itself (anti-spam). */
     const val REMINDER_IGNORED_LIMIT = 3
+
+    /** How long the self-pause lasts before gently trying again (epoch-days). */
+    const val REMINDER_SNOOZE_DAYS = 14L
 
     /**
      * Stable anonymous id used to replace (not duplicate) a vote after reinstall.
@@ -158,6 +174,35 @@ object Preferences {
     suspend fun blockedCallNotification(context: Context): Boolean =
         context.dataStore.data.first()[KEY_BLOCKED_CALL_NOTIFICATION] ?: true
 
+    /** Everything onScreenCall needs, read in ONE DataStore pass — the
+     * screening service runs on the system's ~5 s call budget. */
+    data class ScreeningPrefs(
+        val filteringEnabled: Boolean,
+        val blockThreshold: Int,
+        val warnEnabled: Boolean,
+        /** Country dial for national-format normalization; never empty. */
+        val countryDial: String,
+        val blockedCallNotification: Boolean,
+        val funNotifications: Boolean,
+        val funCustomTitles: Set<String>,
+    )
+
+    suspend fun screeningPrefs(context: Context): ScreeningPrefs {
+        val p = context.dataStore.data.first()
+        return ScreeningPrefs(
+            filteringEnabled = p[KEY_FILTERING_ENABLED] ?: true,
+            blockThreshold = p[KEY_BLOCK_THRESHOLD] ?: 85,
+            warnEnabled = p[KEY_WARN_ENABLED] ?: true,
+            // "" means worldwide scope — normalization still needs a concrete
+            // prefix for national-format numbers, keep the FR historic default.
+            countryDial = (p[KEY_COUNTRY_DIAL] ?: Countries.detectDefault(context).dial)
+                .ifEmpty { "33" },
+            blockedCallNotification = p[KEY_BLOCKED_CALL_NOTIFICATION] ?: true,
+            funNotifications = p[KEY_FUN_NOTIFICATIONS] ?: false,
+            funCustomTitles = p[KEY_FUN_CUSTOM_TITLES] ?: emptySet(),
+        )
+    }
+
     suspend fun setBlockedCallNotification(context: Context, enabled: Boolean) {
         context.dataStore.edit { it[KEY_BLOCKED_CALL_NOTIFICATION] = enabled }
     }
@@ -244,9 +289,27 @@ object Preferences {
     }
 
     /**
-     * Anti-spam kill-switch: number of consecutive reminders that got no
-     * reaction (no tap, no game played). At [REMINDER_IGNORED_LIMIT] the worker
-     * stops posting; any tap or play resets the counter (see
+     * Most recent call whose Home card was displayed during a now-finished
+     * session. "Seen but not acted on" — the card stops headlining it unless
+     * the call is still fresh (see findRecentCallPrompt).
+     */
+    suspend fun recentCallSeenAt(context: Context): Long =
+        context.dataStore.data.first()[KEY_RECENT_CALL_SEEN_AT] ?: 0L
+
+    suspend fun setRecentCallSeenAt(context: Context, timestamp: Long) {
+        context.dataStore.edit { prefs ->
+            prefs[KEY_RECENT_CALL_SEEN_AT] = maxOf(
+                prefs[KEY_RECENT_CALL_SEEN_AT] ?: 0L,
+                timestamp,
+            )
+        }
+    }
+
+    /**
+     * Anti-spam pause: number of consecutive reminders that got no reaction
+     * (no tap, no game played). At [REMINDER_IGNORED_LIMIT] the worker goes
+     * quiet for [REMINDER_SNOOZE_DAYS] days (a pause, never a permanent mute);
+     * any tap, play or visit to the Games hub resets the counter (see
      * [resetReminderIgnored]).
      */
     suspend fun reminderIgnoredCount(context: Context): Int =
@@ -259,7 +322,26 @@ object Preferences {
     }
 
     suspend fun resetReminderIgnored(context: Context) {
-        context.dataStore.edit { it[KEY_REMINDER_IGNORED] = 0 }
+        context.dataStore.edit {
+            it[KEY_REMINDER_IGNORED] = 0
+            it.remove(KEY_REMINDER_SNOOZED_UNTIL)
+        }
+    }
+
+    /** Epoch-day the current reminder pause ends (0 = no pause running). */
+    suspend fun reminderSnoozedUntilDay(context: Context): Long =
+        context.dataStore.data.first()[KEY_REMINDER_SNOOZED_UNTIL] ?: 0L
+
+    suspend fun snoozeReminderUntilDay(context: Context, day: Long) {
+        context.dataStore.edit { it[KEY_REMINDER_SNOOZED_UNTIL] = day }
+    }
+
+    /** Epoch-day a reminder was last actually posted — guards double fires. */
+    suspend fun reminderLastShownDay(context: Context): Long =
+        context.dataStore.data.first()[KEY_REMINDER_LAST_SHOWN_DAY] ?: -1L
+
+    suspend fun setReminderLastShownDay(context: Context, day: Long) {
+        context.dataStore.edit { it[KEY_REMINDER_LAST_SHOWN_DAY] = day }
     }
 
     /** Whether the TRACE interactive tutorial was completed once (first launch only). */

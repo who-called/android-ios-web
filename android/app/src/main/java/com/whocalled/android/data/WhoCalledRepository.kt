@@ -161,12 +161,18 @@ class WhoCalledRepository(
         val vote = if (isSpam) "spam" else "legit"
         val now = System.currentTimeMillis()
 
+        // The REPLACE upsert would wipe what we knew: keep the original
+        // category and creation date across vote flips.
+        val previous = db.myReportDao().byPhone(phone)
+        val keptCategory = category ?: previous?.category
+        val createdAt = previous?.createdAt ?: now
+
         // Persist locally first (pending).
         db.myReportDao().upsert(
-            MyReportEntity(phone, vote, category, now, now, syncState = "pending"),
+            MyReportEntity(phone, vote, keptCategory, createdAt, now, syncState = "pending"),
         )
 
-        pushReport(phone, vote, category, now)
+        pushReport(phone, vote, keptCategory, createdAt)
     }
 
     /** Re-send any reports that failed to sync. */
@@ -181,14 +187,19 @@ class WhoCalledRepository(
     }
 
     /**
-     * Delete one of the user's reports. Locally removed; we also send a
-     * corrective "legit" vote so the crowd score isn't stuck on a mistake.
+     * Delete one of the user's reports. Locally removed; if a SPAM vote had
+     * actually reached the server, we also send a corrective "legit" vote so
+     * the crowd score isn't stuck on a mistake. An unsynced or already-legit
+     * report gets no corrective — it would create a vote out of thin air.
      */
     suspend fun deleteMyReport(phone: String): Result<Unit> = guarded {
+        val existing = db.myReportDao().byPhone(phone)
         db.myReportDao().deleteByPhone(phone)
-        // Best-effort corrective vote (ignored if offline).
-        runCatching {
-            api.report(ReportRequest(phone, Preferences.deviceId(context), "legit", null))
+        if (existing?.vote == "spam" && existing.syncState == "synced") {
+            // Best-effort corrective vote (ignored if offline).
+            runCatching {
+                api.report(ReportRequest(phone, Preferences.deviceId(context), "legit", null))
+            }
         }
         Unit
     }
@@ -196,7 +207,16 @@ class WhoCalledRepository(
     private suspend fun pushReport(phone: String, vote: String, category: String?, createdAt: Long) {
         val now = System.currentTimeMillis()
         try {
-            api.report(ReportRequest(phone, Preferences.deviceId(context), vote, category))
+            // A "legit" vote carries no category — the local row still keeps
+            // it so a later flip back to spam doesn't lose the reason.
+            api.report(
+                ReportRequest(
+                    phone,
+                    Preferences.deviceId(context),
+                    vote,
+                    if (vote == "spam") category else null,
+                ),
+            )
             db.myReportDao().upsert(
                 MyReportEntity(phone, vote, category, createdAt, now, syncState = "synced"),
             )
@@ -213,15 +233,10 @@ class WhoCalledRepository(
     /** Erase all data this device sent to the server, and clear local reports. */
     suspend fun eraseMyData(): Result<Unit> = guarded {
         api.eraseDevice(Preferences.deviceId(context))
-        // Clear local copies too.
-        for (r in db.myReportDao().pending()) db.myReportDao().deleteByPhone(r.phone)
+        // Clear ALL local copies — a synced row left behind would show as
+        // "envoyé" for a report the server just deleted.
+        db.myReportDao().clear()
         Unit
-    }
-
-    /** Request erasure of a specific number from the community database. */
-    suspend fun eraseNumber(rawPhone: String): Result<Unit> = guarded {
-        val phone = PhoneNormalizer.normalize(rawPhone) ?: throw RepoError.InvalidPhone
-        api.eraseNumber(phone)
     }
 
     // MARK: - User rules

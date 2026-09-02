@@ -150,6 +150,15 @@ fun WhoCalledApp(
             nav.navigate("games") { popUpTo("home"); launchSingleTop = true }
         }
     }
+
+    // A notification carrying a number (e.g. hidden SMS) → that number's page.
+    val openPhone by viewModel.openPhone.collectAsState()
+    LaunchedEffect(openPhone) {
+        openPhone?.let { phone ->
+            viewModel.consumeOpenPhone()
+            nav.navigate("number/$phone") { launchSingleTop = true }
+        }
+    }
     // Hide the bottom tab bar on drill-down screens (e.g. the call detail), so
     // they use the full height and nothing is clipped.
     val showBottomBar = route in tabs.map { it.route }

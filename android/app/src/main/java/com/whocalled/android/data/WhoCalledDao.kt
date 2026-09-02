@@ -90,6 +90,12 @@ interface MyReportDao {
     @Query("SELECT * FROM my_reports WHERE syncState != 'synced'")
     suspend fun pending(): List<MyReportEntity>
 
+    @Query("SELECT * FROM my_reports WHERE phone = :phone LIMIT 1")
+    suspend fun byPhone(phone: String): MyReportEntity?
+
     @Query("DELETE FROM my_reports WHERE phone = :phone")
     suspend fun deleteByPhone(phone: String)
+
+    @Query("DELETE FROM my_reports")
+    suspend fun clear()
 }

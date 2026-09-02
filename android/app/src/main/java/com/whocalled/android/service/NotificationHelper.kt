@@ -76,8 +76,14 @@ object NotificationHelper {
     /** Stable id so the opt-out action can dismiss the reminder. */
     val GAME_REMINDER_NOTIFICATION_ID = "game_reminder".hashCode()
 
-    fun showGameReminder(context: Context) {
-        if (NotificationManagerCompat.from(context).areNotificationsEnabled().not()) return
+    /** Returns whether the reminder was actually posted (permission + channel). */
+    fun showGameReminder(context: Context): Boolean {
+        val manager = NotificationManagerCompat.from(context)
+        if (!manager.areNotificationsEnabled()) return false
+        // A blocked channel makes notify() a silent no-op — report it so the
+        // caller never counts an "ignored" reminder nobody could see.
+        val channel = manager.getNotificationChannelCompat(CHANNEL_REMINDER)
+        if (channel != null && channel.importance == NotificationManagerCompat.IMPORTANCE_NONE) return false
         val (title, body) = reminderMessages.random()
         val notification = NotificationCompat.Builder(context, CHANNEL_REMINDER)
             .setSmallIcon(R.drawable.ic_notification_shield)
@@ -88,11 +94,12 @@ object NotificationHelper {
             .setContentIntent(gamesIntent(context)) // opens the Games hub (choose a game)
             // No opt-out action on the notification itself — the toggle lives in
             // Settings → Jeux (cleaner, matches the other game's notification).
+            .setOnlyAlertOnce(true)
             .setAutoCancel(true)
             .build()
-        runCatching {
-            NotificationManagerCompat.from(context).notify(GAME_REMINDER_NOTIFICATION_ID, notification)
-        }
+        return runCatching {
+            manager.notify(GAME_REMINDER_NOTIFICATION_ID, notification)
+        }.isSuccess
     }
 
     /** Content intent that opens the app straight on the Games hub. */
@@ -150,25 +157,48 @@ object NotificationHelper {
             .setContentText(number ?: context.getString(R.string.call_blocked_unknown))
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setContentIntent(detailIntent(context, callLogId))
+            .setGroup(GROUP_BLOCKED_CALLS)
             .setAutoCancel(true)
             .build()
         runCatching {
             // Unique id per blocked call so several can coexist.
             val id = "call_${number ?: "?"}_${System.currentTimeMillis()}".hashCode()
             NotificationManagerCompat.from(context).notify(id, notification)
+            // Group summary so a spam wave collapses into one tray line
+            // instead of flooding the shade with LOW-priority entries.
+            val summary = NotificationCompat.Builder(context, CHANNEL_CALL_BLOCKED)
+                .setSmallIcon(R.drawable.ic_notification_shield)
+                .setColor(WCColor.Coral.toArgb())
+                .setContentTitle(context.getString(R.string.call_blocked_title))
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .setContentIntent(detailIntent(context, null))
+                .setGroup(GROUP_BLOCKED_CALLS)
+                .setGroupSummary(true)
+                .setAutoCancel(true)
+                .build()
+            NotificationManagerCompat.from(context).notify(BLOCKED_CALLS_SUMMARY_ID, summary)
         }
     }
+
+    private const val GROUP_BLOCKED_CALLS = "who_called_blocked_calls"
+    private val BLOCKED_CALLS_SUMMARY_ID = "blocked_calls_summary".hashCode()
 
     /** Discreet "an unwanted SMS notification was hidden" notice. */
     fun showBlockedSms(context: Context, sender: String) {
         if (NotificationManagerCompat.from(context).areNotificationsEnabled().not()) return
+        // Deep-link to the sender's number page when it IS a number (calls
+        // already do) — short codes / alphanumeric senders fall back to Home.
+        val senderPhone = com.whocalled.android.util.PhoneNormalizer.normalize(sender)
         val notification = NotificationCompat.Builder(context, CHANNEL_SMS_BLOCKED)
             .setSmallIcon(R.drawable.ic_notification_shield)
             .setColor(WCColor.Emerald.toArgb())
             .setContentTitle(context.getString(R.string.sms_blocked_title))
             .setContentText(context.getString(R.string.sms_blocked_body, sender))
             .setPriority(NotificationCompat.PRIORITY_LOW)
-            .setContentIntent(detailIntent(context, null)) // just open the app
+            .setContentIntent(
+                if (senderPhone != null) phoneIntent(context, senderPhone)
+                else detailIntent(context, null),
+            )
             .setAutoCancel(true)
             .build()
         runCatching {
@@ -184,14 +214,19 @@ object NotificationHelper {
      * the phone rings and auto-clears after ~45s (covers the ring) so it never
      * lingers. It carries the number + score and opens the detail on tap.
      */
-    fun showWarning(context: Context, phone: String, score: Int, callLogId: Long?) {
+    fun showWarning(context: Context, phone: String, score: Int, category: String?, callLogId: Long?) {
         if (NotificationManagerCompat.from(context).areNotificationsEnabled().not()) return
 
+        // "Démarchage · risque 72%" decides a ringing call better than a bare
+        // percentage — surface the known category while the phone rings.
+        val categoryLabel = com.whocalled.android.data.ReportCategory.fromApi(category)
+            ?.takeIf { it != com.whocalled.android.data.ReportCategory.OTHER }?.label
+        val body = context.getString(R.string.warn_body, phone, score)
         val notification = NotificationCompat.Builder(context, CHANNEL_WARN)
             .setSmallIcon(R.drawable.ic_notification_shield)
             .setColor(WCColor.Amber.toArgb())
             .setContentTitle(context.getString(R.string.warn_title))
-            .setContentText(context.getString(R.string.warn_body, phone, score))
+            .setContentText(if (categoryLabel != null) "$categoryLabel · $body" else body)
             .setSubText(context.getString(R.string.warn_subtext)) // "Sonne mais non bloqué"
             .setPriority(NotificationCompat.PRIORITY_MAX) // heads-up over the call UI
             .setCategory(NotificationCompat.CATEGORY_CALL)
@@ -211,6 +246,24 @@ object NotificationHelper {
 
     /** Flag carried by the daily reminder → open the Games hub. */
     const val EXTRA_OPEN_GAMES = "open_games"
+
+    /** Normalized number carried by a notification → open that number's page. */
+    const val EXTRA_OPEN_PHONE = "open_phone"
+
+    /** Tapping opens the app straight on [phone]'s number page. */
+    private fun phoneIntent(context: Context, phone: String): PendingIntent {
+        val intent = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                Intent.FLAG_ACTIVITY_SINGLE_TOP
+            putExtra(EXTRA_OPEN_PHONE, phone)
+        }
+        return PendingIntent.getActivity(
+            context,
+            "phone_$phone".hashCode(),
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
+    }
 
     /**
      * Tapping a notification opens the app; if [callLogId] is known, MainActivity

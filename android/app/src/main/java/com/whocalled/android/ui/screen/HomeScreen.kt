@@ -162,17 +162,23 @@ fun HomeScreen(
             )
         },
     ) {
-        recentCall?.let { call ->
-            item(key = "recent-call-${call.key}") {
+        val prompt = recentCall
+        if (prompt != null) {
+            item(key = "recent-call-${prompt.call.key}") {
                 RecentCallCard(
-                    call = call,
+                    prompt = prompt,
                     onOpen = {
-                        viewModel.markRecentCallHandled(call)
-                        onRecentCallClick(call)
+                        viewModel.markRecentCallHandled(prompt.call)
+                        onRecentCallClick(prompt.call)
                     },
-                    onDismiss = { viewModel.markRecentCallHandled(call) },
+                    onDismiss = { viewModel.markRecentCallHandled(prompt.call) },
+                    onSeeAll = onSeeAllHistory,
                 )
             }
+        } else if (callLogGranted) {
+            // Same slot, calm mode: the protection tells its story even when
+            // there is nothing to triage.
+            item(key = "recent-call-quiet") { RecentCallQuietRow() }
         }
 
         // Primary action first: update the list (visible without scrolling).
@@ -351,37 +357,55 @@ fun HomeScreen(
 
 @Composable
 private fun RecentCallCard(
-    call: CallEvent,
+    prompt: com.whocalled.android.util.RecentCallPrompt,
     onOpen: () -> Unit,
     onDismiss: () -> Unit,
+    onSeeAll: () -> Unit,
 ) {
-    val (title, message, color) = when (call.action) {
-        CallEventAction.BLOCKED -> Triple(
+    val call = prompt.call
+    // Ticks every minute so "il y a 5 min" follows the clock during a session.
+    val now by androidx.compose.runtime.produceState(initialValue = System.currentTimeMillis()) {
+        while (true) {
+            kotlinx.coroutines.delay(60_000L)
+            value = System.currentTimeMillis()
+        }
+    }
+    // An answered conversation is news, not a threat — no "before calling back"
+    // scare for a call the user actually took.
+    val answered = call.direction == com.whocalled.android.util.CallDirection.INCOMING &&
+        call.durationSeconds >= 30
+    val (title, message, color) = when {
+        call.action == CallEventAction.BLOCKED -> Triple(
             "Appel indésirable bloqué",
             "Who Called a raccroché avant qu’il ne sonne.",
             WCColor.Coral,
         )
-        CallEventAction.WARNED -> Triple(
+        call.action == CallEventAction.WARNED -> Triple(
             "Appel suspect détecté",
             "L’appel a sonné avec une alerte.",
             WCColor.Amber,
         )
-        CallEventAction.REPORTED_SPAM -> Triple(
+        call.action == CallEventAction.REPORTED_SPAM -> Triple(
             "Numéro signalé indésirable",
             "Vous aviez déjà marqué ce numéro comme indésirable.",
             WCColor.Coral,
         )
-        CallEventAction.LEGITIMATE -> Triple(
+        call.action == CallEventAction.LEGITIMATE -> Triple(
             "Numéro marqué légitime",
             "Vous aviez indiqué que ce numéro est légitime.",
             WCColor.Emerald,
         )
-        CallEventAction.CONTACT -> Triple(
+        call.action == CallEventAction.CONTACT -> Triple(
             "Appel d’un contact",
             "Ce numéro figure dans vos contacts.",
             WCColor.Slate,
         )
-        CallEventAction.UNKNOWN -> Triple(
+        answered -> Triple(
+            "Vous avez répondu à un numéro inconnu",
+            "Ajoutez-le à vos contacts ou donnez votre avis.",
+            WCColor.Blue,
+        )
+        else -> Triple(
             "Un numéro inconnu vous a appelé",
             "Vérifiez ce numéro avant de rappeler.",
             WCColor.Blue,
@@ -401,14 +425,23 @@ private fun RecentCallCard(
             )
             Column(Modifier.weight(1f).padding(horizontal = 10.dp)) {
                 Text(title, fontWeight = FontWeight.Bold)
+                // Surface the caller-ID name when the phone already knows it —
+                // "Ma Boulangerie" reassures where a bare number worries.
                 Text(
-                    "+${call.phone}",
+                    call.displayName ?: "+${call.phone}",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(top = 4.dp),
                 )
+                if (call.displayName != null) {
+                    Text(
+                        "+${call.phone} · nom fourni par l’annuaire",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
                 Text(
-                    "${com.whocalled.android.util.RelativeTime.format(call.timestamp)} · $message",
+                    "${com.whocalled.android.util.RelativeTime.format(call.timestamp, now)} · $message",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -425,6 +458,38 @@ private fun RecentCallCard(
             modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
         ) {
             Text("Voir le numéro")
+        }
+        if (prompt.others > 0) {
+            // Dismissing the headline must not bury the rest of the backlog.
+            TextButton(onClick = onSeeAll, modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    if (prompt.others == 1) "et 1 autre appel ces dernières 24 h"
+                    else "et ${prompt.others} autres appels ces dernières 24 h",
+                )
+            }
+        }
+    }
+}
+
+/** Calm replacement for the recent-call slot when there is nothing to triage. */
+@Composable
+private fun RecentCallQuietRow() {
+    BorderedCard(
+        Modifier.padding(horizontal = 16.dp),
+        accent = WCColor.Emerald,
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                Icons.Rounded.VerifiedUser,
+                contentDescription = null,
+                tint = WCColor.Emerald,
+                modifier = Modifier.size(22.dp),
+            )
+            Text(
+                "Aucun nouvel appel à vérifier — tout est calme.",
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(start = 10.dp),
+            )
         }
     }
 }

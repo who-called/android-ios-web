@@ -66,6 +66,9 @@ private enum class Bucket(val title: String) {
 private const val DUPLICATE_WINDOW_MS = 2 * 60_000L
 private const val RECENT_CALL_MAX_AGE_MS = 24 * 60 * 60 * 1_000L
 
+/** A call this fresh keeps headlining Home even if a past session showed it. */
+private const val RECENT_CALL_FRESH_MS = 60 * 60 * 1_000L
+
 // CallLog.Calls values kept here so this merge stays a plain JVM-testable function.
 private val visibleCallTypes = setOf(1, 2, 3, 5, 6) // incoming, outgoing, missed, rejected, blocked
 
@@ -153,19 +156,55 @@ private fun directionOf(type: Int): CallDirection = when (type) {
     else -> CallDirection.INCOMING
 }
 
-/** Newest event eligible for the Home prompt, bounded to the last 24 hours. */
+/** The Home headline: the newest call worth triaging, plus how many more wait. */
+data class RecentCallPrompt(
+    val call: CallEvent,
+    /** Other still-unhandled calls of the last 24 h (they live in the Calls tab). */
+    val others: Int,
+)
+
+/**
+ * Newest event eligible for the Home prompt, bounded to the last 24 hours.
+ *
+ * Two decays keep the card honest news rather than a sticky banner:
+ *  - [handledAt]: the user acted (opened/dismissed) — gone for good;
+ *  - [seenAt]: a previous session displayed it and the user moved on — it only
+ *    re-headlines while still fresh (< 1 h old); afterwards the Calls tab is
+ *    its home. A brand-new call always resets the stage.
+ */
 fun findRecentCallPrompt(
     events: List<CallEvent>,
     handledAt: Long,
+    seenAt: Long = 0L,
     now: Long = System.currentTimeMillis(),
 ): CallEvent? {
     val cutoff = now - RECENT_CALL_MAX_AGE_MS
+    val freshCutoff = now - RECENT_CALL_FRESH_MS
     return events
         .asSequence()
         .filter { it.direction != CallDirection.OUTGOING }
         .filter { it.action !in setOf(CallEventAction.CONTACT, CallEventAction.LEGITIMATE) }
         .filter { it.timestamp > handledAt && it.timestamp >= cutoff }
+        .filter { it.timestamp > seenAt || it.timestamp >= freshCutoff }
         .maxByOrNull { it.timestamp }
+}
+
+/** [findRecentCallPrompt] plus the count of other unhandled calls behind it. */
+fun buildRecentCallPrompt(
+    events: List<CallEvent>,
+    handledAt: Long,
+    seenAt: Long = 0L,
+    now: Long = System.currentTimeMillis(),
+): RecentCallPrompt? {
+    val call = findRecentCallPrompt(events, handledAt, seenAt, now) ?: return null
+    val cutoff = now - RECENT_CALL_MAX_AGE_MS
+    val others = events.count {
+        it.key != call.key &&
+            it.direction != CallDirection.OUTGOING &&
+            it.action !in setOf(CallEventAction.CONTACT, CallEventAction.LEGITIMATE) &&
+            it.timestamp > handledAt && it.timestamp >= cutoff
+    }
+    return RecentCallPrompt(call, others)
 }
 
 private fun bucketOf(timestamp: Long, now: Long): Bucket {

@@ -24,22 +24,24 @@ class WhoCalledScreeningService : CallScreeningService() {
 
     override fun onScreenCall(callDetails: Call.Details) {
         val raw = callDetails.handle?.schemeSpecificPart
-        val phone = PhoneNormalizer.normalize(raw)
         val db = WhoCalledDatabase.get(this)
 
-        val filteringEnabled = runBlocking { Preferences.isFilteringEnabled(this@WhoCalledScreeningService) }
-        if (!filteringEnabled) {
+        // ONE DataStore read for every pref — this runs on the system's ~5 s
+        // call budget, each extra blocking read eats into it.
+        val prefs = runBlocking { Preferences.screeningPrefs(this@WhoCalledScreeningService) }
+        if (!prefs.filteringEnabled) {
             respondToCall(callDetails, allowResponse())
             return
         }
 
-        val blockThreshold = runBlocking { Preferences.blockThreshold(this@WhoCalledScreeningService) }
-        val warnEnabled = runBlocking { Preferences.isWarnEnabled(this@WhoCalledScreeningService) }
+        // National-format numbers resolve against the user's country scope —
+        // a +32 user's "0470…" must match the +32 list, not become a 33….
+        val phone = PhoneNormalizer.normalize(raw, prefs.countryDial)
 
         val decision = ScreeningDecision.decide(
             phone = phone,
-            blockThreshold = blockThreshold,
-            warnEnabled = warnEnabled,
+            blockThreshold = prefs.blockThreshold,
+            warnEnabled = prefs.warnEnabled,
             userRuleDao = db.userRuleDao(),
             scoredNumberDao = db.scoredNumberDao(),
             patternDao = db.patternDao(),
@@ -59,15 +61,24 @@ class WhoCalledScreeningService : CallScreeningService() {
                 ?.let { entry -> runCatching { runBlocking { db.callLogDao().insert(entry) } }.getOrNull() }
 
             when (decision.action) {
-                Action.WARN -> NotificationHelper.showWarning(this, raw ?: p, decision.score, callLogId)
+                Action.WARN -> NotificationHelper.showWarning(
+                    this, raw ?: p, decision.score, decision.category, callLogId,
+                )
                 Action.BLOCK -> {
                     // The system "missed call" notice is suppressed; post our own
                     // discreet "Appel bloqué" notice (opt-out via settings).
-                    val notify = runBlocking { Preferences.blockedCallNotification(this@WhoCalledScreeningService) }
-                    val fun_ = runBlocking { Preferences.funNotifications(this@WhoCalledScreeningService) }
                     // User-written fun titles join the built-in FR/EN rotation.
-                    val custom = if (fun_) runBlocking { Preferences.funCustomTitles(this@WhoCalledScreeningService) } else emptySet()
-                    if (notify) NotificationHelper.showBlockedCall(this, raw ?: p, callLogId, fun_, custom)
+                    if (prefs.blockedCallNotification) {
+                        NotificationHelper.showBlockedCall(
+                            this,
+                            // Normalized digits, never the raw national form —
+                            // the notification prefixes "+" to what it gets.
+                            p,
+                            callLogId,
+                            prefs.funNotifications,
+                            if (prefs.funNotifications) prefs.funCustomTitles else emptySet(),
+                        )
+                    }
                 }
                 Action.ALLOW -> {}
             }

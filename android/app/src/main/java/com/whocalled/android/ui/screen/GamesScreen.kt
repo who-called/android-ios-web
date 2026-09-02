@@ -51,6 +51,9 @@ fun GamesScreen(
     LaunchedEffect(Unit) {
         defense = Preferences.gameState(context, "defense")
         trace = Preferences.gameState(context, "trace")
+        // Visiting the hub proves games are still welcome — lift any
+        // ignored-reminders pause without requiring a finished run.
+        Preferences.resetReminderIgnored(context)
     }
 
     ScrollableScreen(header = { GradientHeader(title = "Jeux", subtitle = "Un défi par jour, ton classement") }) {

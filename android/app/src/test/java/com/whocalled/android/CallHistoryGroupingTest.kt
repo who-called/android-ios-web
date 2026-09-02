@@ -7,6 +7,7 @@ import com.whocalled.android.util.CallEventAction
 import com.whocalled.android.util.CallDirection
 import com.whocalled.android.util.CallerNameSource
 import com.whocalled.android.util.PhoneCall
+import com.whocalled.android.util.buildRecentCallPrompt
 import com.whocalled.android.util.findRecentCallPrompt
 import com.whocalled.android.util.groupCallHistory
 import com.whocalled.android.util.mergeCallEvents
@@ -173,5 +174,40 @@ class CallHistoryGroupingTest {
         assertEquals(recent, findRecentCallPrompt(listOf(old, recent), handledAt = 0, now = now))
         assertEquals(null, findRecentCallPrompt(listOf(recent), handledAt = recent.timestamp, now = now))
         assertEquals(null, findRecentCallPrompt(listOf(old), handledAt = 0, now = now))
+    }
+
+    @Test
+    fun seenCallOnlyReHeadlinesWhileFresh() {
+        val hour = 3_600_000L
+        val fresh = event(4, "33611111111", ageDays = 0).copy(timestamp = now - 30 * 60_000L)
+        val staleSeen = event(5, "33622222222", ageDays = 0).copy(timestamp = now - 3 * hour)
+
+        // Seen in a previous session but < 1 h old → still headlines.
+        assertEquals(
+            fresh,
+            findRecentCallPrompt(listOf(fresh), handledAt = 0, seenAt = fresh.timestamp, now = now),
+        )
+        // Seen and no longer fresh → the Calls tab is its home now.
+        assertEquals(
+            null,
+            findRecentCallPrompt(listOf(staleSeen), handledAt = 0, seenAt = staleSeen.timestamp, now = now),
+        )
+        // A newer call always resets the stage, whatever was seen before.
+        assertEquals(
+            fresh,
+            findRecentCallPrompt(listOf(staleSeen, fresh), handledAt = 0, seenAt = staleSeen.timestamp, now = now),
+        )
+    }
+
+    @Test
+    fun promptCountsTheRestOfTheUnhandledBacklog() {
+        val newest = event(6, "33611111111", ageDays = 0)
+        val other = event(7, "33622222222", ageDays = 0).copy(timestamp = now - 2 * 3_600_000L)
+        val tooOld = event(8, "33633333333", ageDays = 2)
+
+        val prompt = buildRecentCallPrompt(listOf(newest, other, tooOld), handledAt = 0, now = now)
+
+        assertEquals(newest, prompt?.call)
+        assertEquals(1, prompt?.others)
     }
 }

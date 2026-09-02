@@ -68,6 +68,23 @@ fun ReportScreen(
         viewModel.consumeSharedPhone()?.let { phone = it }
     }
 
+    // A success banner from a vote made elsewhere (number detail) must not
+    // greet the user under an empty form as if a send just happened.
+    LaunchedEffect(Unit) { viewModel.clearReportState() }
+
+    // After a successful send from THIS screen (Loading seen here first),
+    // clear the field for the next report — stale successes don't count.
+    var sendInFlight by remember { mutableStateOf(false) }
+    LaunchedEffect(report) {
+        when {
+            report is LoadState.Loading -> sendInFlight = true
+            sendInFlight && report is LoadState.Success -> {
+                phone = ""
+                sendInFlight = false
+            }
+        }
+    }
+
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(12.dp),
