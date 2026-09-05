@@ -23,7 +23,7 @@ type LegalDoc = { title: string; updated: string; intro?: string; sections: Sect
 
 const privacyFr: LegalDoc = {
   title: "Politique de confidentialité",
-  updated: "23 juillet 2026",
+  updated: "5 septembre 2026",
   intro:
     "Cette politique couvre le site who-called.com et les applications mobiles Who Called " +
     "pour Android (com.devfi.whocalled) et iOS (bientôt disponible), éditées par " +
@@ -44,11 +44,11 @@ const privacyFr: LegalDoc = {
     },
     {
       title: "4. Données envoyées à nos serveurs",
-      body: "Signalement d'un numéro (action volontaire) : le numéro signalé au format international, votre vote (indésirable/légitime), une catégorie facultative, l'identifiant anonyme de l'appareil, la date et la langue. Vérification d'un numéro : le numéro recherché est transmis pour interroger la base, sans être associé à votre identifiant. Synchronisation de la liste : la requête contient uniquement le pays choisi et la date de dernière mise à jour — aucun identifiant. Mini-jeux : voir la section 7.",
+      body: "Signalement d'un numéro (action volontaire) : le numéro signalé au format international, votre vote (indésirable/légitime), une catégorie facultative, l'identifiant anonyme de l'appareil, la date et la langue. Vérification d'un numéro : le numéro recherché est transmis pour interroger la base, accompagné de l'identifiant anonyme de l'appareil uniquement pour vous réafficher votre propre vote ; cette requête n'est pas conservée. Synchronisation de la liste : la requête contient uniquement le pays choisi et la date de dernière mise à jour — aucun identifiant. Mini-jeux : voir la section 7.",
     },
     {
       title: "5. Application Android — autorisations",
-      body: "Filtrage d'appels (rôle système « Applications de filtrage d'appels ») : le numéro de chaque appel entrant est comparé localement à la liste stockée sur l'appareil ; il n'est jamais envoyé à nos serveurs. Journal d'appels (READ_CALL_LOG, facultatif et révocable) : permet de signaler un numéro récent en un geste ; la lecture reste locale. Notifications (POST_NOTIFICATIONS, facultatif) : alertes d'appels suspects, avis d'appels/SMS bloqués et rappel quotidien des mini-jeux. Accès aux notifications (bouclier SMS, opt-in) : lit uniquement les notifications de votre application SMS pour masquer celles provenant de numéros indésirables ; le contenu n'est ni stocké ni transmis. Internet : synchronisation de la liste et envoi de vos signalements.",
+      body: "Filtrage d'appels (rôle système « Applications de filtrage d'appels ») : le numéro de chaque appel entrant est comparé localement à la liste stockée sur l'appareil ; il n'est jamais envoyé à nos serveurs. Journal d'appels (READ_CALL_LOG, facultatif et révocable) : permet d'afficher vos appels récents et de signaler un numéro en un geste. La lecture reste locale : seul le numéro que vous choisissez explicitement de signaler est transmis à nos serveurs, le reste du journal n'est jamais envoyé. Notifications (POST_NOTIFICATIONS, facultatif) : alertes d'appels suspects, avis d'appels/SMS bloqués et rappel quotidien des mini-jeux. Accès aux notifications (bouclier SMS, opt-in) : lit uniquement les notifications de votre application SMS pour masquer celles provenant de numéros indésirables ; le contenu n'est ni stocké ni transmis. Internet : synchronisation de la liste et envoi de vos signalements.",
     },
     {
       title: "6. Application iOS — autorisations et extensions",
@@ -95,7 +95,7 @@ const privacyFr: LegalDoc = {
 
 const privacyEn: LegalDoc = {
   title: "Privacy Policy",
-  updated: "July 23, 2026",
+  updated: "September 5, 2026",
   intro:
     "This policy covers the who-called.com website and the Who Called mobile apps " +
     "for Android (com.devfi.whocalled) and iOS (coming soon), published by " +
@@ -116,11 +116,11 @@ const privacyEn: LegalDoc = {
     },
     {
       title: "4. Data sent to our servers",
-      body: "Reporting a number (voluntary action): the reported number in international format, your vote (spam/legitimate), an optional category, the device's anonymous identifier, the date and the language. Checking a number: the number you search is sent to query the database, without being linked to your identifier. List sync: the request only carries the selected country and the last-update date — no identifier. Mini-games: see section 7.",
+      body: "Reporting a number (voluntary action): the reported number in international format, your vote (spam/legitimate), an optional category, the device's anonymous identifier, the date and the language. Checking a number: the number you search is sent to query the database, together with the device's anonymous identifier solely to show you your own vote; this request is not stored. List sync: the request only carries the selected country and the last-update date — no identifier. Mini-games: see section 7.",
     },
     {
       title: "5. Android app — permissions",
-      body: "Call screening (system role “Call screening apps”): each incoming number is checked locally against the list stored on the device; it is never sent to our servers. Call log (READ_CALL_LOG, optional and revocable): lets you report a recent number in one tap; reading stays local. Notifications (POST_NOTIFICATIONS, optional): suspicious-call alerts, blocked call/SMS notices and the daily mini-game reminder. Notification access (SMS shield, opt-in): only reads notifications from your SMS app to hide those coming from unwanted numbers; content is neither stored nor transmitted. Internet: list sync and sending your reports.",
+      body: "Call screening (system role “Call screening apps”): each incoming number is checked locally against the list stored on the device; it is never sent to our servers. Call log (READ_CALL_LOG, optional and revocable): lets you see your recent calls and report a number in one tap. Reading stays local: only the number you explicitly choose to report is sent to our servers; the rest of the call log is never transmitted. Notifications (POST_NOTIFICATIONS, optional): suspicious-call alerts, blocked call/SMS notices and the daily mini-game reminder. Notification access (SMS shield, opt-in): only reads notifications from your SMS app to hide those coming from unwanted numbers; content is neither stored nor transmitted. Internet: list sync and sending your reports.",
     },
     {
       title: "6. iOS app — permissions and extensions",
