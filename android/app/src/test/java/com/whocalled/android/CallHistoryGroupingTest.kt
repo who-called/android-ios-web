@@ -5,12 +5,10 @@ import com.whocalled.android.data.MyReportEntity
 import com.whocalled.android.util.CallEvent
 import com.whocalled.android.util.CallEventAction
 import com.whocalled.android.util.CallDirection
-import com.whocalled.android.util.CallerNameSource
-import com.whocalled.android.util.PhoneCall
+import com.whocalled.android.util.buildCallEvents
 import com.whocalled.android.util.buildRecentCallPrompt
 import com.whocalled.android.util.findRecentCallPrompt
 import com.whocalled.android.util.groupCallHistory
-import com.whocalled.android.util.mergeCallEvents
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -77,93 +75,59 @@ class CallHistoryGroupingTest {
         assertEquals("Hier", sections[1].title)
     }
 
+    private fun journal(id: Long, phone: String, action: String, ageMs: Long = 0) =
+        CallLogEntity(id = id, phone = phone, action = action, spamScore = if (action == "allowed") 0 else 80,
+            category = "telemarketing", timestamp = now - ageMs)
+
+    private fun vote(phone: String, vote: String) =
+        MyReportEntity(phone = phone, vote = vote, category = null, createdAt = now, updatedAt = now, syncState = "synced")
+
     @Test
-    fun warnedCallPresentInBothSourcesIsDeduplicated() {
-        val filtered = listOf(
-            CallLogEntity(
-                id = 7,
-                phone = "33612345678",
-                action = "warned",
-                spamScore = 72,
-                category = "telemarketing",
-                timestamp = now,
-            ),
-        )
-        val system = listOf(
-            PhoneCall(
-                systemId = 42,
-                rawNumber = "+33 6 12 34 56 78",
-                normalizedPhone = "33612345678",
-                timestamp = now + 5_000,
-                type = 1,
+    fun journalVerdictsMapToActionsAndDirections() {
+        val events = buildCallEvents(
+            listOf(
+                journal(1, "33611111111", "blocked"),
+                journal(2, "33622222222", "warned", ageMs = 1_000),
+                journal(3, "33633333333", "allowed", ageMs = 2_000),
             ),
         )
 
-        val merged = mergeCallEvents(filtered, system)
-
-        assertEquals(1, merged.size)
-        assertEquals(CallEventAction.WARNED, merged.single().action)
-        assertEquals(7L, merged.single().callLogId)
+        assertEquals(3, events.size)
+        assertEquals(CallEventAction.BLOCKED, events[0].action)
+        assertEquals(CallDirection.BLOCKED, events[0].direction)
+        assertEquals(CallEventAction.WARNED, events[1].action)
+        assertEquals(CallEventAction.UNKNOWN, events[2].action)
+        assertEquals(CallDirection.INCOMING, events[2].direction)
+        assertEquals(3L, events[2].callLogId)
     }
 
     @Test
-    fun fullHistoryKeepsUnknownContactsAndOutgoingCalls() {
-        val system = listOf(
-            PhoneCall(1, "+33611111111", "33611111111", now, 3),
-            PhoneCall(2, "+33622222222", "33622222222", now - 1_000, 1, contactName = "Alice"),
-            PhoneCall(3, "+33633333333", "33633333333", now - 2_000, 2),
-            PhoneCall(4, "+33644444444", "33644444444", now - 3_000, 6),
-        )
-
-        val merged = mergeCallEvents(emptyList(), system)
-
-        assertEquals(4, merged.size)
-        assertEquals(CallEventAction.UNKNOWN, merged.first { it.phone == "33611111111" }.action)
-        assertEquals(CallEventAction.CONTACT, merged.first { it.phone == "33622222222" }.action)
-        assertEquals(CallDirection.OUTGOING, merged.first { it.phone == "33633333333" }.direction)
-        assertEquals(CallEventAction.BLOCKED, merged.first { it.phone == "33644444444" }.action)
+    fun allowedUnknownCallHeadlinesHome() {
+        val events = buildCallEvents(listOf(journal(1, "33611111111", "allowed")))
+        assertEquals(events.single(), findRecentCallPrompt(events, handledAt = 0, now = now))
     }
 
     @Test
-    fun callerIdNameIsShownButNotTreatedAsAContact() {
-        val system = listOf(
-            PhoneCall(
-                systemId = 1,
-                rawNumber = "+33655555555",
-                normalizedPhone = "33655555555",
-                timestamp = now,
-                type = 1,
-                contactName = "Pharmacie du Centre",
-                nameSource = CallerNameSource.DIRECTORY,
+    fun personalVotesDecorateAllowedCallsOnly() {
+        val events = buildCallEvents(
+            listOf(
+                journal(1, "33611111111", "allowed"),
+                journal(2, "33622222222", "allowed", ageMs = 1_000),
+                journal(3, "33633333333", "blocked", ageMs = 2_000),
             ),
+            listOf(vote("33611111111", "legit"), vote("33622222222", "spam"), vote("33633333333", "legit")),
         )
 
-        val event = mergeCallEvents(emptyList(), system).single()
-
-        assertEquals("Pharmacie du Centre", event.displayName)
-        assertEquals(false, event.isContact)
-        // Not in the address book → still a number worth reviewing.
-        assertEquals(CallEventAction.UNKNOWN, event.action)
+        assertEquals(CallEventAction.LEGITIMATE, events.first { it.phone == "33611111111" }.action)
+        assertEquals(CallEventAction.REPORTED_SPAM, events.first { it.phone == "33622222222" }.action)
+        // The filter's verdict is what happened to the call; a vote does not rewrite it.
+        assertEquals(CallEventAction.BLOCKED, events.first { it.phone == "33633333333" }.action)
     }
 
     @Test
-    fun personalLegitimateVoteDecoratesRecentCall() {
-        val system = listOf(PhoneCall(1, "+33611111111", "33611111111", now, 3))
-        val reports = listOf(
-            MyReportEntity(
-                phone = "33611111111",
-                vote = "legit",
-                category = null,
-                createdAt = now,
-                updatedAt = now,
-                syncState = "synced",
-            ),
-        )
-
-        val merged = mergeCallEvents(emptyList(), system, reports)
-
-        assertEquals(CallEventAction.LEGITIMATE, merged.single().action)
-        assertEquals(null, findRecentCallPrompt(merged, handledAt = 0, now = now))
+    fun legitimateCallNeverHeadlinesHome() {
+        val events = buildCallEvents(listOf(journal(1, "33611111111", "allowed")), listOf(vote("33611111111", "legit")))
+        assertEquals(null, findRecentCallPrompt(events, handledAt = 0, now = now))
     }
 
     @Test

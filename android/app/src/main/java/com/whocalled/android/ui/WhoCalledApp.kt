@@ -54,18 +54,15 @@ fun WhoCalledApp(
     onRequestRole: () -> Unit,
     onRequestNotifications: () -> Unit,
     onSyncNow: () -> Unit,
-    onRequestCallLogPermission: () -> Unit,
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val callLogGranted by viewModel.callLogPermission.collectAsState()
     val stats by viewModel.stats.collectAsState()
 
     // null = still deciding; true = show first-launch shield tunnel.
     var showShieldSetup by remember { mutableStateOf<Boolean?>(null) }
     LaunchedEffect(Unit) {
         viewModel.loadStats()
-        viewModel.refreshCallLogPermission()
         if (Preferences.isShieldSetupCompleted(context)) {
             showShieldSetup = false
             return@LaunchedEffect
@@ -73,8 +70,7 @@ fun WhoCalledApp(
         // Grandfather existing installs so the tunnel only hits true first opens.
         val alreadyUser = Preferences.lastSyncAt(context) > 0L ||
             Preferences.isNotifPromptSeen(context) ||
-            isScreeningRoleHeld.value ||
-            viewModel.callLogPermission.value
+            isScreeningRoleHeld.value
         if (alreadyUser) {
             Preferences.setShieldSetupCompleted(context)
             Preferences.setNotifPromptSeen(context)
@@ -88,14 +84,12 @@ fun WhoCalledApp(
         ProtectionSetupScreen(
             screeningGranted = isScreeningRoleHeld.value,
             notificationsGranted = notificationsGranted.value,
-            callLogGranted = callLogGranted,
             coveredNumbers = stats?.coveredNumbers,
             onRequestScreening = onRequestRole,
             onRequestNotifications = {
                 scope.launch { Preferences.setNotifPromptSeen(context) }
                 onRequestNotifications()
             },
-            onRequestCallLog = onRequestCallLogPermission,
             onFinished = {
                 scope.launch {
                     Preferences.setShieldSetupCompleted(context)
@@ -192,7 +186,6 @@ fun WhoCalledApp(
                     notificationsGranted = notificationsGranted.value,
                     onRequestRole = onRequestRole,
                     onRequestNotifications = onRequestNotifications,
-                    onRequestCallLogPermission = onRequestCallLogPermission,
                     onSyncNow = onSyncNow,
                     onSeeAllHistory = { nav.navigate("calls") },
                     onRecentCallClick = { call ->
@@ -218,7 +211,7 @@ fun WhoCalledApp(
                             nav.navigate("number/${call.phone}")
                         }
                     },
-                    onRequestCallLogPermission = onRequestCallLogPermission,
+                    isScreeningRoleHeld = isScreeningRoleHeld.value,
                 )
             }
             composable("sms") {

@@ -74,7 +74,6 @@ fun HomeScreen(
     notificationsGranted: Boolean = true,
     onRequestRole: () -> Unit,
     onRequestNotifications: () -> Unit = {},
-    onRequestCallLogPermission: () -> Unit = {},
     onSyncNow: () -> Unit,
     onSeeAllHistory: () -> Unit,
     onRecentCallClick: (CallEvent) -> Unit,
@@ -88,7 +87,6 @@ fun HomeScreen(
     val syncProgress by viewModel.syncProgress.collectAsState()
     val stats by viewModel.stats.collectAsState()
     val recentCall by viewModel.recentCallPrompt.collectAsState()
-    val callLogGranted by viewModel.callLogPermission.collectAsState()
 
     val gameState by viewModel.gameState.collectAsState()
     val playedToday = gameState?.lastPlayedDay == com.whocalled.android.game.GameDay.epochDay()
@@ -175,7 +173,7 @@ fun HomeScreen(
                     onSeeAll = onSeeAllHistory,
                 )
             }
-        } else if (callLogGranted) {
+        } else if (isScreeningRoleHeld) {
             // Same slot, calm mode: the protection tells its story even when
             // there is nothing to triage.
             item(key = "recent-call-quiet") { RecentCallQuietRow() }
@@ -247,7 +245,7 @@ fun HomeScreen(
             }
         }
         item {
-            val shieldSteps = listOf(isScreeningRoleHeld, notificationsGranted, callLogGranted)
+            val shieldSteps = listOf(isScreeningRoleHeld, notificationsGranted)
             val shieldDone = shieldSteps.count { it }
             val shieldTotal = shieldSteps.size
 
@@ -263,23 +261,16 @@ fun HomeScreen(
                         fontWeight = FontWeight.Bold,
                     )
                     Text(
-                        when {
-                            !isScreeningRoleHeld ->
-                                "Activez le filtre d’appels pour bloquer les indésirables."
-                            !notificationsGranted ->
-                                "Les alertes sont coupées : activez les notifications."
-                            else ->
-                                "Autorisez l’historique pour voir qui a appelé."
+                        if (!isScreeningRoleHeld) {
+                            "Activez le filtre d’appels pour bloquer les indésirables."
+                        } else {
+                            "Les alertes sont coupées : activez les notifications."
                         },
                         Modifier.padding(vertical = 6.dp),
                         style = MaterialTheme.typography.bodySmall,
                     )
                     Button(
-                        onClick = when {
-                            !isScreeningRoleHeld -> onRequestRole
-                            !notificationsGranted -> onRequestNotifications
-                            else -> onRequestCallLogPermission
-                        },
+                        onClick = if (!isScreeningRoleHeld) onRequestRole else onRequestNotifications,
                     ) {
                         Icon(
                             Icons.Rounded.PowerSettingsNew,
@@ -287,11 +278,7 @@ fun HomeScreen(
                             modifier = Modifier.padding(end = 8.dp),
                         )
                         Text(
-                            when {
-                                !isScreeningRoleHeld -> "Activer le bloqueur"
-                                !notificationsGranted -> "Activer les alertes"
-                                else -> "Afficher mon historique"
-                            },
+                            if (!isScreeningRoleHeld) "Activer le bloqueur" else "Activer les alertes",
                         )
                     }
                 }
@@ -370,10 +357,6 @@ private fun RecentCallCard(
             value = System.currentTimeMillis()
         }
     }
-    // An answered conversation is news, not a threat — no "before calling back"
-    // scare for a call the user actually took.
-    val answered = call.direction == com.whocalled.android.util.CallDirection.INCOMING &&
-        call.durationSeconds >= 30
     val (title, message, color) = when {
         call.action == CallEventAction.BLOCKED -> Triple(
             "Appel indésirable bloqué",
@@ -395,16 +378,6 @@ private fun RecentCallCard(
             "Vous aviez indiqué que ce numéro est légitime.",
             WCColor.Emerald,
         )
-        call.action == CallEventAction.CONTACT -> Triple(
-            "Appel d’un contact",
-            "Ce numéro figure dans vos contacts.",
-            WCColor.Slate,
-        )
-        answered -> Triple(
-            "Vous avez répondu à un numéro inconnu",
-            "Ajoutez-le à vos contacts ou donnez votre avis.",
-            WCColor.Blue,
-        )
         else -> Triple(
             "Un numéro inconnu vous a appelé",
             "Vérifiez ce numéro avant de rappeler.",
@@ -425,21 +398,12 @@ private fun RecentCallCard(
             )
             Column(Modifier.weight(1f).padding(horizontal = 10.dp)) {
                 Text(title, fontWeight = FontWeight.Bold)
-                // Surface the caller-ID name when the phone already knows it —
-                // "Ma Boulangerie" reassures where a bare number worries.
                 Text(
-                    call.displayName ?: "+${call.phone}",
+                    "+${call.phone}",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(top = 4.dp),
                 )
-                if (call.displayName != null) {
-                    Text(
-                        "+${call.phone} · nom fourni par l’annuaire",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
                 Text(
                     "${com.whocalled.android.util.RelativeTime.format(call.timestamp, now)} · $message",
                     style = MaterialTheme.typography.bodySmall,

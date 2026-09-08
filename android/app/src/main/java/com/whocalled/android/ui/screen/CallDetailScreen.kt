@@ -109,7 +109,6 @@ fun CallDetailScreen(
     // A caller name can be far longer than one line. It stays ellipsized so the
     // card keeps its shape, and a tap unfolds it in place — the number right
     // below keeps its own tap action (copy), so the two never compete.
-    var nameExpanded by remember { mutableStateOf(false) }
 
     val call = if (callId != null) detail?.takeIf { it.id == callId } else null
     val displayedPhone = phone?.takeIf { it.isNotBlank() }
@@ -134,12 +133,6 @@ fun CallDetailScreen(
         "warn" -> WCColor.Amber
         "allow" -> WCColor.Emerald
         else -> WCColor.Blue
-    }
-    // Most recent call that carried a caller name, so the screen can show WHO the
-    // number is — and whether that name is an actual contact of the user or only
-    // the phone's caller-ID lookup (see CallerNameSource).
-    val identity = remember(allCallEvents, displayedPhone) {
-        allCallEvents.firstOrNull { it.phone == displayedPhone && it.displayName != null }
     }
     val recentHistory = remember(allCallEvents, displayedPhone) {
         val cutoff = System.currentTimeMillis() - 30L * 86_400_000L
@@ -238,31 +231,11 @@ fun CallDetailScreen(
                         Modifier.weight(1f),
                         verticalArrangement = Arrangement.spacedBy(5.dp),
                     ) {
-                        // A known name becomes the headline; the number sits under it
-                        // so both are always visible together.
-                        identity?.displayName?.let { name ->
-                            Text(
-                                name,
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
-                                maxLines = if (nameExpanded) Int.MAX_VALUE else 1,
-                                overflow = TextOverflow.Ellipsis,
-                                modifier = Modifier.clickable { nameExpanded = !nameExpanded },
-                            )
-                        }
                         Text(
                             "+$displayedPhone",
-                            style = if (identity != null) {
-                                MaterialTheme.typography.bodyMedium
-                            } else {
-                                MaterialTheme.typography.titleLarge
-                            },
+                            style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
-                            color = if (identity != null) {
-                                MaterialTheme.colorScheme.onSurfaceVariant
-                            } else {
-                                MaterialTheme.colorScheme.onSurface
-                            },
+                            color = MaterialTheme.colorScheme.onSurface,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             modifier = Modifier.clickable {
@@ -288,15 +261,6 @@ fun CallDetailScreen(
                                     else -> Icons.Rounded.Search
                                 },
                             )
-                            // Identity as a badge, not a paragraph: "Contact" vs
-                            // "Identifié" is the whole distinction worth making.
-                            identity?.let {
-                                if (it.isContact) {
-                                    StatusBadge("Contact", WCColor.Emerald, Icons.Rounded.Person)
-                                } else {
-                                    StatusBadge("Identifié", WCColor.Indigo, Icons.Rounded.PersonSearch)
-                                }
-                            }
                             if (isArcep || hasCommunityData) {
                                 SourceBadge(source, isArcep, hasCommunityData)
                             }
@@ -498,14 +462,14 @@ fun CallDetailScreen(
                             ReportCategory.fromApi(lookup?.category ?: filteredCall.category)?.label ?: "Inconnu",
                         )
                         DetailLine(
-                            "Filtré le",
+                            if (filteredCall.action == "allowed") "Reçu le" else "Filtré le",
                             DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT, Locale.FRANCE)
                                 .format(Date(filteredCall.timestamp)),
                         )
                     }
                     recentHistory.forEach { event ->
                         DetailLine(
-                            callHistoryLabel(event.direction, event.durationSeconds),
+                            callHistoryLabel(event.direction),
                             com.whocalled.android.util.RelativeTime.format(event.timestamp),
                         )
                     }
@@ -666,18 +630,9 @@ private fun confidenceExplanation(level: String, confidence: Int?): String = whe
     else -> "Aucun avis pondéré exploitable pour le moment."
 }
 
-private fun callHistoryLabel(direction: CallDirection, durationSeconds: Long): String {
-    val directionLabel = when (direction) {
-        CallDirection.INCOMING -> "Entrant"
-        CallDirection.MISSED -> "Manqué"
-        CallDirection.OUTGOING -> "Sortant"
-        CallDirection.REJECTED -> "Refusé"
-        CallDirection.BLOCKED -> "Bloqué"
-    }
-    if (durationSeconds <= 0) return directionLabel
-    val minutes = durationSeconds / 60
-    val seconds = durationSeconds % 60
-    return "$directionLabel · ${minutes}m ${seconds}s"
+private fun callHistoryLabel(direction: CallDirection): String = when (direction) {
+    CallDirection.INCOMING -> "Entrant"
+    CallDirection.BLOCKED -> "Bloqué"
 }
 
 @Composable

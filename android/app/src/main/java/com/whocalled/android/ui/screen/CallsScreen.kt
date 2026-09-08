@@ -15,7 +15,6 @@ import androidx.compose.material.icons.automirrored.outlined.PhoneMissed
 import androidx.compose.material.icons.rounded.Block
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.ChevronRight
-import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.WarningAmber
 import androidx.compose.material3.FilterChip
@@ -52,19 +51,17 @@ private enum class CallsFilter(val label: String) {
     ALL("Tous"),
     REVIEW("À vérifier"),
     FILTERED("Filtrés"),
-    CONTACTS("Contacts"),
 }
 
-/** Android call history enriched locally by Who Called. */
+/** Who Called's own journal of the incoming calls seen by the screening service. */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CallsScreen(
     viewModel: MainViewModel,
     onCallClick: (CallEvent) -> Unit,
-    onRequestCallLogPermission: () -> Unit,
+    isScreeningRoleHeld: Boolean,
 ) {
     val sections by viewModel.groupedCallEvents.collectAsState()
-    val hasPermission by viewModel.callLogPermission.collectAsState()
     var filter by remember { mutableStateOf(CallsFilter.ALL) }
     val clipboard = LocalClipboardManager.current
     val context = LocalContext.current
@@ -80,7 +77,6 @@ fun CallsScreen(
                         CallEventAction.WARNED,
                         CallEventAction.REPORTED_SPAM,
                     )
-                    CallsFilter.CONTACTS -> event.action == CallEventAction.CONTACT
                 }
             }
             section.takeIf { items.isNotEmpty() }?.copy(items = items)
@@ -91,30 +87,10 @@ fun CallsScreen(
         header = {
             GradientHeader(
                 title = "Appels récents",
-                subtitle = "Historique local enrichi par Who Called",
+                subtitle = "Appels vus par le filtre · stockés sur votre téléphone",
             )
         },
     ) {
-        if (!hasPermission) {
-            item {
-                BorderedCard(
-                    Modifier.padding(horizontal = 16.dp),
-                    accent = WCColor.Blue,
-                ) {
-                    Text("Afficher votre historique d’appels", fontWeight = FontWeight.SemiBold)
-                    Text(
-                        "Autorisez la lecture locale du journal pour afficher contacts, inconnus et appels sortants. Rien n’est envoyé.",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(top = 4.dp),
-                    )
-                    TextButton(onClick = onRequestCallLogPermission) {
-                        Text("Autoriser l’accès")
-                    }
-                }
-            }
-        }
-
         item {
             FlowRow(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
@@ -138,12 +114,11 @@ fun CallsScreen(
                         CallsFilter.ALL -> "Aucun appel récent"
                         CallsFilter.REVIEW -> "Aucun numéro à vérifier"
                         CallsFilter.FILTERED -> "Aucun appel filtré"
-                        CallsFilter.CONTACTS -> "Aucun appel de vos contacts"
                     },
-                    subtitle = if (hasPermission)
-                        "Vos prochains appels apparaîtront ici."
+                    subtitle = if (isScreeningRoleHeld)
+                        "Les prochains appels vus par le filtre apparaîtront ici."
                     else
-                        "Les appels bloqués restent visibles même sans autoriser le journal système.",
+                        "Activez le filtre d’appels pour voir qui vous appelle.",
                     accent = WCColor.Blue,
                 )
             }
@@ -198,21 +173,19 @@ private fun CallRow(
         CallEventAction.WARNED -> Triple("Alerté", WCColor.Amber, Icons.Rounded.WarningAmber)
         CallEventAction.REPORTED_SPAM -> Triple("Indésirable", WCColor.Coral, Icons.Rounded.Block)
         CallEventAction.LEGITIMATE -> Triple("Légitime", WCColor.Emerald, Icons.Rounded.CheckCircle)
-        CallEventAction.CONTACT -> Triple("Contact", WCColor.Slate, Icons.Rounded.Person)
         CallEventAction.UNKNOWN -> Triple("Non évalué", WCColor.Blue, Icons.Rounded.Search)
     }
-    val name = event.displayName
     BorderedCard(
         Modifier
             .padding(horizontal = 16.dp)
             .combinedClickable(onClick = onClick, onLongClick = onLongClick),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            // weight(1f) + single-line ellipsis: a long contact name or a long
+            // weight(1f) + single-line ellipsis: a long
             // "+3312… · Entrant · il y a 3 j" never wraps onto a second line.
             Column(Modifier.weight(1f)) {
                 Text(
-                    name ?: "+${event.phone}",
+                    "+${event.phone}",
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -220,7 +193,6 @@ private fun CallRow(
                 val attempts = if (event.attempts > 1) " · ${event.attempts} appels" else ""
                 Text(
                     buildString {
-                        if (name != null) append("+${event.phone} · ")
                         append(directionLabel(event.direction))
                         append(" · ")
                         append(com.whocalled.android.util.RelativeTime.format(event.timestamp))
@@ -251,8 +223,5 @@ private fun CallRow(
 
 private fun directionLabel(direction: CallDirection): String = when (direction) {
     CallDirection.INCOMING -> "Entrant"
-    CallDirection.MISSED -> "Manqué"
-    CallDirection.OUTGOING -> "Sortant"
-    CallDirection.REJECTED -> "Refusé"
     CallDirection.BLOCKED -> "Bloqué"
 }

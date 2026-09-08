@@ -77,6 +77,9 @@ interface CallLogDao {
 
     @Query("SELECT * FROM call_log WHERE id = :id LIMIT 1")
     suspend fun findById(id: Long): CallLogEntity?
+
+    @Query("DELETE FROM call_log WHERE timestamp < :before")
+    suspend fun pruneOlderThan(before: Long)
 }
 
 @Dao

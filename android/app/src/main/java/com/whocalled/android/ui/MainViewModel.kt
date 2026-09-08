@@ -8,8 +8,6 @@ import com.whocalled.android.data.MyReportEntity
 import com.whocalled.android.data.RepoError
 import com.whocalled.android.data.WhoCalledDatabase
 import com.whocalled.android.data.WhoCalledRepository
-import com.whocalled.android.util.CallLogReader
-import com.whocalled.android.util.PhoneCall
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -82,14 +80,10 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         repo.observeMyReports()
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
-    // System call log (for "report from recents")
-    private val _systemCalls = MutableStateFlow<List<PhoneCall>>(emptyList())
-    val systemCalls: StateFlow<List<PhoneCall>> = _systemCalls
-
-    /** Complete local call history enriched with filtering and personal votes. */
+    /** Our own journal of screened calls (blocked, warned, allowed) + personal votes. */
     val callEvents: StateFlow<List<com.whocalled.android.util.CallEvent>> =
-        combine(filteredCalls, systemCalls, myReports) { filtered, system, reports ->
-            com.whocalled.android.util.mergeCallEvents(filtered, system, reports)
+        combine(filteredCalls, myReports) { journal, reports ->
+            com.whocalled.android.util.buildCallEvents(journal, reports)
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     val groupedCallEvents: StateFlow<List<com.whocalled.android.util.CallHistorySection>> =
@@ -122,10 +116,6 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
                 com.whocalled.android.util.buildRecentCallPrompt(calls, handledAt, seenAt)
             }
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
-
-    // Observable permission state so the UI recomposes after the grant.
-    private val _callLogPermission = MutableStateFlow(false)
-    val callLogPermission: StateFlow<Boolean> = _callLogPermission
 
     init {
         viewModelScope.launch {
@@ -248,21 +238,6 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
 
     fun loadCommunity() {
         viewModelScope.launch { repo.community().onSuccess { _community.value = it } }
-    }
-
-    /** Re-reads the permission state and loads calls if granted. Call on resume + after grant. */
-    fun refreshCallLogPermission() {
-        val granted = CallLogReader.hasPermission(getApplication())
-        _callLogPermission.value = granted
-        if (granted) loadSystemCalls()
-    }
-
-    fun loadSystemCalls() {
-        viewModelScope.launch {
-            _systemCalls.value = withContext(Dispatchers.IO) {
-                CallLogReader.recentCalls(getApplication())
-            }
-        }
     }
 
     fun markRecentCallHandled(call: com.whocalled.android.util.CallEvent) {

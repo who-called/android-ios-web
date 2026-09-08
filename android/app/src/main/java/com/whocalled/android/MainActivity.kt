@@ -27,10 +27,6 @@ class MainActivity : ComponentActivity() {
         ActivityResultContracts.StartActivityForResult(),
     ) { refreshRoleState() }
 
-    private val callLogLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission(),
-    ) { viewModel.refreshCallLogPermission() }
-
     // POST_NOTIFICATIONS is a runtime permission on Android 13+ — without it,
     // EVERY notification (blocked call, WARN, reminder) is silently dropped.
     private val notifLauncher = registerForActivityResult(
@@ -76,9 +72,6 @@ class MainActivity : ComponentActivity() {
                         onRequestRole = ::requestScreeningRole,
                         onRequestNotifications = ::requestNotificationPermission,
                         onSyncNow = viewModel::syncNow,
-                        onRequestCallLogPermission = {
-                            callLogLauncher.launch(android.Manifest.permission.READ_CALL_LOG)
-                        },
                     )
                 }
             }
@@ -89,7 +82,6 @@ class MainActivity : ComponentActivity() {
         super.onResume()
         refreshRoleState()
         refreshNotificationState()
-        viewModel.refreshCallLogPermission()
         viewModel.refreshSmsState()
     }
 

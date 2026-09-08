@@ -29,7 +29,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.CheckCircle
-import androidx.compose.material.icons.rounded.History
 import androidx.compose.material.icons.rounded.NotificationsActive
 import androidx.compose.material.icons.rounded.PhoneLocked
 import androidx.compose.material3.Button
@@ -67,13 +66,12 @@ import java.text.NumberFormat
 private enum class SetupStep {
     SCREENING,
     NOTIFICATIONS,
-    CALL_LOG,
 }
 
 /**
  * First-launch shield activation tunnel.
  *
- * Steps are always sequential (1 → 2 → 3). Already-granted permissions are not
+ * Steps are always sequential (1 → 2). Already-granted permissions are not
  * skipped silently: the step still appears with a "Continuer" CTA. Fresh grants
  * via the system dialog auto-advance shortly after.
  */
@@ -81,11 +79,9 @@ private enum class SetupStep {
 fun ProtectionSetupScreen(
     screeningGranted: Boolean,
     notificationsGranted: Boolean,
-    callLogGranted: Boolean,
     coveredNumbers: Long?,
     onRequestScreening: () -> Unit,
     onRequestNotifications: () -> Unit,
-    onRequestCallLog: () -> Unit,
     onFinished: () -> Unit,
 ) {
     val view = LocalView.current
@@ -106,14 +102,12 @@ fun ProtectionSetupScreen(
         buildList {
             add(SetupStep.SCREENING)
             if (needsNotifications) add(SetupStep.NOTIFICATIONS)
-            add(SetupStep.CALL_LOG)
         }
     }
 
     fun isGranted(step: SetupStep): Boolean = when (step) {
         SetupStep.SCREENING -> screeningGranted
         SetupStep.NOTIFICATIONS -> notificationsGranted || !needsNotifications
-        SetupStep.CALL_LOG -> callLogGranted
     }
 
     fun bravoFor(step: SetupStep): String = when (step) {
@@ -121,7 +115,6 @@ fun ProtectionSetupScreen(
             "✓ Filtre activé · ${NumberFormat.getInstance().format(it)} numéros prêts"
         } ?: "✓ Filtre d’appels activé"
         SetupStep.NOTIFICATIONS -> "✓ Alertes activées"
-        SetupStep.CALL_LOG -> "✓ Historique autorisé"
     }
 
     // Always start at step 0 so notifications is never jumped over.
@@ -155,7 +148,7 @@ fun ProtectionSetupScreen(
     }
 
     // Fresh grant on the current step → brief confirmation, then next step.
-    LaunchedEffect(screeningGranted, notificationsGranted, callLogGranted, stepIndex) {
+    LaunchedEffect(screeningGranted, notificationsGranted, stepIndex) {
         if (completing) return@LaunchedEffect
         val current = steps.getOrNull(stepIndex) ?: return@LaunchedEffect
         if (!isGranted(current)) return@LaunchedEffect
@@ -189,7 +182,6 @@ fun ProtectionSetupScreen(
         when (current) {
             SetupStep.SCREENING -> onRequestScreening()
             SetupStep.NOTIFICATIONS -> onRequestNotifications()
-            SetupStep.CALL_LOG -> onRequestCallLog()
         }
     }
 
@@ -392,8 +384,7 @@ private fun AdaptiveStepBody(
                     when (step) {
                         SetupStep.SCREENING -> "Protection déjà activée"
                         SetupStep.NOTIFICATIONS -> "Alertes déjà activées"
-                        SetupStep.CALL_LOG -> "Historique déjà autorisé"
-                    }
+                                        }
                 } else {
                     copy.title
                 },
@@ -447,13 +438,5 @@ private fun stepCopy(step: SetupStep): StepCopy = when (step) {
         body = "Sans notifications, la protection reste silencieuse : pas d’alerte sur un appel suspect, " +
             "ni de confirmation quand un numéro est bloqué.",
         cta = "Activer les alertes",
-    )
-    SetupStep.CALL_LOG -> StepCopy(
-        icon = Icons.Rounded.History,
-        accent = WCColor.Blue,
-        title = "Voir qui a appelé",
-        body = "Pour afficher vos appels récents et signaler un numéro en un geste. " +
-            "L’historique reste sur votre téléphone — rien n’est envoyé.",
-        cta = "Afficher mon historique",
     )
 }

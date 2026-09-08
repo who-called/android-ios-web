@@ -46,8 +46,8 @@ android {
         applicationId = "com.devfi.whocalled"
         minSdk = 29
         targetSdk = 37
-        versionCode = 15
-        versionName = "0.5.0"
+        versionCode = 16
+        versionName = "0.5.1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         // API base URL — override per build type / .env later.

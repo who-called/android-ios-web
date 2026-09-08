@@ -92,7 +92,12 @@ class ScreeningDecisionTest {
     }
 
     @Test fun `null phone allowed`() {
-        assertNull(ScreeningDecision.logEntry("x", decide(null).action, 0, null))
+        assertEquals(Action.ALLOW, decide(null).action)
+    }
+
+    @Test fun `allowed calls are journaled too`() {
+        // No READ_CALL_LOG: the journal is our only call history, so ALLOW must be recorded.
+        assertEquals("allowed", ScreeningDecision.logEntry("33600000000", Action.ALLOW, 0, null).action)
     }
 
     @Test fun `arcep block pattern matches and blocks`() {

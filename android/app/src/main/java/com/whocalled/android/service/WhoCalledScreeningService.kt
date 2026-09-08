@@ -20,6 +20,7 @@ class WhoCalledScreeningService : CallScreeningService() {
 
     private companion object {
         const val TAG = "WhoCalledScreening"
+        const val JOURNAL_RETENTION_MS = 90L * 24 * 60 * 60 * 1_000
     }
 
     override fun onScreenCall(callDetails: Call.Details) {
@@ -58,7 +59,12 @@ class WhoCalledScreeningService : CallScreeningService() {
         // so the notification can deep-link straight to that call's detail.
         phone?.let { p ->
             val callLogId = ScreeningDecision.logEntry(p, decision.action, decision.score, decision.category)
-                ?.let { entry -> runCatching { runBlocking { db.callLogDao().insert(entry) } }.getOrNull() }
+                .let { entry -> runCatching { runBlocking { db.callLogDao().insert(entry) } }.getOrNull() }
+            // Allowed calls are journaled too, so the table grows with every
+            // call: keep it bounded to what the Calls tab can meaningfully show.
+            runCatching {
+                runBlocking { db.callLogDao().pruneOlderThan(System.currentTimeMillis() - JOURNAL_RETENTION_MS) }
+            }
 
             when (decision.action) {
                 Action.WARN -> NotificationHelper.showWarning(

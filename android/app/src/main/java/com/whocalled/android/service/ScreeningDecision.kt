@@ -61,9 +61,20 @@ object ScreeningDecision {
         return Decision(Action.ALLOW, 0, null)
     }
 
-    fun logEntry(phone: String, action: Action, score: Int, category: String?): CallLogEntity? = when (action) {
-        Action.BLOCK -> CallLogEntity(phone = phone, action = "blocked", spamScore = score, category = category ?: "unknown", timestamp = System.currentTimeMillis())
-        Action.WARN -> CallLogEntity(phone = phone, action = "warned", spamScore = score, category = category ?: "unknown", timestamp = System.currentTimeMillis())
-        Action.ALLOW -> null
-    }
+    /**
+     * Journal entry for every incoming call the screening service sees — allowed
+     * ones included. That local journal is the app's only call history: it never
+     * reads the phone's system call log (no READ_CALL_LOG permission).
+     */
+    fun logEntry(phone: String, action: Action, score: Int, category: String?): CallLogEntity = CallLogEntity(
+        phone = phone,
+        action = when (action) {
+            Action.BLOCK -> "blocked"
+            Action.WARN -> "warned"
+            Action.ALLOW -> "allowed"
+        },
+        spamScore = score,
+        category = category ?: "unknown",
+        timestamp = System.currentTimeMillis(),
+    )
 }
