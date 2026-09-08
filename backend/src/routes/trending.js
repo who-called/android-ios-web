@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { prisma } from "../db.js";
+import { isIndexable } from "../seoEligibility.js";
 
 export const trendingRouter = Router();
 
@@ -69,7 +70,7 @@ trendingRouter.get("/", async (req, res) => {
   // Enrich with the number's current status/score/category in one query.
   const numbers = await prisma.number.findMany({
     where: { phone: { in: ranked.map((e) => e.phone) } },
-    select: { phone: true, spamScore: true, status: true, category: true, source: true },
+    select: { phone: true, spamScore: true, status: true, category: true, source: true, reportCountSpam: true },
   });
   const byPhone = new Map(numbers.map((n) => [n.phone, n]));
 
@@ -87,6 +88,9 @@ trendingRouter.get("/", async (req, res) => {
       status: n?.status ?? "unknown",
       category: n?.category ?? "unknown",
       source: n?.source ?? "community",
+      // Same rule as /seo/indexable — lets the web mark links to noindex
+      // pages rel=nofollow instead of spending crawl budget on them.
+      indexable: isIndexable(n),
       topReason: top
         ? { category: top[0], count: top[1], share: Math.round((top[1] / e.count) * 100) }
         : null,

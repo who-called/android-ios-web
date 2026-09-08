@@ -1,33 +1,9 @@
 import { Router } from "express";
 import { prisma } from "../db.js";
 import { config } from "../config.js";
+import { MIN_REPORTS_FOR_INDEX, isPersonalMobileFR, isArcepEligible, isIndexable } from "../seoEligibility.js";
 
 export const seoRouter = Router();
-
-/**
- * SEO indexability (RGPD-safe long-tail strategy):
- *
- * Two independent sources of eligibility:
- *   1. ARCEP — FR ONLY. Official French telemarketer/operator prefixes
- *      (phones starting with "33"). These are FR-specific by nature.
- *   2. Community reports — COUNTRY-AGNOSTIC. Any number with >= N reports is
- *      eligible regardless of country (same rule for FR, BE, US, …).
- *
- * In all cases we exclude personal mobiles to avoid publishing pages about
- * individuals (FR 06/07 → 336/337). Other countries' mobiles are reported via
- * community signals only and stay subject to the same report threshold.
- */
-const MIN_REPORTS_FOR_INDEX = parseInt(process.env.SEO_MIN_REPORTS ?? "3", 10);
-
-/** Exclude French personal mobiles (336…, 337…) from public indexed pages. */
-function isPersonalMobileFR(phone) {
-  return /^33[67]/.test(phone);
-}
-
-/** ARCEP eligibility is FR-only (phone in the French country code). */
-function isArcepEligible(n) {
-  return n.source === "arcep" && n.phone.startsWith("33");
-}
 
 /**
  * GET /api/v1/seo/numbers?limit=&offset=
@@ -59,9 +35,7 @@ seoRouter.get("/numbers", async (req, res) => {
     skip: offset,
   });
 
-  const numbers = rows
-    .filter((n) => !isPersonalMobileFR(n.phone))
-    .filter((n) => isArcepEligible(n) || n.reportCountSpam >= MIN_REPORTS_FOR_INDEX);
+  const numbers = rows.filter(isIndexable);
 
   res.json({
     serverTime: new Date().toISOString(),
@@ -169,10 +143,7 @@ seoRouter.get("/indexable/:phone", async (req, res) => {
 
   const number = await prisma.number.findUnique({ where: { phone } });
 
-  const eligible =
-    !!number &&
-    !isPersonalMobileFR(phone) &&
-    (isArcepEligible(number) || number.reportCountSpam >= MIN_REPORTS_FOR_INDEX);
+  const eligible = isIndexable(number);
 
   res.json({
     phone,
