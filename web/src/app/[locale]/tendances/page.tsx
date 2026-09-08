@@ -95,6 +95,8 @@ function TrendingRow({
       <div className="min-w-0 flex-1">
         <Link
           href={`${base}/numero/${n.phone}`}
+          // Links to noindex pages: don't spend crawl budget on them.
+          rel={n.indexable === false ? "nofollow" : undefined}
           className="font-semibold underline-offset-2 hover:underline"
         >
           +{n.phone}

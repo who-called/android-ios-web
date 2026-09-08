@@ -6,6 +6,7 @@ import { countryFromCode } from "@/lib/countries";
 import { config } from "@/lib/config";
 import { getDict } from "@/i18n/dictionaries";
 import { alternatesFor, toDictLocale, urlLocales } from "@/i18n/locales";
+import { isPersonalMobileFR, robotsFor } from "@/lib/seo";
 import { ShieldIcon, CheckCircleIcon, BlockIcon, BellIcon, ListIcon } from "@/components/Icons";
 import { NumberVote } from "@/components/NumberVote";
 import { NumberContactActions } from "@/components/NumberContactActions";
@@ -31,13 +32,13 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale, phone } = await params;
   const t = getDict(toDictLocale(locale)).seo;
-  const { indexable } = await fetchIndexable(phone);
+  const { ok, indexable } = await fetchIndexable(phone);
   const display = fmt(phone);
   return {
     title: t.numberTitle.replace("{phone}", display),
     description: t.numberDesc.replace("{phone}", display),
     alternates: alternatesFor(locale, `/numero/${phone}`),
-    robots: indexable ? { index: true, follow: true } : { index: false, follow: true },
+    robots: robotsFor(ok, indexable, isPersonalMobileFR(phone)),
   };
 }
 

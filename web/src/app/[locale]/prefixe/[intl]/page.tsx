@@ -4,6 +4,7 @@ import { fetchPrefix, fetchPrefixes } from "@/lib/api";
 import { config } from "@/lib/config";
 import { getDict } from "@/i18n/dictionaries";
 import { alternatesFor, toDictLocale, urlLocales } from "@/i18n/locales";
+import { robotsFor } from "@/lib/seo";
 
 export const revalidate = 3600;
 export const dynamicParams = true;
@@ -22,14 +23,14 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale, intl } = await params;
   const t = getDict(toDictLocale(locale)).prefix;
-  const { exists, prefix } = await fetchPrefix(intl);
+  const { ok, exists, prefix } = await fetchPrefix(intl);
   const display = prefix?.display ?? `+${intl}`;
   return {
     title: t.title.replace("{display}", display),
     description: t.desc.replace("{display}", display),
     alternates: alternatesFor(locale, `/prefixe/${intl}`),
     // Index only real ARCEP prefixes (aggregate, no personal data → RGPD-safe).
-    robots: exists ? { index: true, follow: true } : { index: false, follow: true },
+    robots: robotsFor(ok, exists),
   };
 }
 

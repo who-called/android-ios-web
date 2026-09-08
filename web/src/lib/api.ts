@@ -59,6 +59,8 @@ export type TrendingNumber = {
   status: "block" | "warn" | "allow" | "unknown";
   category: string;
   source: string;
+  /** Same rule as /seo/indexable; absent on older backends. */
+  indexable?: boolean;
   topReason?: TopReason | null;
 };
 
@@ -141,19 +143,26 @@ export async function fetchSeoNumbers(limit = 2000): Promise<SeoNumber[]> {
   }
 }
 
-/** Per-number indexability + data, used by the page to decide noindex. */
+/**
+ * Per-number indexability + data, used by the page to decide noindex.
+ * `ok: false` means the API could not answer (network error / 5xx) — the
+ * page must then NOT emit noindex, or a transient outage during an ISR
+ * revalidation would de-index a legitimate page for an hour (seen in GSC).
+ */
 export async function fetchIndexable(
   phone: string,
-): Promise<{ indexable: boolean; isArcep: boolean; number: SeoNumber | null }> {
+): Promise<{ ok: boolean; indexable: boolean; isArcep: boolean; number: SeoNumber | null }> {
+  const unknown = { ok: false, indexable: false, isArcep: false, number: null };
   try {
     const res = await fetch(
       `${config.apiBaseUrl}/seo/indexable/${encodeURIComponent(phone)}`,
       { next: { revalidate: 3600 } },
     );
-    if (!res.ok) return { indexable: false, isArcep: false, number: null };
-    return res.json();
+    if (res.status >= 500) return unknown;
+    if (!res.ok) return { ...unknown, ok: true }; // 4xx: invalid phone → not indexable
+    return { ok: true, ...(await res.json()) };
   } catch {
-    return { indexable: false, isArcep: false, number: null };
+    return unknown;
   }
 }
 
@@ -178,20 +187,26 @@ export async function fetchPrefixes(): Promise<SeoPrefix[]> {
   }
 }
 
-/** One prefix detail + the quality numbers under it. */
+/**
+ * One prefix detail + the quality numbers under it.
+ * `ok: false` = API unreachable (see fetchIndexable) → page must not noindex.
+ */
 export async function fetchPrefix(intl: string): Promise<{
+  ok: boolean;
   exists: boolean;
   prefix: SeoPrefix | null;
   numbers: SeoNumber[];
 }> {
+  const unknown = { ok: false, exists: false, prefix: null, numbers: [] };
   try {
     const res = await fetch(`${config.apiBaseUrl}/seo/prefix/${encodeURIComponent(intl)}`, {
       next: { revalidate: 3600 },
     });
-    if (!res.ok) return { exists: false, prefix: null, numbers: [] };
-    return res.json();
+    if (res.status >= 500) return unknown;
+    if (!res.ok) return { ...unknown, ok: true }; // 4xx: invalid prefix → not indexable
+    return { ok: true, ...(await res.json()) };
   } catch {
-    return { exists: false, prefix: null, numbers: [] };
+    return unknown;
   }
 }
 
