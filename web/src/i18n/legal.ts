@@ -311,7 +311,7 @@ const supportEn: LegalDoc = {
 
 const deletionFr: LegalDoc = {
   title: "Suppression de vos données",
-  updated: "23 juillet 2026",
+  updated: "8 septembre 2026",
   intro:
     "Who Called ne demande aucun compte : les seules données conservées sur nos serveurs sont vos signalements, vos scores de jeux et un identifiant anonyme d'appareil. Voici comment tout supprimer.",
   sections: [
@@ -332,15 +332,15 @@ const deletionFr: LegalDoc = {
       body: `Si vous êtes responsable d'un numéro listé, demandez son retrait à ${company.privacyEmail}. Les préfixes de la liste officielle ARCEP ne sont pas concernés.`,
     },
     {
-      title: "5. Délais",
-      body: "Suppression via l'application : immédiate. Par email : sous 30 jours au plus, conformément au RGPD (en pratique quelques jours ouvrés).",
+      title: "5. Délais et durées de conservation",
+      body: "Suppression via l'application : immédiate. Par email : sous 30 jours au plus, conformément au RGPD (en pratique quelques jours ouvrés). Sans demande de votre part, les signalements sont conservés au maximum 365 jours puis supprimés automatiquement ; les scores de jeux et l'identifiant anonyme sont conservés tant que l'appareil est enregistré. Aucune autre donnée n'est conservée après suppression.",
     },
   ],
 };
 
 const deletionEn: LegalDoc = {
   title: "Deleting your data",
-  updated: "July 23, 2026",
+  updated: "September 8, 2026",
   intro:
     "Who Called requires no account: the only data kept on our servers are your reports, your game scores and an anonymous device identifier. Here is how to delete everything.",
   sections: [
@@ -361,8 +361,8 @@ const deletionEn: LegalDoc = {
       body: `If you are responsible for a listed number, request its removal at ${company.privacyEmail}. Prefixes from the official ARCEP list are not affected.`,
     },
     {
-      title: "5. Timeframe",
-      body: "Deletion through the app: immediate. By email: within 30 days at most, as required by the GDPR (in practice a few business days).",
+      title: "5. Timeframe and retention",
+      body: "Deletion through the app: immediate. By email: within 30 days at most, as required by the GDPR (in practice a few business days). Without a request from you, reports are kept for at most 365 days and then deleted automatically; game scores and the anonymous identifier are kept as long as the device is registered. No other data is retained after deletion.",
     },
   ],
 };
