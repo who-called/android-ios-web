@@ -40,7 +40,7 @@ const privacyFr: LegalDoc = {
     },
     {
       title: "3. Données stockées sur votre appareil (jamais envoyées)",
-      body: "Vos règles personnelles (numéros bloqués/autorisés), vos réglages, la copie locale de la liste de blocage, le journal local des appels filtrés et des SMS masqués, votre progression dans les mini-jeux (séries, records locaux) et un identifiant technique anonyme (UUID aléatoire, généré sur l'appareil). Ces données restent sur l'appareil et disparaissent à la désinstallation.",
+      body: "Vos règles personnelles (numéros bloqués/autorisés), vos réglages, la copie locale de la liste de blocage, le journal local des appels vus par le filtre et des SMS masqués, votre progression dans les mini-jeux (séries, records locaux) et un identifiant technique anonyme (UUID aléatoire, généré sur l'appareil). Ces données restent sur l'appareil et disparaissent à la désinstallation.",
     },
     {
       title: "4. Données envoyées à nos serveurs",
@@ -48,7 +48,7 @@ const privacyFr: LegalDoc = {
     },
     {
       title: "5. Application Android — autorisations",
-      body: "Filtrage d'appels (rôle système « Applications de filtrage d'appels ») : le numéro de chaque appel entrant est comparé localement à la liste stockée sur l'appareil ; il n'est jamais envoyé à nos serveurs. Journal d'appels (READ_CALL_LOG, facultatif et révocable) : permet d'afficher vos appels récents et de signaler un numéro en un geste. La lecture reste locale : seul le numéro que vous choisissez explicitement de signaler est transmis à nos serveurs, le reste du journal n'est jamais envoyé. Notifications (POST_NOTIFICATIONS, facultatif) : alertes d'appels suspects, avis d'appels/SMS bloqués et rappel quotidien des mini-jeux. Accès aux notifications (bouclier SMS, opt-in) : lit uniquement les notifications de votre application SMS pour masquer celles provenant de numéros indésirables ; le contenu n'est ni stocké ni transmis. Internet : synchronisation de la liste et envoi de vos signalements.",
+      body: "Filtrage d'appels (rôle système « Applications de filtrage d'appels ») : le numéro de chaque appel entrant est comparé localement à la liste stockée sur l'appareil ; il n'est jamais envoyé à nos serveurs. Journal local : chaque appel entrant vu par le filtre (bloqué, alerté ou autorisé) est consigné sur l'appareil pendant 90 jours, pour retrouver qui a appelé et signaler un numéro en un geste. L'application ne lit pas le journal d'appels du téléphone et ne demande aucune autorisation SMS ni journal d'appels ; seul un numéro que vous choisissez de signaler est transmis. Notifications (POST_NOTIFICATIONS, facultatif) : alertes d'appels suspects, avis d'appels/SMS bloqués et rappel quotidien des mini-jeux. Accès aux notifications (bouclier SMS, opt-in) : lit uniquement les notifications de votre application SMS pour masquer celles provenant de numéros indésirables ; le contenu n'est ni stocké ni transmis. Internet : synchronisation de la liste et envoi de vos signalements.",
     },
     {
       title: "6. Application iOS — autorisations et extensions",
@@ -112,7 +112,7 @@ const privacyEn: LegalDoc = {
     },
     {
       title: "3. Data stored on your device (never sent)",
-      body: "Your personal rules (blocked/allowed numbers), your settings, the local copy of the blocklist, the local log of filtered calls and hidden SMS, your mini-game progress (streaks, local records) and an anonymous technical identifier (random UUID generated on the device). This data stays on the device and is removed when you uninstall.",
+      body: "Your personal rules (blocked/allowed numbers), your settings, the local copy of the blocklist, the local log of calls seen by the filter and hidden SMS, your mini-game progress (streaks, local records) and an anonymous technical identifier (random UUID generated on the device). This data stays on the device and is removed when you uninstall.",
     },
     {
       title: "4. Data sent to our servers",
@@ -120,7 +120,7 @@ const privacyEn: LegalDoc = {
     },
     {
       title: "5. Android app — permissions",
-      body: "Call screening (system role “Call screening apps”): each incoming number is checked locally against the list stored on the device; it is never sent to our servers. Call log (READ_CALL_LOG, optional and revocable): lets you see your recent calls and report a number in one tap. Reading stays local: only the number you explicitly choose to report is sent to our servers; the rest of the call log is never transmitted. Notifications (POST_NOTIFICATIONS, optional): suspicious-call alerts, blocked call/SMS notices and the daily mini-game reminder. Notification access (SMS shield, opt-in): only reads notifications from your SMS app to hide those coming from unwanted numbers; content is neither stored nor transmitted. Internet: list sync and sending your reports.",
+      body: "Call screening (system role “Call screening apps”): each incoming number is checked locally against the list stored on the device; it is never sent to our servers. Local journal: every incoming call seen by the filter (blocked, warned or allowed) is recorded on the device for 90 days, so you can see who called and report a number in one tap. The app does not read the phone's call log and requests no SMS or call-log permission; only a number you choose to report is transmitted. Notifications (POST_NOTIFICATIONS, optional): suspicious-call alerts, blocked call/SMS notices and the daily mini-game reminder. Notification access (SMS shield, opt-in): only reads notifications from your SMS app to hide those coming from unwanted numbers; content is neither stored nor transmitted. Internet: list sync and sending your reports.",
     },
     {
       title: "6. iOS app — permissions and extensions",
