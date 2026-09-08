@@ -732,7 +732,7 @@ function buildSlides({ W, H }) {
     ["05-sms", slideA({
       W, H,
       title: ["Bouclier SMS", "inclus"],
-      sub: "Les SMS d’arnaque sont masqués",
+      sub: "Notifications de SMS indésirables masquées",
       screen: screenSms(),
     })],
     ["06-marque", slideABrand({ W, H })],

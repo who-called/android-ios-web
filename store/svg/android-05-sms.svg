@@ -20,7 +20,7 @@
 </defs><rect width="1080" height="1920" fill="url(#bgLight)"/>
     <circle cx="540" cy="1100" r="669.6" fill="#3B82F6" opacity="0.16"/>
     <circle cx="540" cy="1100" r="522.288" fill="#3B82F6" opacity="0.18"/>
-    <circle cx="540" cy="1100" r="374.97600000000006" fill="#3B82F6" opacity="0.20"/><text x="540" y="150" font-family="'Helvetica Neue', 'Segoe UI', Roboto, Arial, sans-serif" font-size="74" font-weight="800" fill="#0F172A" text-anchor="middle">Bouclier SMS</text><text x="540" y="234.36" font-family="'Helvetica Neue', 'Segoe UI', Roboto, Arial, sans-serif" font-size="74" font-weight="800" fill="#0F172A" text-anchor="middle">inclus</text><text x="540" y="330.72" font-family="'Helvetica Neue', 'Segoe UI', Roboto, Arial, sans-serif" font-size="34" font-weight="500" fill="#3D5175" text-anchor="middle">Les SMS d’arnaque sont masqués</text>
+    <circle cx="540" cy="1100" r="374.97600000000006" fill="#3B82F6" opacity="0.20"/><text x="540" y="150" font-family="'Helvetica Neue', 'Segoe UI', Roboto, Arial, sans-serif" font-size="74" font-weight="800" fill="#0F172A" text-anchor="middle">Bouclier SMS</text><text x="540" y="234.36" font-family="'Helvetica Neue', 'Segoe UI', Roboto, Arial, sans-serif" font-size="74" font-weight="800" fill="#0F172A" text-anchor="middle">inclus</text><text x="540" y="330.72" font-family="'Helvetica Neue', 'Segoe UI', Roboto, Arial, sans-serif" font-size="34" font-weight="500" fill="#3D5175" text-anchor="middle">Notifications de SMS indésirables masquées</text>
   <g>
     <rect x="187" y="467" width="706" height="1470.9079069767442" rx="106.6" fill="#0F172A" opacity="0.14"/>
     <rect x="190" y="470" width="700" height="1464.9079069767442" rx="103.6" fill="#0B1220"/>
