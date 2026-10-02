@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import { NumberTool } from "@/components/NumberTool";
+import { PromoVideo } from "@/components/PromoVideo";
 import { StoreBadges } from "@/components/StoreBadges";
 import {
   BellIcon,
@@ -19,7 +20,8 @@ import { toDictLocale } from "@/i18n/locales";
 
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
-  const t = getDict(toDictLocale(locale));
+  const lang = toDictLocale(locale);
+  const t = getDict(lang);
   const base = `/${locale}`;
 
   return (
@@ -48,6 +50,17 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
                 <NumberTool dict={t} locale={locale} />
               </Suspense>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Promo film */}
+      <section className="border-b border-hair bg-night">
+        <div className="mx-auto max-w-5xl px-4 py-12 sm:py-16">
+          <h2 className="text-center text-2xl font-bold text-white sm:text-3xl">{t.video.title}</h2>
+          <p className="mx-auto mt-2 max-w-xl text-center text-white/70">{t.video.subtitle}</p>
+          <div className="mt-8">
+            <PromoVideo lang={lang} label={t.video.title} soundOnLabel={t.video.soundOn} soundOffLabel={t.video.soundOff} />
           </div>
         </div>
       </section>

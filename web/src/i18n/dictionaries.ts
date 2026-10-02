@@ -24,6 +24,12 @@ const fr = {
     privacy: "Aucun compte. Aucune donnée personnelle. Numéros au format international.",
   },
   stats: { arcep: "préfixes ARCEP", anon: "anonyme", free: "gratuit", multi: "multiplateforme" },
+  video: {
+    title: "Who Called en 23 secondes",
+    subtitle: "Bloquer, vérifier, signaler, filtrer les SMS : tout ce que fait l'app, sans compte ni pub.",
+    soundOn: "Activer le son",
+    soundOff: "Couper le son",
+  },
   compare: {
     title: "Le bon appel passe. Le spam, non.",
     subtitle: "Who Called distingue les numéros sûrs des indésirables et agit pour vous.",
@@ -253,6 +259,12 @@ const en: Dict = {
     privacy: "No account. No personal data. International number format.",
   },
   stats: { arcep: "known prefixes", anon: "anonymous", free: "free", multi: "cross-platform" },
+  video: {
+    title: "Who Called in 23 seconds",
+    subtitle: "Block, check, report, filter scam texts: everything the app does, with no account and no ads.",
+    soundOn: "Turn sound on",
+    soundOff: "Mute",
+  },
   compare: {
     title: "Good calls ring. Spam doesn't.",
     subtitle: "Who Called tells safe numbers from unwanted ones and acts for you.",
