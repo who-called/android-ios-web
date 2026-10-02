@@ -12,8 +12,8 @@ import kotlinx.coroutines.runBlocking
  * Real-time call screening — the heart of who-called.
  *
  *   BLOCK → silently reject (setDisallowCall + setRejectCall, skip log/notification)
- *   WARN  → let the phone ring AND fire a custom notification ("⚠️ spam probable, score X%")
- *           — the signature feature: "fais sonner mais affiche une alerte".
+ *   WARN  → let the phone ring AND fire a heads-up + optional overlay banner
+ *           ("⚠️ spam probable, score X%") — the signature feature.
  *   ALLOW → ring normally.
  */
 class WhoCalledScreeningService : CallScreeningService() {

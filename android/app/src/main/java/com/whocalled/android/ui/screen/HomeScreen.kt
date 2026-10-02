@@ -3,7 +3,6 @@ package com.whocalled.android.ui.screen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,6 +14,7 @@ import androidx.compose.material.icons.rounded.Block
 import androidx.compose.material.icons.rounded.ChevronRight
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.outlined.Shield
+import androidx.compose.material.icons.rounded.Layers
 import androidx.compose.material.icons.rounded.PowerSettingsNew
 import androidx.compose.material.icons.rounded.PhoneInTalk
 import androidx.compose.material.icons.rounded.VerifiedUser
@@ -40,7 +40,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
+import com.whocalled.android.R
 import com.whocalled.android.data.Countries
 import com.whocalled.android.data.Preferences
 import kotlinx.coroutines.launch
@@ -57,9 +61,12 @@ import com.whocalled.android.ui.components.BorderedCard
 import com.whocalled.android.ui.components.GradientHeader
 import com.whocalled.android.ui.components.ScrollableScreen
 import com.whocalled.android.ui.theme.WCColor
+import com.whocalled.android.network.CommunityResponse
 import com.whocalled.android.network.StatsResponse
 import com.whocalled.android.util.CallEvent
 import com.whocalled.android.util.CallEventAction
+import com.whocalled.android.util.RecentCallPrompt
+import com.whocalled.android.util.RelativeTime
 import java.text.DateFormat
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
@@ -67,13 +74,42 @@ import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 
+/**
+ * Everything the Home screen renders, as plain data. [HomeScreen] fills it from
+ * the ViewModel; screenshot tests and previews fill it with fixtures.
+ */
+data class HomeUiState(
+    val isScreeningRoleHeld: Boolean,
+    val notificationsGranted: Boolean = true,
+    /** Default true so store screenshots stay on the quiet/protected layout. */
+    val overlayGranted: Boolean = true,
+    val warnEnabled: Boolean = true,
+    val blocked: Int = 0,
+    val warned: Int = 0,
+    val sync: LoadState = LoadState.Idle,
+    val syncProgress: Int = 0,
+    val stats: StatsResponse? = null,
+    val recentCall: RecentCallPrompt? = null,
+    val community: CommunityResponse? = null,
+    val smsOn: Boolean = false,
+    val playedToday: Boolean = false,
+    val streak: Int = 0,
+    val bestToday: Int = 0,
+    val countryDial: String = "33",
+    val showCountryBanner: Boolean = false,
+    /** Fixed clock for "il y a 17 h"; null = wall clock (ticks every minute). */
+    val now: Long? = null,
+)
+
 @Composable
 fun HomeScreen(
     viewModel: MainViewModel,
     isScreeningRoleHeld: Boolean,
     notificationsGranted: Boolean = true,
+    overlayGranted: Boolean = true,
     onRequestRole: () -> Unit,
     onRequestNotifications: () -> Unit = {},
+    onRequestOverlay: () -> Unit = {},
     onSyncNow: () -> Unit,
     onSeeAllHistory: () -> Unit,
     onRecentCallClick: (CallEvent) -> Unit,
@@ -87,6 +123,7 @@ fun HomeScreen(
     val syncProgress by viewModel.syncProgress.collectAsState()
     val stats by viewModel.stats.collectAsState()
     val recentCall by viewModel.recentCallPrompt.collectAsState()
+    val smsOn by viewModel.smsBlockingEnabled.collectAsState()
 
     val gameState by viewModel.gameState.collectAsState()
     val playedToday = gameState?.lastPlayedDay == com.whocalled.android.game.GameDay.epochDay()
@@ -105,30 +142,92 @@ fun HomeScreen(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var showCountryBanner by remember { mutableStateOf(false) }
-    var showCountryDialog by remember { mutableStateOf(false) }
     var countryDial by remember { mutableStateOf("") }
+    var warnEnabled by remember { mutableStateOf(true) }
     LaunchedEffect(Unit) {
         countryDial = Preferences.countryDial(context)
         showCountryBanner = !Preferences.isCountryConfirmed(context)
+        warnEnabled = Preferences.isWarnEnabled(context)
     }
     fun confirmCountry() {
         showCountryBanner = false
         scope.launch { Preferences.setCountryConfirmed(context, true) }
     }
 
+    HomeContent(
+        state = HomeUiState(
+            isScreeningRoleHeld = isScreeningRoleHeld,
+            notificationsGranted = notificationsGranted,
+            overlayGranted = overlayGranted,
+            warnEnabled = warnEnabled,
+            blocked = blocked,
+            warned = warned,
+            sync = sync,
+            syncProgress = syncProgress,
+            stats = stats,
+            recentCall = recentCall,
+            community = community,
+            smsOn = smsOn,
+            playedToday = playedToday,
+            streak = gameState?.streak ?: 0,
+            bestToday = gameState?.bestScoreToday ?: 0,
+            countryDial = countryDial,
+            showCountryBanner = showCountryBanner,
+        ),
+        onRequestRole = onRequestRole,
+        onRequestNotifications = onRequestNotifications,
+        onRequestOverlay = onRequestOverlay,
+        onSyncNow = onSyncNow,
+        onSeeAllHistory = onSeeAllHistory,
+        onRecentCallOpen = { call ->
+            viewModel.markRecentCallHandled(call)
+            onRecentCallClick(call)
+        },
+        onRecentCallDismiss = { call -> viewModel.markRecentCallHandled(call) },
+        onCountrySelected = { dial ->
+            countryDial = dial
+            viewModel.setCountry(dial)
+            confirmCountry()
+        },
+        onCountryConfirmed = { confirmCountry() },
+        onSmsClick = onSmsClick,
+        onPlayGame = onPlayGame,
+        onOpenLeaderboard = onOpenLeaderboard,
+    )
+}
+
+/** Stateless Home: renders [state], reports intents through callbacks. */
+@Composable
+fun HomeContent(
+    state: HomeUiState,
+    onRequestRole: () -> Unit = {},
+    onRequestNotifications: () -> Unit = {},
+    onRequestOverlay: () -> Unit = {},
+    onSyncNow: () -> Unit = {},
+    onSeeAllHistory: () -> Unit = {},
+    onRecentCallOpen: (CallEvent) -> Unit = {},
+    onRecentCallDismiss: (CallEvent) -> Unit = {},
+    onCountrySelected: (String) -> Unit = {},
+    onCountryConfirmed: () -> Unit = {},
+    onSmsClick: () -> Unit = {},
+    onPlayGame: () -> Unit = {},
+    onOpenLeaderboard: () -> Unit = {},
+) {
+    val isScreeningRoleHeld = state.isScreeningRoleHeld
+    var showCountryDialog by remember { mutableStateOf(false) }
+    val numberFormat = rememberNumberFormat()
+
     if (showCountryDialog) {
         AlertDialog(
             onDismissRequest = { showCountryDialog = false },
-            title = { Text("Pays surveillé") },
+            title = { Text(stringResource(R.string.home_country_dialog_title)) },
             text = {
                 Column {
                     Countries.list.forEach { c ->
                         Row(
                             modifier = Modifier.fillMaxWidth().clickable {
-                                countryDial = c.dial
                                 showCountryDialog = false
-                                viewModel.setCountry(c.dial)
-                                confirmCountry()
+                                onCountrySelected(c.dial)
                             }.padding(vertical = 10.dp),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
@@ -138,15 +237,19 @@ fun HomeScreen(
                     }
                 }
             },
-            confirmButton = { TextButton(onClick = { showCountryDialog = false }) { Text("Fermer") } },
+            confirmButton = {
+                TextButton(onClick = { showCountryDialog = false }) { Text(stringResource(R.string.common_close)) }
+            },
         )
     }
 
     ScrollableScreen(
         header = {
             GradientHeader(
-                title = "Who Called",
-                subtitle = if (isScreeningRoleHeld) "Vous êtes protégé" else "Protection à activer",
+                title = stringResource(R.string.app_name),
+                subtitle = stringResource(
+                    if (isScreeningRoleHeld) R.string.home_protected else R.string.home_protection_to_enable,
+                ),
                 trailing = {
                     Icon(
                         if (isScreeningRoleHeld) Icons.Rounded.VerifiedUser else Icons.Outlined.Shield,
@@ -160,16 +263,14 @@ fun HomeScreen(
             )
         },
     ) {
-        val prompt = recentCall
+        val prompt = state.recentCall
         if (prompt != null) {
             item(key = "recent-call-${prompt.call.key}") {
                 RecentCallCard(
                     prompt = prompt,
-                    onOpen = {
-                        viewModel.markRecentCallHandled(prompt.call)
-                        onRecentCallClick(prompt.call)
-                    },
-                    onDismiss = { viewModel.markRecentCallHandled(prompt.call) },
+                    fixedNow = state.now,
+                    onOpen = { onRecentCallOpen(prompt.call) },
+                    onDismiss = { onRecentCallDismiss(prompt.call) },
                     onSeeAll = onSeeAllHistory,
                 )
             }
@@ -181,6 +282,7 @@ fun HomeScreen(
 
         // Primary action first: update the list (visible without scrolling).
         item {
+            val sync = state.sync
             OutlinedButton(
                 onClick = onSyncNow,
                 enabled = sync !is LoadState.Loading,
@@ -188,10 +290,10 @@ fun HomeScreen(
             ) {
                 if (sync is LoadState.Loading) {
                     CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
-                    Text("Mise à jour…", modifier = Modifier.padding(start = 8.dp))
+                    Text(stringResource(R.string.home_sync_updating), modifier = Modifier.padding(start = 8.dp))
                 } else {
                     Icon(Icons.Rounded.Refresh, contentDescription = null, modifier = Modifier.padding(end = 8.dp))
-                    Text("Mettre à jour la liste")
+                    Text(stringResource(R.string.home_sync_button))
                 }
             }
             if (sync is LoadState.Loading) {
@@ -199,9 +301,9 @@ fun HomeScreen(
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 6.dp),
                 )
                 Text(
-                    if (syncProgress > 0)
-                        "${NumberFormat.getInstance().format(syncProgress)} numéros récupérés…"
-                    else "Connexion au serveur…",
+                    if (state.syncProgress > 0)
+                        stringResource(R.string.home_sync_progress, numberFormat.format(state.syncProgress))
+                    else stringResource(R.string.home_sync_connecting),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(horizontal = 16.dp),
@@ -209,7 +311,7 @@ fun HomeScreen(
             }
         }
         item {
-            val (kind, msg) = when (val s = sync) {
+            val (kind, msg) = when (val s = state.sync) {
                 is LoadState.Error -> BannerKind.Error to s.message
                 is LoadState.Success -> BannerKind.Success to s.message
                 else -> BannerKind.Info to null
@@ -217,8 +319,8 @@ fun HomeScreen(
             AnimatedBanner(kind, msg, Modifier.padding(horizontal = 16.dp))
         }
         item {
-            if (showCountryBanner) {
-                val c = Countries.byDial(countryDial)
+            if (state.showCountryBanner) {
+                val c = Countries.byDial(state.countryDial)
                 BorderedCard(
                     Modifier.padding(horizontal = 16.dp),
                     accent = MaterialTheme.colorScheme.primary,
@@ -226,26 +328,29 @@ fun HomeScreen(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Rounded.Public, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                         Column(Modifier.weight(1f).padding(horizontal = 10.dp)) {
-                            Text("Numéros surveillés : ${c.flag} ${c.name}", fontWeight = FontWeight.SemiBold)
                             Text(
-                                "Détecté automatiquement. Touchez « Modifier » pour changer.",
+                                stringResource(R.string.home_country_watched, c.flag, c.name),
+                                fontWeight = FontWeight.SemiBold,
+                            )
+                            Text(
+                                stringResource(R.string.home_country_detected),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         }
-                        TextButton(onClick = { showCountryDialog = true }) { Text("Modifier") }
+                        TextButton(onClick = { showCountryDialog = true }) { Text(stringResource(R.string.common_edit)) }
                         Icon(
                             Icons.Rounded.Close,
-                            contentDescription = "Fermer",
+                            contentDescription = stringResource(R.string.common_close),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.clickable { confirmCountry() }.padding(4.dp),
+                            modifier = Modifier.clickable { onCountryConfirmed() }.padding(4.dp),
                         )
                     }
                 }
             }
         }
         item {
-            val shieldSteps = listOf(isScreeningRoleHeld, notificationsGranted)
+            val shieldSteps = listOf(isScreeningRoleHeld, state.notificationsGranted)
             val shieldDone = shieldSteps.count { it }
             val shieldTotal = shieldSteps.size
 
@@ -255,17 +360,19 @@ fun HomeScreen(
                     accent = if (isScreeningRoleHeld) WCColor.Amber else WCColor.Coral,
                 ) {
                     Text(
-                        if (isScreeningRoleHeld) "Protection partielle · $shieldDone/$shieldTotal"
-                        else "Bouclier non activé · $shieldDone/$shieldTotal",
+                        stringResource(
+                            if (isScreeningRoleHeld) R.string.home_shield_partial else R.string.home_shield_off,
+                            shieldDone,
+                            shieldTotal,
+                        ),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                     )
                     Text(
-                        if (!isScreeningRoleHeld) {
-                            "Activez le filtre d’appels pour bloquer les indésirables."
-                        } else {
-                            "Les alertes sont coupées : activez les notifications."
-                        },
+                        stringResource(
+                            if (!isScreeningRoleHeld) R.string.home_shield_enable_filter
+                            else R.string.home_shield_enable_notifs,
+                        ),
                         Modifier.padding(vertical = 6.dp),
                         style = MaterialTheme.typography.bodySmall,
                     )
@@ -278,7 +385,9 @@ fun HomeScreen(
                             modifier = Modifier.padding(end = 8.dp),
                         )
                         Text(
-                            if (!isScreeningRoleHeld) "Activer le bloqueur" else "Activer les alertes",
+                            stringResource(
+                                if (!isScreeningRoleHeld) R.string.home_enable_blocker else R.string.home_enable_alerts,
+                            ),
                         )
                     }
                 }
@@ -286,22 +395,51 @@ fun HomeScreen(
             if (isScreeningRoleHeld) {
                 // Saracroche-style "active and up to date" card, but in our emerald.
                 ProtectionCard(
-                    blocked = blocked,
-                    warned = warned,
-                    stats = stats,
+                    blocked = state.blocked,
+                    warned = state.warned,
+                    stats = state.stats,
+                    now = state.now ?: System.currentTimeMillis(),
                     onSeeBlocked = onSeeAllHistory,
                 )
             }
         }
 
+        if (isScreeningRoleHeld && state.warnEnabled && !state.overlayGranted) {
+            item {
+                BorderedCard(
+                    Modifier.padding(horizontal = 16.dp),
+                    accent = WCColor.Amber,
+                ) {
+                    Text(
+                        stringResource(R.string.home_overlay_title),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                    )
+                    Text(
+                        stringResource(R.string.home_overlay_body),
+                        Modifier.padding(vertical = 6.dp),
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                    Button(onClick = onRequestOverlay) {
+                        Icon(
+                            Icons.Rounded.Layers,
+                            contentDescription = null,
+                            modifier = Modifier.padding(end = 8.dp),
+                        )
+                        Text(stringResource(R.string.home_overlay_cta))
+                    }
+                }
+            }
+        }
+
         // Community shield — compact shared counter (the collective mission).
         item {
-            community?.let { c -> CommunityShieldCard(c) }
+            state.community?.let { c -> CommunityShieldCard(c) }
         }
 
         // SMS shield entry — green, distinct from the call card, tappable.
         item {
-            val smsOn by viewModel.smsBlockingEnabled.collectAsState()
+            val smsOn = state.smsOn
             BorderedCard(
                 Modifier
                     .padding(horizontal = 16.dp)
@@ -316,10 +454,9 @@ fun HomeScreen(
                         modifier = Modifier.size(28.dp),
                     )
                     Column(Modifier.weight(1f).padding(start = 12.dp)) {
-                        Text("Bouclier SMS", fontWeight = FontWeight.SemiBold)
+                        Text(stringResource(R.string.home_sms_title), fontWeight = FontWeight.SemiBold)
                         Text(
-                            if (smsOn) "Actif · les SMS indésirables sont masqués"
-                            else "Masquez les notifications des SMS indésirables",
+                            stringResource(if (smsOn) R.string.home_sms_on else R.string.home_sms_off),
                             style = MaterialTheme.typography.bodySmall,
                             color = if (smsOn) WCColor.Emerald else MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -332,9 +469,9 @@ fun HomeScreen(
         // Bonus (discreet): the daily game lives mainly in the "Jeu" tab.
         item {
             DailyChallengeCard(
-                playedToday = playedToday,
-                streak = gameState?.streak ?: 0,
-                bestToday = gameState?.bestScoreToday ?: 0,
+                playedToday = state.playedToday,
+                streak = state.streak,
+                bestToday = state.bestToday,
                 onPlay = onPlayGame,
                 onLeaderboard = onOpenLeaderboard,
             )
@@ -342,45 +479,54 @@ fun HomeScreen(
     }
 }
 
+/** Locale-aware grouping ("28 873 272" in fr, "28,873,272" in en). */
+@Composable
+private fun rememberNumberFormat(): NumberFormat {
+    val locale = LocalConfiguration.current.locales[0] ?: Locale.getDefault()
+    return remember(locale) { NumberFormat.getInstance(locale) }
+}
+
 @Composable
 private fun RecentCallCard(
-    prompt: com.whocalled.android.util.RecentCallPrompt,
+    prompt: RecentCallPrompt,
+    fixedNow: Long?,
     onOpen: () -> Unit,
     onDismiss: () -> Unit,
     onSeeAll: () -> Unit,
 ) {
     val call = prompt.call
     // Ticks every minute so "il y a 5 min" follows the clock during a session.
-    val now by androidx.compose.runtime.produceState(initialValue = System.currentTimeMillis()) {
+    val tickingNow by androidx.compose.runtime.produceState(initialValue = System.currentTimeMillis()) {
         while (true) {
             kotlinx.coroutines.delay(60_000L)
             value = System.currentTimeMillis()
         }
     }
-    val (title, message, color) = when {
-        call.action == CallEventAction.BLOCKED -> Triple(
-            "Appel indésirable bloqué",
-            "Who Called a raccroché avant qu’il ne sonne.",
+    val now = fixedNow ?: tickingNow
+    val (title, message, color) = when (call.action) {
+        CallEventAction.BLOCKED -> Triple(
+            stringResource(R.string.home_recent_blocked_title),
+            stringResource(R.string.home_recent_blocked_msg),
             WCColor.Coral,
         )
-        call.action == CallEventAction.WARNED -> Triple(
-            "Appel suspect détecté",
-            "L’appel a sonné avec une alerte.",
+        CallEventAction.WARNED -> Triple(
+            stringResource(R.string.home_recent_warned_title),
+            stringResource(R.string.home_recent_warned_msg),
             WCColor.Amber,
         )
-        call.action == CallEventAction.REPORTED_SPAM -> Triple(
-            "Numéro signalé indésirable",
-            "Vous aviez déjà marqué ce numéro comme indésirable.",
+        CallEventAction.REPORTED_SPAM -> Triple(
+            stringResource(R.string.home_recent_reported_title),
+            stringResource(R.string.home_recent_reported_msg),
             WCColor.Coral,
         )
-        call.action == CallEventAction.LEGITIMATE -> Triple(
-            "Numéro marqué légitime",
-            "Vous aviez indiqué que ce numéro est légitime.",
+        CallEventAction.LEGITIMATE -> Triple(
+            stringResource(R.string.home_recent_legit_title),
+            stringResource(R.string.home_recent_legit_msg),
             WCColor.Emerald,
         )
-        else -> Triple(
-            "Un numéro inconnu vous a appelé",
-            "Vérifiez ce numéro avant de rappeler.",
+        CallEventAction.UNKNOWN -> Triple(
+            stringResource(R.string.home_recent_unknown_title),
+            stringResource(R.string.home_recent_unknown_msg),
             WCColor.Blue,
         )
     }
@@ -405,14 +551,14 @@ private fun RecentCallCard(
                     modifier = Modifier.padding(top = 4.dp),
                 )
                 Text(
-                    "${com.whocalled.android.util.RelativeTime.format(call.timestamp, now)} · $message",
+                    "${RelativeTime.format(LocalContext.current.resources, call.timestamp, now)} · $message",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
             Icon(
                 Icons.Rounded.Close,
-                contentDescription = "Fermer",
+                contentDescription = stringResource(R.string.common_close),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.clickable(onClick = onDismiss).padding(4.dp),
             )
@@ -421,15 +567,12 @@ private fun RecentCallCard(
             onClick = onOpen,
             modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
         ) {
-            Text("Voir le numéro")
+            Text(stringResource(R.string.home_recent_see_number))
         }
         if (prompt.others > 0) {
             // Dismissing the headline must not bury the rest of the backlog.
             TextButton(onClick = onSeeAll, modifier = Modifier.fillMaxWidth()) {
-                Text(
-                    if (prompt.others == 1) "et 1 autre appel ces dernières 24 h"
-                    else "et ${prompt.others} autres appels ces dernières 24 h",
-                )
+                Text(pluralStringResource(R.plurals.home_recent_others, prompt.others, prompt.others))
             }
         }
     }
@@ -450,7 +593,7 @@ private fun RecentCallQuietRow() {
                 modifier = Modifier.size(22.dp),
             )
             Text(
-                "Aucun nouvel appel à vérifier — tout est calme.",
+                stringResource(R.string.home_quiet),
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(start = 10.dp),
             )
@@ -469,9 +612,10 @@ private fun ProtectionCard(
     blocked: Int,
     warned: Int,
     stats: StatsResponse?,
+    now: Long,
     onSeeBlocked: () -> Unit,
 ) {
-    val nf = remember { NumberFormat.getInstance(Locale.FRANCE) }
+    val nf = rememberNumberFormat()
     Column(
         Modifier
             .padding(horizontal = 16.dp)
@@ -492,7 +636,7 @@ private fun ProtectionCard(
                 modifier = Modifier.size(34.dp),
             )
             Text(
-                "Bloqueur actif et à jour",
+                stringResource(R.string.home_blocker_active),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(start = 10.dp),
@@ -506,16 +650,17 @@ private fun ProtectionCard(
         stats?.let { s ->
             StatRow(
                 icon = Icons.Rounded.Storage,
-                label = "Numéros couverts",
+                label = stringResource(R.string.home_covered_numbers),
                 value = nf.format(s.coveredNumbers),
-                subtitle = relativeUpdate(s.lastUpdate)?.let { "Mise à jour auto · $it" },
+                subtitle = relativeUpdate(s.lastUpdate, now)?.let { stringResource(R.string.home_auto_update, it) },
             )
             // Per-country breakdown (matches the device's scope).
             s.countryNumbers?.let { cn ->
                 val c = Countries.byDial(s.country ?: "")
-                val arcep = s.countryArcepPatternCount?.let { " · ${nf.format(it)} préfixes ARCEP" } ?: ""
+                val arcep = s.countryArcepPatternCount
+                    ?.let { stringResource(R.string.home_arcep_prefixes, nf.format(it)) } ?: ""
                 Text(
-                    "${c.flag} ${c.name} : ${nf.format(cn)} numéros$arcep",
+                    stringResource(R.string.home_country_breakdown, c.flag, c.name, nf.format(cn), arcep),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(start = 30.dp, bottom = 6.dp),
@@ -528,17 +673,17 @@ private fun ProtectionCard(
         CountRow(
             icon = Icons.Rounded.Block,
             color = WCColor.Coral,
-            label = "Appels bloqués",
+            label = stringResource(R.string.home_blocked_calls),
             count = blocked,
-            subtitle = if (blocked == 0) "Aucun pour l’instant" else "Rejetés sans sonner · voir le détail",
+            subtitle = stringResource(if (blocked == 0) R.string.home_none_yet else R.string.home_blocked_detail),
             onClick = onSeeBlocked,
         )
         CountRow(
             icon = Icons.Rounded.WarningAmber,
             color = WCColor.Amber,
-            label = "Appels suspects",
+            label = stringResource(R.string.home_suspect_calls),
             count = warned,
-            subtitle = if (warned == 0) "Aucun pour l’instant" else "Ont sonné, vous avez été prévenu · voir le détail",
+            subtitle = stringResource(if (warned == 0) R.string.home_none_yet else R.string.home_suspect_detail),
             onClick = onSeeBlocked,
         )
     }
@@ -594,23 +739,28 @@ private fun StatRow(icon: androidx.compose.ui.graphics.vector.ImageVector, label
     }
 }
 
-/** "dernière MAJ aujourd'hui / il y a 3 j / le 12 juin" from an ISO-8601 date. */
-private fun relativeUpdate(iso: String?): String? {
+/** "à jour aujourd'hui / mise à jour il y a 3 j / MAJ le 12 juin" from an ISO-8601 date. */
+@Composable
+private fun relativeUpdate(iso: String?, now: Long): String? {
     if (iso.isNullOrBlank()) return null
     val parser = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US).apply {
         timeZone = TimeZone.getTimeZone("UTC")
     }
     val time = runCatching { parser.parse(iso)?.time }.getOrNull() ?: return null
-    val days = ((System.currentTimeMillis() - time) / 86_400_000L).toInt()
+    val days = ((now - time) / 86_400_000L).toInt()
+    val locale = LocalConfiguration.current.locales[0] ?: Locale.getDefault()
     return when {
-        days <= 0 -> "à jour aujourd’hui"
-        days == 1 -> "mise à jour hier"
-        days < 30 -> "mise à jour il y a $days j"
-        else -> "MAJ le " + DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.FRANCE).format(Date(time))
+        days <= 0 -> stringResource(R.string.home_update_today)
+        days == 1 -> stringResource(R.string.home_update_yesterday)
+        days < 30 -> stringResource(R.string.home_update_days_ago, days)
+        else -> stringResource(
+            R.string.home_update_on,
+            DateFormat.getDateInstance(DateFormat.MEDIUM, locale).format(Date(time)),
+        )
     }
 }
 
-/** Home entry for the daily DEFENSE game — a retention hook with a shareable streak. */
+/** Home entry for the daily games — a retention hook with a shareable streak. */
 @Composable
 private fun DailyChallengeCard(
     playedToday: Boolean,
@@ -631,7 +781,7 @@ private fun DailyChallengeCard(
                     if (playedToday && bestToday > 0) append("  ·  $bestToday pts")
                 }
                 Text(
-                    "Jeux — défis du jour & classements$extra",
+                    stringResource(R.string.home_games_row, extra),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -643,16 +793,16 @@ private fun DailyChallengeCard(
 
 /** Compact "community shield" — a shared counter + thin weekly-goal bar (soft, one card). */
 @Composable
-private fun CommunityShieldCard(c: com.whocalled.android.network.CommunityResponse) {
-    val fmt = java.text.NumberFormat.getInstance()
+private fun CommunityShieldCard(c: CommunityResponse) {
+    val fmt = rememberNumberFormat()
     val progress = if (c.goal > 0) (c.week.toFloat() / c.goal).coerceIn(0f, 1f) else 0f
     BorderedCard(Modifier.padding(horizontal = 16.dp), accent = WCColor.Blue) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text("🛡️")
             Column(Modifier.weight(1f).padding(start = 10.dp)) {
-                Text("Bouclier communautaire", fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodyMedium)
+                Text(stringResource(R.string.home_community_title), fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.bodyMedium)
                 Text(
-                    "${fmt.format(c.total)} signalements ensemble · +${fmt.format(c.week)} cette semaine",
+                    stringResource(R.string.home_community_line, fmt.format(c.total), fmt.format(c.week)),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )

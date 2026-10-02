@@ -65,6 +65,7 @@ import com.whocalled.android.data.ReportCategory
 import com.whocalled.android.network.LookupResponse
 import com.whocalled.android.ui.LoadState
 import com.whocalled.android.ui.MainViewModel
+import com.whocalled.android.ui.WarnAlertContext
 import com.whocalled.android.ui.components.AnimatedBanner
 import com.whocalled.android.ui.components.BannerKind
 import com.whocalled.android.ui.components.BorderedCard
@@ -73,6 +74,7 @@ import com.whocalled.android.ui.components.ScoreGauge
 import com.whocalled.android.ui.components.StatusBadge
 import com.whocalled.android.ui.theme.WCColor
 import com.whocalled.android.util.CallDirection
+import com.whocalled.android.util.CallEventAction
 import java.text.DateFormat
 import java.util.Date
 import java.util.Locale
@@ -144,6 +146,21 @@ fun CallDetailScreen(
         it.timestamp >= System.currentTimeMillis() - 7L * 86_400_000L
     }
     val isBlocked = rule == "block" || (rule == null && status == "block")
+    val incomingWarn by viewModel.warnAlert.collectAsState()
+    var stickyWarn by remember(callId, phone) { mutableStateOf<WarnAlertContext?>(null) }
+    LaunchedEffect(incomingWarn) {
+        if (incomingWarn != null) {
+            stickyWarn = incomingWarn
+            viewModel.clearWarnAlert()
+        }
+    }
+    val warnEvent = remember(call, recentHistory, stickyWarn) {
+        call?.takeIf { it.action == "warned" }?.let {
+            WarnAlertContext(it.timestamp, it.spamScore, it.category)
+        } ?: stickyWarn ?: recentHistory.firstOrNull { it.action == CallEventAction.WARNED }?.let {
+            WarnAlertContext(it.timestamp, it.spamScore, it.category)
+        }
+    }
 
     fun launchNumberAction(action: NumberAction) {
         val target = displayedPhone ?: return
@@ -208,6 +225,25 @@ fun CallDetailScreen(
         if (displayedPhone == null) {
             item { Text("Chargement…") }
             return@LazyColumn
+        }
+
+        if (warnEvent != null) {
+            item {
+                val categoryLabel = ReportCategory.fromApi(warnEvent.category)
+                    ?.takeIf { it != ReportCategory.OTHER }?.label
+                BorderedCard(accent = WCColor.Amber) {
+                    Text(
+                        "Appel reçu ${formatReceivedAt(warnEvent.at)}",
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                    Text(
+                        warnScoreExplanation(warnEvent.score, categoryLabel),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(top = 4.dp),
+                    )
+                }
+            }
         }
 
         // 1) Verdict + identity, all in one card: score, name, number, badges and
@@ -602,6 +638,25 @@ private fun sourceExplanation(
         "Le verdict combine les avis récents, leur volume et la réputation des contributeurs."
     else ->
         "L’absence d’avis ne signifie pas que ce numéro est fiable. Restez prudent avant de rappeler."
+}
+
+private fun formatReceivedAt(timestamp: Long): String {
+    val time = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.getDefault()).format(Date(timestamp))
+    val then = java.util.Calendar.getInstance().apply { timeInMillis = timestamp }
+    val now = java.util.Calendar.getInstance()
+    val sameDay = now.get(java.util.Calendar.DAY_OF_YEAR) == then.get(java.util.Calendar.DAY_OF_YEAR) &&
+        now.get(java.util.Calendar.YEAR) == then.get(java.util.Calendar.YEAR)
+    return if (sameDay) {
+        "aujourd’hui à $time"
+    } else {
+        val date = DateFormat.getDateInstance(DateFormat.SHORT, Locale.getDefault()).format(Date(timestamp))
+        "le $date à $time"
+    }
+}
+
+private fun warnScoreExplanation(score: Int, categoryLabel: String?): String {
+    val what = categoryLabel?.let { "$score % · $it" } ?: "$score %"
+    return "Score $what. Des signalements existent, mais pas assez pour bloquer automatiquement. L’appel a sonné : c’était à vous de répondre ou de refuser."
 }
 
 private fun verdictExplanation(status: String, confidenceLevel: String): String = when (status) {

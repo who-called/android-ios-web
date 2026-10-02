@@ -18,6 +18,7 @@ import com.whocalled.android.ui.theme.WCColor
  */
 object NotificationHelper {
     const val CHANNEL_WARN = "who_called_warn"
+    const val CHANNEL_WARN_DETAIL = "who_called_warn_detail"
     const val CHANNEL_SMS_BLOCKED = "who_called_sms_blocked"
     const val CHANNEL_CALL_BLOCKED = "who_called_call_blocked"
     const val CHANNEL_REMINDER = "who_called_reminder"
@@ -32,6 +33,15 @@ object NotificationHelper {
             description = context.getString(R.string.warn_channel_desc)
         }
         manager.createNotificationChannel(warn)
+
+        val warnDetail = NotificationChannel(
+            CHANNEL_WARN_DETAIL,
+            context.getString(R.string.warn_detail_channel_name),
+            NotificationManager.IMPORTANCE_LOW,
+        ).apply {
+            description = context.getString(R.string.warn_detail_channel_desc)
+        }
+        manager.createNotificationChannel(warnDetail)
 
         val smsBlocked = NotificationChannel(
             CHANNEL_SMS_BLOCKED,
@@ -207,39 +217,93 @@ object NotificationHelper {
     }
 
     /**
-     * WARN alert during a ringing suspicious call. Android doesn't let us put a
-     * label under the number on the call screen (the CallScreeningService API has
-     * no caller-name field — Saracroche has the same limit), so we make the alert
-     * stand out instead: a heads-up, sticky (ongoing) notice that stays up while
-     * the phone rings and auto-clears after ~45s (covers the ring) so it never
-     * lingers. It carries the number + score and opens the detail on tap.
+     * WARN during a ringing suspicious call.
+     *
+     * Overlay: only one banner at a time, last incoming WARN wins (a second
+     * call replaces the first). It auto-hides after [WarnOverlay.DISPLAY_MS]
+     * (~ring window) because we cannot observe hang-up without extra permission.
+     *
+     * Notifications: never stacked on top of the banner. With overlay, a silent
+     * shade entry per warned call (grouped, same pattern as blocked calls) so
+     * two suspects stay independently tappable. Without overlay, a heads-up.
      */
     fun showWarning(context: Context, phone: String, score: Int, category: String?, callLogId: Long?) {
+        val locked = context.getSystemService(android.app.KeyguardManager::class.java)
+            ?.isKeyguardLocked == true
+        val overlayShown = !locked && WarnOverlay.show(context, phone, score, category)
         if (NotificationManagerCompat.from(context).areNotificationsEnabled().not()) return
 
-        // "Démarchage · risque 72%" decides a ringing call better than a bare
-        // percentage — surface the known category while the phone rings.
-        val categoryLabel = com.whocalled.android.data.ReportCategory.fromApi(category)
-            ?.takeIf { it != com.whocalled.android.data.ReportCategory.OTHER }?.label
-        val body = context.getString(R.string.warn_body, phone, score)
+        val display = phone.trim().let { if (it.startsWith("+")) it else "+$it" }
+        val line = context.getString(R.string.warn_detail_line, display, score)
+        val tap = warnTapIntent(context, phone, score, category, callLogId)
+
+        if (overlayShown) {
+            postSilentWarnDetail(context, line, tap, callLogId, display)
+            return
+        }
+
         val notification = NotificationCompat.Builder(context, CHANNEL_WARN)
             .setSmallIcon(R.drawable.ic_notification_shield)
             .setColor(WCColor.Amber.toArgb())
             .setContentTitle(context.getString(R.string.warn_title))
-            .setContentText(if (categoryLabel != null) "$categoryLabel · $body" else body)
-            .setSubText(context.getString(R.string.warn_subtext)) // "Sonne mais non bloqué"
-            .setPriority(NotificationCompat.PRIORITY_MAX) // heads-up over the call UI
+            .setContentText(line)
+            .setSubText(context.getString(R.string.warn_subtext))
+            .setPriority(NotificationCompat.PRIORITY_MAX)
             .setCategory(NotificationCompat.CATEGORY_CALL)
-            .setContentIntent(detailIntent(context, callLogId))
-            .setOngoing(true) // sticky while it rings — not swiped away by accident
-            .setTimeoutAfter(45_000L) // auto-clear after the ring window
+            .setContentIntent(tap)
+            .setOngoing(true)
+            .setTimeoutAfter(45_000L)
             .setAutoCancel(true)
             .build()
-
         runCatching {
             NotificationManagerCompat.from(context).notify(phone.hashCode(), notification)
         }
     }
+
+    /**
+     * One shade row per warned call (like blocked calls), collapsed under a
+     * group summary so a burst does not flood the tray. No timeout: the point
+     * is to open the file after hanging up.
+     */
+    private fun postSilentWarnDetail(
+        context: Context,
+        line: String,
+        tap: PendingIntent,
+        callLogId: Long?,
+        display: String,
+    ) {
+        val id = callLogId?.let { "warn_$it".hashCode() }
+            ?: "warn_${display}_${System.currentTimeMillis()}".hashCode()
+        val notification = NotificationCompat.Builder(context, CHANNEL_WARN_DETAIL)
+            .setSmallIcon(R.drawable.ic_notification_shield)
+            .setColor(WCColor.Amber.toArgb())
+            .setContentTitle(context.getString(R.string.warn_detail_title))
+            .setContentText(line)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setSilent(true)
+            .setContentIntent(tap)
+            .setGroup(GROUP_WARNED_CALLS)
+            .setAutoCancel(true)
+            .build()
+        val summary = NotificationCompat.Builder(context, CHANNEL_WARN_DETAIL)
+            .setSmallIcon(R.drawable.ic_notification_shield)
+            .setColor(WCColor.Amber.toArgb())
+            .setContentTitle(context.getString(R.string.warn_group_title))
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setSilent(true)
+            .setContentIntent(detailIntent(context, null))
+            .setGroup(GROUP_WARNED_CALLS)
+            .setGroupSummary(true)
+            .setAutoCancel(true)
+            .build()
+        runCatching {
+            NotificationManagerCompat.from(context).notify(id, notification)
+            NotificationManagerCompat.from(context).notify(WARNED_CALLS_SUMMARY_ID, summary)
+        }
+    }
+
+    private const val GROUP_WARNED_CALLS = "who_called_warned_calls"
+    private val WARNED_CALLS_SUMMARY_ID = "warned_calls_summary".hashCode()
 
     /** Key for the call-log id carried by a notification's content intent. */
     const val EXTRA_OPEN_CALL_ID = "open_call_id"
@@ -249,6 +313,38 @@ object NotificationHelper {
 
     /** Normalized number carried by a notification → open that number's page. */
     const val EXTRA_OPEN_PHONE = "open_phone"
+    const val EXTRA_FROM_WARN = "from_warn"
+    const val EXTRA_WARN_AT = "warn_at"
+    const val EXTRA_WARN_SCORE = "warn_score"
+    const val EXTRA_WARN_CATEGORY = "warn_category"
+
+    /** Opens the number/call page and carries the WARN context for the explanation card. */
+    private fun warnTapIntent(
+        context: Context,
+        phone: String,
+        score: Int,
+        category: String?,
+        callLogId: Long?,
+    ): PendingIntent {
+        val normalized = com.whocalled.android.util.PhoneNormalizer.normalize(phone)
+        val intent = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                Intent.FLAG_ACTIVITY_SINGLE_TOP
+            putExtra(EXTRA_FROM_WARN, true)
+            putExtra(EXTRA_WARN_AT, System.currentTimeMillis())
+            putExtra(EXTRA_WARN_SCORE, score)
+            if (!category.isNullOrBlank()) putExtra(EXTRA_WARN_CATEGORY, category)
+            if (callLogId != null) putExtra(EXTRA_OPEN_CALL_ID, callLogId)
+            else if (normalized != null) putExtra(EXTRA_OPEN_PHONE, normalized)
+        }
+        val requestCode = callLogId?.toInt() ?: "warn_$phone".hashCode()
+        return PendingIntent.getActivity(
+            context,
+            requestCode,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
+    }
 
     /** Tapping opens the app straight on [phone]'s number page. */
     private fun phoneIntent(context: Context, phone: String): PendingIntent {

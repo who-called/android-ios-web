@@ -22,6 +22,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import com.whocalled.android.R
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -44,15 +46,40 @@ import com.whocalled.android.ui.screen.SettingsScreen
 import com.whocalled.android.ui.screen.SmsSettingsScreen
 import kotlinx.coroutines.launch
 
-private data class Tab(val route: String, val label: String, val icon: @Composable () -> Unit)
+private data class Tab(val route: String, val label: Int, val icon: @Composable () -> Unit)
+
+private val tabs = listOf(
+    Tab("home", R.string.nav_home) { Icon(Icons.Rounded.Home, null) },
+    Tab("calls", R.string.nav_calls) { Icon(Icons.Rounded.Phone, null) },
+    Tab("report", R.string.nav_report) { Icon(Icons.Rounded.Flag, null) },
+    Tab("games", R.string.nav_games) { Text("🎮") },
+    Tab("settings", R.string.nav_settings) { Icon(Icons.Rounded.Settings, null) },
+)
+
+/** The 5-tab bottom bar. Shared with screenshot tests so store captures carry the real chrome. */
+@Composable
+fun AppBottomBar(activeRoute: String, onSelect: (String) -> Unit) {
+    NavigationBar {
+        tabs.forEach { tab ->
+            NavigationBarItem(
+                selected = activeRoute == tab.route,
+                onClick = { onSelect(tab.route) },
+                icon = tab.icon,
+                label = { Text(stringResource(tab.label), maxLines = 1, softWrap = false) },
+            )
+        }
+    }
+}
 
 @Composable
 fun WhoCalledApp(
     viewModel: MainViewModel,
     isScreeningRoleHeld: State<Boolean>,
     notificationsGranted: State<Boolean>,
+    overlayGranted: State<Boolean>,
     onRequestRole: () -> Unit,
     onRequestNotifications: () -> Unit,
+    onRequestOverlay: () -> Unit,
     onSyncNow: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -84,12 +111,14 @@ fun WhoCalledApp(
         ProtectionSetupScreen(
             screeningGranted = isScreeningRoleHeld.value,
             notificationsGranted = notificationsGranted.value,
+            overlayGranted = overlayGranted.value,
             coveredNumbers = stats?.coveredNumbers,
             onRequestScreening = onRequestRole,
             onRequestNotifications = {
                 scope.launch { Preferences.setNotifPromptSeen(context) }
                 onRequestNotifications()
             },
+            onRequestOverlay = onRequestOverlay,
             onFinished = {
                 scope.launch {
                     Preferences.setShieldSetupCompleted(context)
@@ -104,13 +133,6 @@ fun WhoCalledApp(
     if (showShieldSetup == null) return
 
     val nav = rememberNavController()
-    val tabs = listOf(
-        Tab("home", "Accueil") { Icon(Icons.Rounded.Home, null) },
-        Tab("calls", "Appels") { Icon(Icons.Rounded.Phone, null) },
-        Tab("report", "Signaler") { Icon(Icons.Rounded.Flag, null) },
-        Tab("games", "Jeux") { Text("🎮") },
-        Tab("settings", "Réglages") { Icon(Icons.Rounded.Settings, null) },
-    )
 
     val current by nav.currentBackStackEntryAsState()
     val route = current?.destination?.route
@@ -160,19 +182,10 @@ fun WhoCalledApp(
     Scaffold(
         bottomBar = {
             if (showBottomBar) {
-                NavigationBar {
-                    tabs.forEach { tab ->
-                        NavigationBarItem(
-                            selected = route == tab.route,
-                            onClick = {
-                                nav.navigate(tab.route) {
-                                    popUpTo("home")
-                                    launchSingleTop = true
-                                }
-                            },
-                            icon = tab.icon,
-                            label = { Text(tab.label, maxLines = 1, softWrap = false) },
-                        )
+                AppBottomBar(activeRoute = route ?: "home") { target ->
+                    nav.navigate(target) {
+                        popUpTo("home")
+                        launchSingleTop = true
                     }
                 }
             }
@@ -184,8 +197,10 @@ fun WhoCalledApp(
                     viewModel = viewModel,
                     isScreeningRoleHeld = isScreeningRoleHeld.value,
                     notificationsGranted = notificationsGranted.value,
+                    overlayGranted = overlayGranted.value,
                     onRequestRole = onRequestRole,
                     onRequestNotifications = onRequestNotifications,
+                    onRequestOverlay = onRequestOverlay,
                     onSyncNow = onSyncNow,
                     onSeeAllHistory = { nav.navigate("calls") },
                     onRecentCallClick = { call ->

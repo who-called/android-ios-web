@@ -8,6 +8,19 @@
     <string name="warn_title">⚠️ Appel suspect — non bloqué</string>
     <string name="warn_body">%1$s · risque de spam %2$d%%. À vous de décider de répondre.</string>
     <string name="warn_subtext">Who Called · le téléphone sonne</string>
+    <string name="warn_detail_channel_name">Détail d\'un appel suspect</string>
+    <string name="warn_detail_channel_desc">Notification discrète, sans bandeau, pour ouvrir le détail après une alerte à l\'écran.</string>
+    <string name="warn_detail_title">Appel suspect</string>
+    <string name="warn_detail_line">%1$s · %2$d%% · Voir le détail</string>
+    <string name="warn_group_title">Appels suspects</string>
+
+    <!-- WARN overlay (drawn over the incoming-call screen) -->
+    <string name="overlay_title">Appel suspect</string>
+    <string name="overlay_not_blocked">Non bloqué — à vous de décider</string>
+    <string name="overlay_dismiss">Fermer l’alerte</string>
+    <string name="home_overlay_title">Alerte visible pendant l’appel</string>
+    <string name="home_overlay_body">Autorisez l’affichage par-dessus pour voir le risque spam pendant que ça sonne, sans cacher Répondre.</string>
+    <string name="home_overlay_cta">Autoriser l’affichage</string>
 
     <!-- SMS shield -->
     <string name="sms_blocked_channel_name">SMS indésirables masqués</string>
@@ -25,4 +38,77 @@
     <!-- Daily game reminder -->
     <string name="reminder_channel_name">Rappel de jeu</string>
     <string name="reminder_channel_desc">Un rappel bienveillant, une fois par jour, pour venir jouer le défi. Désactivable dans les réglages.</string>
+    <!-- Bottom navigation -->
+    <string name="nav_home">Accueil</string>
+    <string name="nav_calls">Appels</string>
+    <string name="nav_report">Signaler</string>
+    <string name="nav_games">Jeux</string>
+    <string name="nav_settings">Réglages</string>
+
+    <!-- Shared -->
+    <string name="common_close">Fermer</string>
+    <string name="common_edit">Modifier</string>
+    <string name="common_collapse">Réduire</string>
+    <string name="common_expand">Développer</string>
+    <string name="common_scroll_top">Remonter en haut</string>
+
+    <!-- Relative time -->
+    <string name="reltime_now">à l’instant</string>
+    <string name="reltime_minutes">il y a %1$d min</string>
+    <string name="reltime_hours">il y a %1$d h</string>
+    <string name="reltime_yesterday">hier</string>
+    <string name="reltime_days">il y a %1$d j</string>
+
+    <!-- Home -->
+    <string name="home_protected">Vous êtes protégé</string>
+    <string name="home_protection_to_enable">Protection à activer</string>
+    <string name="home_country_dialog_title">Pays surveillé</string>
+    <string name="home_sync_updating">Mise à jour…</string>
+    <string name="home_sync_button">Mettre à jour la liste</string>
+    <string name="home_sync_progress">%1$s numéros récupérés…</string>
+    <string name="home_sync_connecting">Connexion au serveur…</string>
+    <string name="home_country_watched">Numéros surveillés : %1$s %2$s</string>
+    <string name="home_country_detected">Détecté automatiquement. Touchez « Modifier » pour changer.</string>
+    <string name="home_shield_partial">Protection partielle · %1$d/%2$d</string>
+    <string name="home_shield_off">Bouclier non activé · %1$d/%2$d</string>
+    <string name="home_shield_enable_filter">Activez le filtre d’appels pour bloquer les indésirables.</string>
+    <string name="home_shield_enable_notifs">Les alertes sont coupées : activez les notifications.</string>
+    <string name="home_enable_blocker">Activer le bloqueur</string>
+    <string name="home_enable_alerts">Activer les alertes</string>
+    <string name="home_sms_title">Bouclier SMS</string>
+    <string name="home_sms_on">Actif · les SMS indésirables sont masqués</string>
+    <string name="home_sms_off">Masquez les notifications des SMS indésirables</string>
+    <string name="home_recent_blocked_title">Appel indésirable bloqué</string>
+    <string name="home_recent_blocked_msg">Who Called a raccroché avant qu’il ne sonne.</string>
+    <string name="home_recent_warned_title">Appel suspect détecté</string>
+    <string name="home_recent_warned_msg">L’appel a sonné avec une alerte.</string>
+    <string name="home_recent_reported_title">Numéro signalé indésirable</string>
+    <string name="home_recent_reported_msg">Vous aviez déjà marqué ce numéro comme indésirable.</string>
+    <string name="home_recent_legit_title">Numéro marqué légitime</string>
+    <string name="home_recent_legit_msg">Vous aviez indiqué que ce numéro est légitime.</string>
+    <string name="home_recent_unknown_title">Un numéro inconnu vous a appelé</string>
+    <string name="home_recent_unknown_msg">Vérifiez ce numéro avant de rappeler.</string>
+    <string name="home_recent_see_number">Voir le numéro</string>
+    <plurals name="home_recent_others">
+        <item quantity="one">et %1$d autre appel ces dernières 24 h</item>
+        <item quantity="other">et %1$d autres appels ces dernières 24 h</item>
+    </plurals>
+    <string name="home_quiet">Aucun nouvel appel à vérifier — tout est calme.</string>
+    <string name="home_blocker_active">Bloqueur actif et à jour</string>
+    <string name="home_covered_numbers">Numéros couverts</string>
+    <string name="home_auto_update">Mise à jour auto · %1$s</string>
+    <string name="home_country_breakdown">%1$s %2$s : %3$s numéros%4$s</string>
+    <string name="home_arcep_prefixes">" · %1$s préfixes ARCEP"</string>
+    <string name="home_blocked_calls">Appels bloqués</string>
+    <string name="home_none_yet">Aucun pour l’instant</string>
+    <string name="home_blocked_detail">Rejetés sans sonner · voir le détail</string>
+    <string name="home_suspect_calls">Appels suspects</string>
+    <string name="home_suspect_detail">Ont sonné, vous avez été prévenu · voir le détail</string>
+    <string name="home_update_today">à jour aujourd’hui</string>
+    <string name="home_update_yesterday">mise à jour hier</string>
+    <string name="home_update_days_ago">mise à jour il y a %1$d j</string>
+    <string name="home_update_on">MAJ le %1$s</string>
+    <string name="home_games_row">Jeux — défis du jour &amp; classements%1$s</string>
+    <string name="home_community_title">Bouclier communautaire</string>
+    <string name="home_community_line">%1$s signalements ensemble · +%2$s cette semaine</string>
 </resources>

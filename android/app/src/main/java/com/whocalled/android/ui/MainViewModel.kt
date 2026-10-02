@@ -518,7 +518,8 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     private val _openCallId = MutableStateFlow<Long?>(null)
     val openCallId: StateFlow<Long?> = _openCallId
 
-    fun requestOpenCall(id: Long) {
+    fun requestOpenCall(id: Long, warnAlert: WarnAlertContext? = null) {
+        _warnAlert.value = warnAlert
         _openCallId.value = id
     }
 
@@ -539,11 +540,26 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     private val _openPhone = MutableStateFlow<String?>(null)
     val openPhone: StateFlow<String?> = _openPhone
 
-    fun requestOpenPhone(phone: String) { _openPhone.value = phone }
+    fun requestOpenPhone(phone: String, warnAlert: WarnAlertContext? = null) {
+        _warnAlert.value = warnAlert
+        _openPhone.value = phone
+    }
 
     fun consumeOpenPhone(): String? {
         val v = _openPhone.value
         _openPhone.value = null
+        return v
+    }
+
+    /** Context from a WARN notification tap — shown on the number page, then cleared. */
+    private val _warnAlert = MutableStateFlow<WarnAlertContext?>(null)
+    val warnAlert: StateFlow<WarnAlertContext?> = _warnAlert
+
+    fun clearWarnAlert() { _warnAlert.value = null }
+
+    fun consumeWarnAlert(): WarnAlertContext? {
+        val v = _warnAlert.value
+        _warnAlert.value = null
         return v
     }
 
@@ -567,6 +583,12 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         _apiTest.value = ApiTestState.Idle
     }
 }
+
+data class WarnAlertContext(
+    val at: Long,
+    val score: Int,
+    val category: String?,
+)
 
 /** Result of the Settings API connectivity probe. */
 sealed interface ApiTestState {

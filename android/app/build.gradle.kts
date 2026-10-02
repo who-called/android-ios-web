@@ -46,8 +46,8 @@ android {
         applicationId = "com.devfi.whocalled"
         minSdk = 29
         targetSdk = 37
-        versionCode = 16
-        versionName = "0.5.1"
+        versionCode = 17
+        versionName = "0.5.2"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         // API base URL — override per build type / .env later.
@@ -97,6 +97,20 @@ android {
         compose = true
         buildConfig = true
     }
+    testOptions {
+        unitTests {
+            // Robolectric + Roborazzi store screenshots (see app/src/test/.../screenshots).
+            isIncludeAndroidResources = true
+            all { test ->
+                test.systemProperty("robolectric.graphicsMode", "NATIVE")
+                test.systemProperty("robolectric.pixelCopyRenderMode", "hardware")
+                // Always (re)record: these are generated assets, not regression goldens.
+                test.systemProperty("roborazzi.test.record", "true")
+                test.systemProperty("whocalled.screenshots.dir", rootProject.file("../store/screenshots/generated").absolutePath)
+                test.maxHeapSize = "4g"
+            }
+        }
+    }
 }
 
 kotlin {
@@ -133,4 +147,10 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     testImplementation(libs.junit)
+    testImplementation(platform(libs.androidx.compose.bom))
+    testImplementation(libs.androidx.ui.test.junit4)
+    testImplementation(libs.androidx.ui.test.manifest)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.roborazzi)
+    testImplementation(libs.roborazzi.compose)
 }

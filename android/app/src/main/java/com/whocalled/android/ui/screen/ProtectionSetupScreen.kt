@@ -29,6 +29,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.CheckCircle
+import androidx.compose.material.icons.rounded.Layers
 import androidx.compose.material.icons.rounded.NotificationsActive
 import androidx.compose.material.icons.rounded.PhoneLocked
 import androidx.compose.material3.Button
@@ -66,6 +67,7 @@ import java.text.NumberFormat
 private enum class SetupStep {
     SCREENING,
     NOTIFICATIONS,
+    OVERLAY,
 }
 
 /**
@@ -79,9 +81,11 @@ private enum class SetupStep {
 fun ProtectionSetupScreen(
     screeningGranted: Boolean,
     notificationsGranted: Boolean,
+    overlayGranted: Boolean,
     coveredNumbers: Long?,
     onRequestScreening: () -> Unit,
     onRequestNotifications: () -> Unit,
+    onRequestOverlay: () -> Unit,
     onFinished: () -> Unit,
 ) {
     val view = LocalView.current
@@ -102,12 +106,14 @@ fun ProtectionSetupScreen(
         buildList {
             add(SetupStep.SCREENING)
             if (needsNotifications) add(SetupStep.NOTIFICATIONS)
+            add(SetupStep.OVERLAY)
         }
     }
 
     fun isGranted(step: SetupStep): Boolean = when (step) {
         SetupStep.SCREENING -> screeningGranted
         SetupStep.NOTIFICATIONS -> notificationsGranted || !needsNotifications
+        SetupStep.OVERLAY -> overlayGranted
     }
 
     fun bravoFor(step: SetupStep): String = when (step) {
@@ -115,6 +121,7 @@ fun ProtectionSetupScreen(
             "✓ Filtre activé · ${NumberFormat.getInstance().format(it)} numéros prêts"
         } ?: "✓ Filtre d’appels activé"
         SetupStep.NOTIFICATIONS -> "✓ Alertes activées"
+        SetupStep.OVERLAY -> "✓ Bannière sur l’écran d’appel"
     }
 
     // Always start at step 0 so notifications is never jumped over.
@@ -148,7 +155,7 @@ fun ProtectionSetupScreen(
     }
 
     // Fresh grant on the current step → brief confirmation, then next step.
-    LaunchedEffect(screeningGranted, notificationsGranted, stepIndex) {
+    LaunchedEffect(screeningGranted, notificationsGranted, overlayGranted, stepIndex) {
         if (completing) return@LaunchedEffect
         val current = steps.getOrNull(stepIndex) ?: return@LaunchedEffect
         if (!isGranted(current)) return@LaunchedEffect
@@ -182,6 +189,7 @@ fun ProtectionSetupScreen(
         when (current) {
             SetupStep.SCREENING -> onRequestScreening()
             SetupStep.NOTIFICATIONS -> onRequestNotifications()
+            SetupStep.OVERLAY -> onRequestOverlay()
         }
     }
 
@@ -384,7 +392,8 @@ private fun AdaptiveStepBody(
                     when (step) {
                         SetupStep.SCREENING -> "Protection déjà activée"
                         SetupStep.NOTIFICATIONS -> "Alertes déjà activées"
-                                        }
+                        SetupStep.OVERLAY -> "Bannière déjà autorisée"
+                    }
                 } else {
                     copy.title
                 },
@@ -438,5 +447,13 @@ private fun stepCopy(step: SetupStep): StepCopy = when (step) {
         body = "Sans notifications, la protection reste silencieuse : pas d’alerte sur un appel suspect, " +
             "ni de confirmation quand un numéro est bloqué.",
         cta = "Activer les alertes",
+    )
+    SetupStep.OVERLAY -> StepCopy(
+        icon = Icons.Rounded.Layers,
+        accent = WCColor.Amber,
+        title = "Alerte visible pendant l’appel",
+        body = "L’app Téléphone recouvre la notification. Autorisez l’affichage par-dessus pour garder " +
+            "le score spam à l’écran pendant que ça sonne — sans bloquer l’appel, ni devenir le composeur.",
+        cta = "Autoriser l’affichage",
     )
 }

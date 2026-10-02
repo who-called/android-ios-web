@@ -36,6 +36,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -53,9 +54,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.core.app.NotificationManagerCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.whocalled.android.BuildConfig
 import com.whocalled.android.data.Preferences
 import com.whocalled.android.service.NotificationHelper
+import com.whocalled.android.service.WarnOverlay
 import com.whocalled.android.ui.ApiTestState
 import com.whocalled.android.ui.LoadState
 import com.whocalled.android.ui.MainViewModel
@@ -63,6 +68,7 @@ import com.whocalled.android.ui.components.BorderedCard
 import com.whocalled.android.ui.components.GradientHeader
 import com.whocalled.android.ui.components.ScrollableScreen
 import com.whocalled.android.ui.theme.WCColor
+import com.whocalled.android.util.OverlayPermission
 import com.whocalled.android.worker.GameReminderWorker
 import kotlinx.coroutines.launch
 
@@ -75,6 +81,7 @@ fun SettingsScreen(viewModel: MainViewModel) {
 
     var filtering by remember { mutableStateOf(true) }
     var warn by remember { mutableStateOf(true) }
+    var overlayGranted by remember { mutableStateOf(false) }
     var blockedCallNotif by remember { mutableStateOf(true) }
     var funNotifs by remember { mutableStateOf(false) }
     var funCustomTitles by remember { mutableStateOf(setOf<String>()) }
@@ -186,6 +193,7 @@ fun SettingsScreen(viewModel: MainViewModel) {
     LaunchedEffect(Unit) {
         filtering = Preferences.isFilteringEnabled(context)
         warn = Preferences.isWarnEnabled(context)
+        overlayGranted = OverlayPermission.isGranted(context)
         blockedCallNotif = Preferences.blockedCallNotification(context)
         funNotifs = Preferences.funNotifications(context)
         funCustomTitles = Preferences.funCustomTitles(context)
@@ -195,6 +203,18 @@ fun SettingsScreen(viewModel: MainViewModel) {
         reminderSnoozedUntil = Preferences.reminderSnoozedUntilDay(context)
         threshold = Preferences.blockThreshold(context).toFloat()
         countryDial = Preferences.countryDial(context)
+    }
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                overlayGranted = OverlayPermission.isGranted(context)
+                notifsEnabled = NotificationManagerCompat.from(context).areNotificationsEnabled()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
     fun open(url: String) {
@@ -227,12 +247,22 @@ fun SettingsScreen(viewModel: MainViewModel) {
                 HorizontalDivider(Modifier.padding(vertical = 4.dp))
                 ToggleRow(
                     title = "M’alerter en cas de doute",
-                    description = "Pour les numéros au score moyen (suspects sans certitude), le téléphone sonne normalement mais une notification vous prévient. Vous décidez de répondre ou non.",
+                    description = "Pour les numéros au score moyen, le téléphone sonne et une alerte vous prévient. Vous décidez de répondre ou non.",
                     checked = warn,
                 ) {
                     warn = it
                     scope.launch { Preferences.setWarnEnabled(context, it) }
                     if (it) askNotifPermissionIfNeeded()
+                }
+                if (warn) {
+                    HorizontalDivider(Modifier.padding(vertical = 4.dp))
+                    ToggleRow(
+                        title = "Bannière sur l’écran d’appel",
+                        description = "Affiche l’alerte par-dessus l’appel entrant. L’app Téléphone reste celle qui répond. Sans ça, la notification disparaît derrière l’écran d’appel.",
+                        checked = overlayGranted,
+                    ) {
+                        OverlayPermission.openSettings(context)
+                    }
                 }
                 HorizontalDivider(Modifier.padding(vertical = 4.dp))
                 ToggleRow(
@@ -623,17 +653,38 @@ fun SettingsScreen(viewModel: MainViewModel) {
                         fontWeight = FontWeight.SemiBold,
                         color = if (notifsEnabled) WCColor.Emerald else MaterialTheme.colorScheme.error,
                     )
+                    Text(
+                        "Affichage par-dessus : " +
+                            if (overlayGranted) "accordé ✓" else "refusé — la bannière d’appel ne s’affichera pas",
+                        fontWeight = FontWeight.SemiBold,
+                        color = if (overlayGranted) WCColor.Emerald else WCColor.Amber,
+                        modifier = Modifier.padding(top = 4.dp),
+                    )
                     if (!notifsEnabled) {
                         Row {
                             TextButton(onClick = { askNotifPermissionIfNeeded() }) { Text("Demander") }
                             TextButton(onClick = { openSystemNotificationSettings() }) { Text("Réglages système") }
                         }
                     }
+                    if (!overlayGranted) {
+                        TextButton(onClick = { OverlayPermission.openSettings(context) }) {
+                            Text("Autoriser l’affichage par-dessus")
+                        }
+                    }
                     Text(
-                        "Envoyer un test maintenant :",
+                        "Test caché — simule un appel suspect (notif + bannière 45 s) :",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(top = 4.dp),
+                        modifier = Modifier.padding(top = 8.dp),
+                    )
+                    androidx.compose.material3.Button(onClick = {
+                        NotificationHelper.showWarning(context, "+33612345678", 72, "telemarketing", null)
+                    }) { Text("Simuler un appel suspect") }
+                    Text(
+                        "Autres tests :",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(top = 8.dp),
                     )
                     androidx.compose.material3.OutlinedButton(onClick = {
                         NotificationHelper.showBlockedCall(context, "+33612345678", null, funMode = false)
@@ -642,8 +693,8 @@ fun SettingsScreen(viewModel: MainViewModel) {
                         NotificationHelper.showBlockedCall(context, "+33612345678", null, funMode = true, customTitles = funCustomTitles)
                     }) { Text("Appel bloqué (fun)") }
                     androidx.compose.material3.OutlinedButton(onClick = {
-                        NotificationHelper.showWarning(context, "+33612345678", 72, "telemarketing", null)
-                    }) { Text("Alerte WARN (score 72)") }
+                        WarnOverlay.show(context, "+33612345678", 72, "telemarketing")
+                    }) { Text("Bannière overlay seule") }
                     androidx.compose.material3.OutlinedButton(onClick = {
                         NotificationHelper.showBlockedSms(context, "36777")
                     }) { Text("SMS indésirable masqué") }

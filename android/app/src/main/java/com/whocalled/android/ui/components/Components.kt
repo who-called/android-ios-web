@@ -53,6 +53,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.whocalled.android.R
 import com.whocalled.android.ui.theme.WCColor
 import kotlinx.coroutines.launch
 
@@ -169,7 +171,7 @@ fun ExpandableSection(
             }
             Icon(
                 if (expanded) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore,
-                contentDescription = if (expanded) "Réduire" else "Développer",
+                contentDescription = stringResource(if (expanded) R.string.common_collapse else R.string.common_expand),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
@@ -416,7 +418,7 @@ fun ScrollableScreen(
                 containerColor = WCColor.Indigo,
                 contentColor = Color.White,
             ) {
-                Icon(Icons.Rounded.KeyboardArrowUp, contentDescription = "Remonter en haut")
+                Icon(Icons.Rounded.KeyboardArrowUp, contentDescription = stringResource(R.string.common_scroll_top))
             }
         }
     }

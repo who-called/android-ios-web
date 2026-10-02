@@ -22,6 +22,7 @@ class MainActivity : ComponentActivity() {
     private val viewModel: MainViewModel by viewModels()
     private val isScreeningRole = mutableStateOf(false)
     private val notificationsGranted = mutableStateOf(false)
+    private val overlayGranted = mutableStateOf(false)
 
     private val roleLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
@@ -48,6 +49,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         refreshRoleState()
         refreshNotificationState()
+        refreshOverlayState()
         handleShareIntent(intent)
         handleOpenCallIntent(intent)
         handleOpenGamesIntent(intent)
@@ -69,8 +71,10 @@ class MainActivity : ComponentActivity() {
                         viewModel = viewModel,
                         isScreeningRoleHeld = isScreeningRole,
                         notificationsGranted = notificationsGranted,
+                        overlayGranted = overlayGranted,
                         onRequestRole = ::requestScreeningRole,
                         onRequestNotifications = ::requestNotificationPermission,
+                        onRequestOverlay = ::requestOverlayPermission,
                         onSyncNow = viewModel::syncNow,
                     )
                 }
@@ -82,6 +86,7 @@ class MainActivity : ComponentActivity() {
         super.onResume()
         refreshRoleState()
         refreshNotificationState()
+        refreshOverlayState()
         viewModel.refreshSmsState()
     }
 
@@ -106,7 +111,7 @@ class MainActivity : ComponentActivity() {
         val phone = intent?.getStringExtra(
             com.whocalled.android.service.NotificationHelper.EXTRA_OPEN_PHONE,
         )
-        if (!phone.isNullOrBlank()) viewModel.requestOpenPhone(phone)
+        if (!phone.isNullOrBlank()) viewModel.requestOpenPhone(phone, warnAlertFrom(intent))
     }
 
     /** A notification tap carries a call-log id → open that call's detail. */
@@ -115,7 +120,26 @@ class MainActivity : ComponentActivity() {
             com.whocalled.android.service.NotificationHelper.EXTRA_OPEN_CALL_ID,
             -1L,
         ) ?: -1L
-        if (id > 0L) viewModel.requestOpenCall(id)
+        if (id > 0L) viewModel.requestOpenCall(id, warnAlertFrom(intent))
+    }
+
+    private fun warnAlertFrom(intent: Intent?): com.whocalled.android.ui.WarnAlertContext? {
+        if (intent?.getBooleanExtra(
+                com.whocalled.android.service.NotificationHelper.EXTRA_FROM_WARN, false,
+            ) != true
+        ) return null
+        return com.whocalled.android.ui.WarnAlertContext(
+            at = intent.getLongExtra(
+                com.whocalled.android.service.NotificationHelper.EXTRA_WARN_AT,
+                System.currentTimeMillis(),
+            ),
+            score = intent.getIntExtra(
+                com.whocalled.android.service.NotificationHelper.EXTRA_WARN_SCORE, 0,
+            ),
+            category = intent.getStringExtra(
+                com.whocalled.android.service.NotificationHelper.EXTRA_WARN_CATEGORY,
+            ),
+        )
     }
 
     /** The daily game-reminder tap → open the Games hub. */
@@ -174,6 +198,15 @@ class MainActivity : ComponentActivity() {
         } else {
             notificationsGranted.value = true
         }
+    }
+
+    private fun refreshOverlayState() {
+        overlayGranted.value =
+            com.whocalled.android.util.OverlayPermission.isGranted(this)
+    }
+
+    private fun requestOverlayPermission() {
+        com.whocalled.android.util.OverlayPermission.openSettings(this)
     }
 
     private fun requestScreeningRole() {

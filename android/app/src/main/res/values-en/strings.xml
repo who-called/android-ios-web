@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- WARN notification -->
+    <string name="warn_channel_name">Suspicious call alerts</string>
+    <string name="warn_channel_desc">Notifies you when an incoming call has a high spam score.</string>
+    <string name="warn_title">⚠️ Suspicious call — not blocked</string>
+    <string name="warn_body">%1$s · %2$d%% spam risk. Your call whether to answer.</string>
+    <string name="warn_subtext">Who Called · the phone is ringing</string>
+    <string name="warn_detail_channel_name">Suspicious call details</string>
+    <string name="warn_detail_channel_desc">Quiet notification, no heads-up, to open the call details after an on-screen alert.</string>
+    <string name="warn_detail_title">Suspicious call</string>
+    <string name="warn_detail_line">%1$s · %2$d%% · See details</string>
+    <string name="warn_group_title">Suspicious calls</string>
+
+    <!-- WARN overlay (drawn over the incoming-call screen) -->
+    <string name="overlay_title">Suspicious call</string>
+    <string name="overlay_not_blocked">Not blocked — your call whether to answer</string>
+    <string name="overlay_dismiss">Dismiss alert</string>
+    <string name="home_overlay_title">Alert visible during the call</string>
+    <string name="home_overlay_body">Allow drawing over other apps to see the spam risk while it rings, without covering Answer.</string>
+    <string name="home_overlay_cta">Allow overlay</string>
+
+    <!-- SMS shield -->
+    <string name="sms_blocked_channel_name">Hidden spam SMS</string>
+    <string name="sms_blocked_channel_desc">Quietly notifies you when a spam SMS notification is hidden.</string>
+    <string name="sms_blocked_title">Spam SMS hidden</string>
+    <string name="sms_blocked_body">Notification hidden for %1$s. The message stays in your SMS app.</string>
+    <string name="sms_listener_label">Who Called SMS Shield</string>
+
+    <!-- Blocked-call notification -->
+    <string name="call_blocked_channel_name">Blocked calls</string>
+    <string name="call_blocked_channel_desc">Quietly notifies you when a spam call is blocked.</string>
+    <string name="call_blocked_title">Call blocked</string>
+    <string name="call_blocked_unknown">Hidden number</string>
+
+    <!-- Daily game reminder -->
+    <string name="reminder_channel_name">Game reminder</string>
+    <string name="reminder_channel_desc">A gentle reminder, once a day, to come play the daily challenge. Can be turned off in Settings.</string>
+
+    <!-- Bottom navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_calls">Calls</string>
+    <string name="nav_report">Report</string>
+    <string name="nav_games">Games</string>
+    <string name="nav_settings">Settings</string>
+
+    <!-- Shared -->
+    <string name="common_close">Close</string>
+    <string name="common_edit">Change</string>
+    <string name="common_collapse">Collapse</string>
+    <string name="common_expand">Expand</string>
+    <string name="common_scroll_top">Back to top</string>
+
+    <!-- Relative time -->
+    <string name="reltime_now">just now</string>
+    <string name="reltime_minutes">%1$d min ago</string>
+    <string name="reltime_hours">%1$d h ago</string>
+    <string name="reltime_yesterday">yesterday</string>
+    <string name="reltime_days">%1$d d ago</string>
+
+    <!-- Home -->
+    <string name="home_protected">You are protected</string>
+    <string name="home_protection_to_enable">Protection to enable</string>
+    <string name="home_country_dialog_title">Monitored country</string>
+    <string name="home_sync_updating">Updating…</string>
+    <string name="home_sync_button">Update the list</string>
+    <string name="home_sync_progress">%1$s numbers fetched…</string>
+    <string name="home_sync_connecting">Connecting to server…</string>
+    <string name="home_country_watched">Monitored numbers: %1$s %2$s</string>
+    <string name="home_country_detected">Detected automatically. Tap “Change” to switch.</string>
+    <string name="home_shield_partial">Partial protection · %1$d/%2$d</string>
+    <string name="home_shield_off">Shield not enabled · %1$d/%2$d</string>
+    <string name="home_shield_enable_filter">Enable the call filter to block spam.</string>
+    <string name="home_shield_enable_notifs">Alerts are off: enable notifications.</string>
+    <string name="home_enable_blocker">Enable the blocker</string>
+    <string name="home_enable_alerts">Enable alerts</string>
+    <string name="home_sms_title">SMS Shield</string>
+    <string name="home_sms_on">Active · spam SMS are hidden</string>
+    <string name="home_sms_off">Hide notifications from spam SMS</string>
+    <string name="home_recent_blocked_title">Spam call blocked</string>
+    <string name="home_recent_blocked_msg">Who Called hung up before it rang.</string>
+    <string name="home_recent_warned_title">Suspicious call detected</string>
+    <string name="home_recent_warned_msg">The call rang with an alert.</string>
+    <string name="home_recent_reported_title">Number reported as spam</string>
+    <string name="home_recent_reported_msg">You had already flagged this number as spam.</string>
+    <string name="home_recent_legit_title">Number marked legitimate</string>
+    <string name="home_recent_legit_msg">You had marked this number as legitimate.</string>
+    <string name="home_recent_unknown_title">An unknown number called you</string>
+    <string name="home_recent_unknown_msg">Check this number before calling back.</string>
+    <string name="home_recent_see_number">View the number</string>
+    <plurals name="home_recent_others">
+        <item quantity="one">and %1$d other call in the last 24 h</item>
+        <item quantity="other">and %1$d other calls in the last 24 h</item>
+    </plurals>
+    <string name="home_quiet">No new calls to check — all quiet.</string>
+    <string name="home_blocker_active">Blocker active and up to date</string>
+    <string name="home_covered_numbers">Numbers covered</string>
+    <string name="home_auto_update">Auto-update · %1$s</string>
+    <string name="home_country_breakdown">%1$s %2$s: %3$s numbers%4$s</string>
+    <string name="home_arcep_prefixes">" · %1$s ARCEP prefixes"</string>
+    <string name="home_blocked_calls">Blocked calls</string>
+    <string name="home_none_yet">None so far</string>
+    <string name="home_blocked_detail">Rejected without ringing · see details</string>
+    <string name="home_suspect_calls">Suspicious calls</string>
+    <string name="home_suspect_detail">Rang, you were warned · see details</string>
+    <string name="home_update_today">up to date today</string>
+    <string name="home_update_yesterday">updated yesterday</string>
+    <string name="home_update_days_ago">updated %1$d d ago</string>
+    <string name="home_update_on">Updated on %1$s</string>
+    <string name="home_games_row">Games — daily challenges &amp; leaderboards%1$s</string>
+    <string name="home_community_title">Community shield</string>
+    <string name="home_community_line">%1$s reports together · +%2$s this week</string>
+</resources>
