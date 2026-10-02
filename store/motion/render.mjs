@@ -18,6 +18,7 @@ const [W, H] = format === "ios" ? [1080, 2340] : format === "9x16" ? [1080, 1920
 const audio = !process.argv.includes("--no-audio");
 if (format === "ios" && fps > 30) throw new Error("App Store previews are capped at 30 fps");
 
+await import("./build-screens.mjs"); // real app screens, from store/screens.mjs + i18n.js
 mkdirSync(dirname(out), { recursive: true });
 if (audio && !existsSync(`${here}/sfx.wav`)) await import("./sfx.mjs");
 const browser = await chromium.launch({ channel: "chrome" });

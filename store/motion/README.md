@@ -5,6 +5,7 @@
 - **Preview**: open `index.html` (space = play/pause, scrub bar, 🔇/🔊 sound, language and format selectors).
   URL params: `?lang=fr|en|es`, `?format=16x9|9x16|ios`, `?t=12.5` (freeze on a frame).
 - **Texts**: everything on screen lives in `i18n.js`. Add a language by copying the `fr` block.
+- **App screens**: the phone shows the real store-listing screens (Verify, Report, SMS Shield) from `store/screens.mjs`, the same module `store/generate.mjs` uses for the Play/App Store screenshots. Their texts are the `app` block of `i18n.js`. `node build-screens.mjs` regenerates `screens.gen.js` (done automatically by `render.mjs`), so a change to a store screen shows up in the film too.
   Oversized display words shrink automatically to fit the frame.
 - **Sound**: `node sfx.mjs` regenerates `sfx.wav` (export, git-ignored, created on demand by `render.mjs`) and `sfx.m4a` (preview), mastered at -16 LUFS. Cue times mirror the GSAP timeline, so if you retime a scene in `index.html`, move its cues too.
 

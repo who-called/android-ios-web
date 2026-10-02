@@ -104,24 +104,24 @@ for (let i = 0; i < 12; i++) tick(10.4 + Math.pow(i / 12, 1.6) * 1.1, .05, .25);
 [note(76), note(72)].forEach((f, i) => tone(11.0 + i * .12, f, .5, { gain: .12, d: .15, shape: "square", pan: .25, rev: .3 }));
 pop(11.15, 1000, .1, .25); pop(11.25, 1200, .1, .25);
 
-// S5 report: swipe, buttons, tap, success, community sparkle
+// S5 report: three taps on the real Report screen (Unwanted → category → Send), success, community sparkle
 whoosh(11.9, .4, .14, .25);
-for (let i = 0; i < 6; i++) pop(12.3 + i * .05, 700 + i * 80, .06, .25);
-whoosh(12.75, .5, .06, .6);
-tick(13.45, .16, .25); tone(13.45, 180, .12, { gain: .2, d: .04, pan: .25, rev: .1 });
-noise(13.5, .35, { gain: .08, lo: 1200, hi: 400, d: .15, pan: .25 });
-[note(79), note(84)].forEach((f, i) => chime(13.9 + i * .13, f, .13, .25));
-for (let i = 0; i < 22; i++) { const t = 13.55 + Math.pow(rnd(), .8) * 1.3; tone(t, note(84 + [0, 2, 4, 7, 9, 12][Math.floor(rnd() * 6)]), .25, { gain: .035, d: .07, pan: (rnd() - .5) * 1.8, rev: .7 }); }
-pop(13.55, 1500, .1, .6);
+whoosh(12.4, .45, .05, .3);
+const tap = (t, f) => { tick(t, .16, .25); tone(t, 180, .12, { gain: .2, d: .04, pan: .25, rev: .1 }); pop(t + .02, f, .09, .25); };
+tap(12.95, 760); tap(13.3, 980); tap(13.65, 620);
+noise(13.68, .3, { gain: .06, lo: 1500, hi: 500, d: .12, pan: .25 });
+[note(79), note(84)].forEach((f, i) => chime(13.82 + i * .13, f, .13, .25));
+for (let i = 0; i < 22; i++) { const t = 13.85 + Math.pow(rnd(), .8) * 1.05; tone(t, note(84 + [0, 2, 4, 7, 9, 12][Math.floor(rnd() * 6)]), .25, { gain: .035, d: .07, pan: (rnd() - .5) * 1.8, rev: .7 }); }
+pop(13.85, 1500, .1, .6);
 
-// S6 SMS shield
+// S6 SMS shield: toggle on, SMS cards arrive, scan flags the two scams, the real one passes
 whoosh(14.85, .4, .14, .25);
-for (let i = 0; i < 4; i++) pop(15.25 + i * .09, 820, .07, .25);
-tone(15.85, 420, .85, { f2: 260, gain: .06, a: .15, d: 3, shape: "saw", pan: .25, rev: .3 });
-noise(15.85, .85, { gain: .06, lo: 2000, hi: 900, a: .2, d: 3, pan: .25 });
-[16.0, 16.38, 16.55].forEach((t) => { tone(t, 700, .14, { f2: 300, gain: .12, d: .05, shape: "square", pan: .25, rev: .3 }); });
-whoosh(16.75, .45, .1, .25, false);
-pop(17.05, 600, .12, .25);
+tick(15.35, .12, .25); tone(15.37, 880, .14, { f2: 1320, gain: .08, d: .05, pan: .25, rev: .3 });
+for (let i = 0; i < 3; i++) pop(15.62 + i * .15, 820, .07, .25);
+tone(15.95, 420, 1.1, { f2: 260, gain: .06, a: .15, d: 3, shape: "saw", pan: .25, rev: .3 });
+noise(15.95, 1.1, { gain: .06, lo: 2000, hi: 900, a: .2, d: 3, pan: .25 });
+[16.28, 16.41].forEach((t) => tone(t, 700, .14, { f2: 300, gain: .12, d: .05, shape: "square", pan: .25, rev: .3 }));
+pluck(16.53, note(84), .12, .25);
 
 // S7 values: rising plucks on each check
 whoosh(17.5, .6, .2, .4, false);

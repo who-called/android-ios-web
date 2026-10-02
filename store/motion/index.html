@@ -9,6 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="i18n.js"></script>
+<script src="screens.gen.js"></script>
 <style>
 :root {
   --night: #1B2A4A; --night-d: #131F38; --ink: #0A1324;
@@ -118,65 +119,22 @@ body.render #viewport { inset: 0; }
 .copy p { margin-top: 30px; font-size: 34px; font-weight: 500; line-height: 1.3; color: #BFD0EE; opacity: 0; max-width: 680px; }
 .f9x16 .copy p { margin-left: auto; margin-right: auto; }
 
-#phoneWrap { position: absolute; width: 420px; height: 860px; perspective: 1800px; }
-.f16x9 #phoneWrap { left: 1180px; top: 110px; }
-.f9x16 #phoneWrap { left: 330px; top: 860px; transform: scale(1.12); transform-origin: 50% 0; }
-.fios #phoneWrap { top: 1060px; }
-#phone { position: absolute; inset: 0; border-radius: 64px; padding: 13px; opacity: 0; transform-style: preserve-3d;
-  background: linear-gradient(145deg, #3A4658, #10151F 40%, #232C3B); box-shadow: 0 60px 120px -30px rgba(0,0,0,.75), 0 0 0 2px rgba(255,255,255,.06), inset 0 0 0 2px rgba(255,255,255,.08); }
-.screen { position: absolute; inset: 13px; border-radius: 52px; overflow: hidden; background: var(--paper); color: var(--text); }
-.notch { position: absolute; top: 14px; left: 50%; width: 118px; height: 34px; margin-left: -59px; border-radius: 20px; background: #05070C; z-index: 5; }
-.appbar { height: 150px; padding: 66px 28px 0; background: linear-gradient(135deg, var(--blue), #15294D); color: #fff; display: flex; align-items: center; gap: 12px; font-size: 26px; font-weight: 800; letter-spacing: -.01em; }
-.appbar svg { width: 38px; height: 38px; }
-.scrs { position: absolute; left: 0; right: 0; top: 150px; bottom: 0; }
-.scr { position: absolute; inset: 0; padding: 24px 22px; opacity: 0; }
-.card { background: #fff; border-radius: 28px; box-shadow: 0 10px 30px -12px rgba(27,42,74,.25), 0 0 0 1px var(--line); }
-
-/* verify screen */
-.search { height: 66px; border-radius: 22px; background: #fff; box-shadow: 0 0 0 2px var(--blue), 0 10px 24px -10px rgba(37,99,235,.5); display: flex; align-items: center; gap: 12px; padding: 0 20px; font-size: 25px; font-weight: 700; }
-.search svg { width: 26px; height: 26px; stroke: var(--muted); fill: none; stroke-width: 2.6; flex: none; }
-.ph { color: #94A3B8; font-weight: 500; font-family: "Inter Tight", sans-serif; font-size: 22px; }
-.caret { width: 3px; height: 30px; background: var(--blue); border-radius: 2px; margin-left: -8px; }
-.result { margin-top: 22px; padding: 26px 22px 24px; text-align: center; opacity: 0; }
-.gauge { position: relative; width: 300px; height: 168px; margin: 4px auto 0; }
-.gauge svg { width: 100%; height: 100%; overflow: visible; }
-.g-track { fill: none; stroke: #E8EDF5; stroke-width: 22; stroke-linecap: round; }
-.g-val { fill: none; stroke: url(#gGrad); stroke-width: 22; stroke-linecap: round; }
-.g-score { position: absolute; left: 0; right: 0; bottom: 0; font-size: 84px; font-weight: 900; letter-spacing: -.05em; line-height: .9; color: var(--text); }
-.g-score small { font-size: 26px; font-weight: 700; color: var(--muted); letter-spacing: 0; margin-left: 4px; }
-.g-label { margin-top: 10px; font-size: 20px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .12em; }
-.verdict { margin-top: 16px; font-size: 27px; font-weight: 800; color: var(--coral); opacity: 0; }
-.chips { margin-top: 16px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-.pchip { padding: 9px 16px; border-radius: 999px; font-size: 19px; font-weight: 800; opacity: 0; }
-.pchip.coral { background: #FDE8E8; color: #B91C1C; } .pchip.blue { background: #E3ECFD; color: #1D4ED8; }
-.last { margin-top: 16px; font-size: 18px; color: var(--muted); font-weight: 600; opacity: 0; }
-
-/* report screen */
-.r-num { font-size: 26px; font-weight: 700; text-align: center; padding: 22px; }
-.r-q { margin: 26px 4px 16px; font-size: 32px; font-weight: 800; letter-spacing: -.02em; }
-.r-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-.r-btn { position: relative; overflow: hidden; height: 84px; border-radius: 22px; background: #fff; box-shadow: 0 0 0 2px var(--line); display: grid; place-items: center; font-size: 22px; font-weight: 800; color: var(--text); opacity: 0; }
-.r-btn .fill { position: absolute; left: 50%; top: 50%; width: 360px; height: 360px; margin: -180px; border-radius: 50%; background: var(--coral); transform: scale(0); }
-.r-btn span { position: relative; }
-.finger { position: absolute; left: 0; top: 0; width: 64px; height: 64px; margin: -32px; border-radius: 50%; background: rgba(27,42,74,.22); border: 3px solid rgba(255,255,255,.95); box-shadow: 0 10px 24px rgba(0,0,0,.25); opacity: 0; z-index: 4; }
-.toast { position: absolute; left: 22px; right: 22px; bottom: 30px; padding: 20px 22px; border-radius: 24px; background: var(--night); color: #fff; display: flex; gap: 16px; align-items: center; font-size: 21px; font-weight: 700; line-height: 1.25; opacity: 0; }
-.toast .ok { flex: none; width: 48px; height: 48px; border-radius: 50%; background: var(--emerald); display: grid; place-items: center; }
-.toast .ok svg { width: 28px; height: 28px; fill: none; stroke: #fff; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
-
-/* sms screen */
-.m-h { font-size: 34px; font-weight: 800; letter-spacing: -.02em; margin: 4px 4px 16px; }
-.msg { position: relative; overflow: hidden; margin-bottom: 12px; opacity: 0; }
-.msg-in { position: relative; display: flex; gap: 14px; padding: 18px; }
-.m-av { flex: none; width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; font-size: 24px; color: #fff; background: #94A3B8; }
-.msg.ok .m-av { background: var(--emerald); }
-.m-from { font-size: 21px; font-weight: 800; }
-.m-txt { font-size: 18.5px; line-height: 1.3; color: var(--muted); margin-top: 3px; }
-.m-mask { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(254,226,226,.55); opacity: 0; }
-.m-mask b { padding: 8px 18px; border-radius: 999px; background: var(--coral); color: #fff; font-size: 19px; font-weight: 800; letter-spacing: .04em; }
+/* phone: same frame as the store visuals (store/generate.mjs phone()) — screen 430×932 */
+#phoneWrap { position: absolute; width: 440px; height: 921px; perspective: 1800px; }
+.f16x9 #phoneWrap { left: 1170px; top: 80px; }
+.f9x16 #phoneWrap { left: 320px; top: 750px; transform: scale(1.25); transform-origin: 50% 0; }
+.fios #phoneWrap { top: 980px; transform: scale(1.4); }
+#phoneZoom { position: absolute; inset: 0; transform-style: preserve-3d; }
+#phone { position: absolute; inset: 0; border-radius: 65px; opacity: 0; transform-style: preserve-3d; background: #0B1220;
+  box-shadow: 0 60px 120px -30px rgba(0,0,0,.75), 0 0 0 3px rgba(15,23,42,.35), inset 0 0 0 1.5px rgba(255,255,255,.1); }
+.screen { position: absolute; inset: 14px; border-radius: 51px; overflow: hidden; background: #F7F9FE; }
+.punch { position: absolute; left: 50%; top: 32px; width: 14px; height: 14px; margin-left: -7px; border-radius: 50%; background: #0B1220; }
+.scr { position: absolute; inset: 0; opacity: 0; }
+.scr svg.app { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.caret { width: 3px; height: 30px; background: var(--blue); border-radius: 2px; }
+.finger { position: absolute; left: 0; top: 0; width: 54px; height: 54px; margin: -27px; border-radius: 50%; background: rgba(27,42,74,.22); border: 3px solid rgba(255,255,255,.95); box-shadow: 0 10px 24px rgba(0,0,0,.25); opacity: 0; z-index: 4; }
 .scan { position: absolute; left: 0; right: 0; top: 0; height: 120px; opacity: 0; pointer-events: none;
-  background: linear-gradient(180deg, transparent, rgba(37,99,235,.18) 70%, rgba(37,99,235,.0)); border-bottom: 3px solid var(--blue); box-shadow: 0 12px 30px rgba(37,99,235,.35); }
-.folder { margin-top: 6px; padding: 20px 22px; display: flex; align-items: center; gap: 14px; font-size: 21px; font-weight: 800; color: #B91C1C; background: #FEF2F2; box-shadow: 0 0 0 2px #FECACA; opacity: 0; }
-.folder svg { width: 30px; height: 30px; fill: var(--coral); }
+  background: linear-gradient(180deg, transparent, rgba(37,99,235,.16) 70%, rgba(37,99,235,.0)); border-bottom: 3px solid var(--blue); box-shadow: 0 12px 30px rgba(37,99,235,.35); }
 
 /* community network */
 #net { position: absolute; inset: 0; opacity: 0; }
@@ -262,47 +220,15 @@ body.render #controls { display: none; }
         <div class="copy" id="c6"><div class="kicker"><i></i><span data-i18n="s6.kicker"></span></div><h2 data-split="s6.title"></h2><p data-i18n="s6.sub"></p></div>
       </div>
 
-      <div id="phoneWrap"><div id="phone">
+      <div id="phoneWrap"><div id="phoneZoom"><div id="phone">
+        <!-- real app screens from store/screens.mjs, injected from screens.gen.js -->
         <div class="screen">
-          <div class="notch"></div>
-          <div class="appbar">
-            <svg viewBox="0 0 48 48"><path d="M24 4l16 6v12c0 11-7 18-16 22C15 40 8 33 8 22V10z" fill="#fff"/><path d="M21.2 29.6l-5.2-5.2 2.6-2.6 2.6 2.6 9.4-9.4 2.6 2.6z" fill="#1D4ED8"/></svg>
-            <span data-i18n="s8.name"></span>
-          </div>
-          <div class="scrs">
-            <div class="scr" id="scr4">
-              <div class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><span class="ph" data-i18n="s4.search"></span><span class="mono" id="typed4"></span><span class="caret"></span></div>
-              <div class="result card">
-                <div class="gauge">
-                  <svg viewBox="0 0 200 112">
-                    <defs><linearGradient id="gGrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#10B981"/><stop offset=".45" stop-color="#F59E0B"/><stop offset="1" stop-color="#EF4444"/></linearGradient></defs>
-                    <path class="g-track" d="M14 100 A86 86 0 0 1 186 100"/>
-                    <path class="g-val" id="gVal" pathLength="100" stroke-dasharray="100 100" stroke-dashoffset="100" d="M14 100 A86 86 0 0 1 186 100"/>
-                  </svg>
-                  <div class="g-score"><span id="score4">0</span><small>/100</small></div>
-                </div>
-                <div class="g-label" data-i18n="s4.scoreLabel"></div>
-                <div class="verdict" data-i18n="s4.verdict"></div>
-                <div class="chips"><span class="pchip coral" data-i18n="s4.category"></span><span class="pchip blue" data-i18n="s4.reports"></span></div>
-                <div class="last" data-i18n="s4.last"></div>
-              </div>
-            </div>
-            <div class="scr" id="scr5">
-              <div class="card r-num mono" data-i18n="s4.number"></div>
-              <div class="r-q" data-i18n="s5.question"></div>
-              <div class="r-grid" id="rGrid"></div>
-              <div class="finger"></div>
-              <div class="toast"><div class="ok"><svg viewBox="0 0 24 24"><path id="okPath" d="M5 12.5l4.5 4.5L19 7.5" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1"/></svg></div><span data-i18n="s5.thanks"></span></div>
-            </div>
-            <div class="scr" id="scr6">
-              <div class="m-h" data-i18n="s6.header"></div>
-              <div id="msgs"></div>
-              <div class="folder card"><svg viewBox="0 0 24 24"><path d="M3 6a2 2 0 012-2h4l2 2h8a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg><span data-i18n="s6.folder"></span></div>
-              <div class="scan"></div>
-            </div>
-          </div>
+          <div class="scr" id="scr4"></div>
+          <div class="scr" id="scr5"><div class="finger"></div></div>
+          <div class="scr" id="scr6"><div class="scan"></div></div>
         </div>
-      </div></div>
+        <div class="punch"></div>
+      </div></div></div>
       <div class="plus" data-i18n="s5.plus"></div>
 
       <!-- scene 7: values -->
@@ -374,8 +300,10 @@ body.render #controls { display: none; }
   $("#slams").innerHTML = L.s2.words.map((w) => `<div class="slam">${esc(w)}</div>`).join("");
   $("#wordmark").innerHTML = [...L.s8.name].map((c) => c === " " ? `<span class="w" style="width:.26em"></span>` : `<span class="w"><span class="wi ch">${esc(c)}</span></span>`).join("");
   $("#vals").innerHTML = L.s7.words.map((w) => `<div class="val"><div class="ck"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div><div>${splitWords(w)}</div></div>`).join("");
-  $("#rGrid").innerHTML = L.s5.cats.map((c) => `<div class="r-btn"><div class="fill"></div><span>${esc(c)}</span></div>`).join("");
-  $("#msgs").innerHTML = L.s6.msgs.map((m) => `<div class="msg card ${m.spam ? "spam" : "ok"}"><div class="msg-in"><div class="m-av">${esc([...m.from][0])}</div><div><div class="m-from">${esc(m.from)}</div><div class="m-txt">${esc(m.text)}</div></div></div>${m.spam ? `<div class="m-mask"><b>${esc(L.s6.masked)}</b></div>` : ""}</div>`).join("");
+  $(".screen").insertAdjacentHTML("afterbegin", `<svg width="0" height="0" style="position:absolute">${window.WC_SCREEN_DEFS}</svg>`);
+  const S = window.WC_SCREENS[LANG];
+  [["#scr4", S.lookup], ["#scr5", S.report], ["#scr6", S.sms]].forEach(([id, svg]) =>
+    $(id).insertAdjacentHTML("afterbegin", `<svg class="app" viewBox="0 0 430 932">${svg}</svg>`));
   const ICON_ANDROID = '<svg viewBox="0 0 24 24"><path d="M7 9h10a1 1 0 011 1v7a2 2 0 01-2 2h-1v2.5a1.5 1.5 0 01-3 0V19h-0v2.5a1.5 1.5 0 01-3 0V19H8a2 2 0 01-2-2v-7a1 1 0 011-1zm-3 1.5a1.5 1.5 0 013 0v5a1.5 1.5 0 01-3 0zm16 0a1.5 1.5 0 00-3 0v5a1.5 1.5 0 003 0zM7.2 8a4.9 4.9 0 019.6 0zM9.5 6.3a.6.6 0 100-1.2.6.6 0 000 1.2zm5 0a.6.6 0 100-1.2.6.6 0 000 1.2z"/></svg>';
   const ICON_PHONE = '<svg viewBox="0 0 24 24"><path d="M8 2h8a2 2 0 012 2v16a2 2 0 01-2 2H8a2 2 0 01-2-2V4a2 2 0 012-2zm0 3v13h8V5zm4 14.2a.9.9 0 100 1.8.9.9 0 000-1.8z"/></svg>';
   $("#plats").innerHTML = L.s8.platforms.map((p, i) => `<div class="plat">${i === 0 ? ICON_ANDROID : ICON_PHONE}<span>${esc(p)}</span></div>`).join("");
@@ -524,42 +452,68 @@ body.render #controls { display: none; }
 
     tl.fromTo("#phone", { autoAlpha: 0, y: 380, rotateY: -32, rotateX: 18, rotate: 6 }, { autoAlpha: 1, y: 0, rotateY: -14, rotateX: 4, rotate: 0, duration: 1.2, ease: "expo.out" }, 8.65);
     tl.to("#phone", { rotateY: 10, rotateX: -2, y: -14, duration: 8.2, ease: "sine.inOut" }, 9.85);
+    // push-in on the part of the screen that is talking (origin in % of the phone)
+    const zoom = (t, s, origin, dur = 1) => tl.to("#phoneZoom", { scale: s, transformOrigin: origin, duration: dur, ease: "power2.inOut" }, t);
+    const el = (id) => document.getElementById(id);
+    const K = $(".screen").offsetWidth / 430; // app screen units → px
+    const centerOf = (id) => { const b = el(id).getBBox(); return [(b.x + b.width / 2) * K, (b.y + b.height / 2) * K]; };
+    const pop = (target, t, o = {}) => tl.fromTo(target, { opacity: 0, scale: .6, transformOrigin: "50% 50%" }, { opacity: 1, scale: 1, duration: .45, ease: "back.out(2.6)", ...o }, t);
+    const slideUp = (target, t, o = {}) => tl.fromTo(target, { opacity: 0, y: 28 }, { opacity: 1, y: 0, duration: .6, ease: "expo.out", ...o }, t);
+
+    /* verify: type the number, the score card fills in */
     copyIn("c4", 8.8);
     screenIn("#scr4", 8.95);
-    const typed = $("#typed4");
-    tl.set("#scr4 .ph", { display: "none" }, 9.45);
-    type(typed, L.s4.number, 9.45, .8);
-    blink("#scr4 .caret", 10.3, 2);
-    tl.fromTo("#scr4 .result", { autoAlpha: 0, y: 60, scale: .96 }, { autoAlpha: 1, y: 0, scale: 1, duration: .7, ease: "expo.out" }, 10.25);
-    tl.fromTo("#gVal", { attr: { "stroke-dashoffset": 100 } }, { attr: { "stroke-dashoffset": 13 }, duration: 1.15, ease: "power3.out" }, 10.4);
+    const num = el("lk-num"), caret = el("lk-caret"), numStr = num.textContent;
+    const scoreEl = el("lk-score"), scoreMax = parseInt(scoreEl.textContent, 10);
+    gsap.set(["#lk-scorecard", "#lk-cat", "#lk-recent"], { opacity: 0 });
+    gsap.set("#lk-arc", { attr: { "stroke-dasharray": "1 1", "stroke-dashoffset": 1 } });
+    num.textContent = "";
+    const typedN = { n: 0 };
+    tl.to(typedN, { n: numStr.length, duration: .85, ease: "none", onUpdate: () => {
+      num.textContent = numStr.slice(0, Math.round(typedN.n));
+      caret.setAttribute("x", 82 + num.getComputedTextLength());
+    } }, 9.4);
+    blink(caret, 10.3, 2);
+    tl.set(caret, { opacity: 0 }, 10.95);
+    slideUp("#lk-scorecard", 10.2);
+    tl.to("#lk-arc", { attr: { "stroke-dashoffset": 0 }, duration: 1.15, ease: "power3.out" }, 10.4);
     const sc = { v: 0 };
-    tl.to(sc, { v: 87, duration: 1.15, ease: "power3.out", onUpdate: () => ($("#score4").textContent = Math.round(sc.v)) }, 10.4);
-    tl.fromTo("#scr4 .verdict", { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: .5, ease: "expo.out" }, 11.0);
-    tl.fromTo("#scr4 .pchip", { autoAlpha: 0, scale: .5 }, { autoAlpha: 1, scale: 1, duration: .45, ease: "back.out(2.5)", stagger: .1 }, 11.15);
-    tl.fromTo("#scr4 .last", { autoAlpha: 0 }, { autoAlpha: 1, duration: .4 }, 11.4);
+    tl.to(sc, { v: scoreMax, duration: 1.15, ease: "power3.out", onUpdate: () => (scoreEl.textContent = Math.round(sc.v)) }, 10.4);
+    pop("#lk-srcs", 11.0);
+    tl.fromTo("#lk-cat", { opacity: 0, x: 40 }, { opacity: 1, x: 0, duration: .55, ease: "expo.out" }, 11.15);
+    slideUp("#lk-recent", 11.3);
+    tl.fromTo(["#lk-row0", "#lk-row1", "#lk-row2"], { opacity: 0, x: 16 }, { opacity: 1, x: 0, duration: .4, ease: "power2.out", stagger: .08 }, 11.42);
+    zoom(10.05, 1.22, "50% 30%", 1.1);
+    zoom(11.35, 1, "50% 30%", .7);
 
     /* ===== S5 — 12.0 → 15.0 : report ===== */
     copyOut("c4", 11.85);
     copyIn("c5", 12.15);
     screenOut("#scr4", 11.95);
     screenIn("#scr5", 12.05);
-    const btns = $$(".r-btn");
-    tl.fromTo(btns, { autoAlpha: 0, y: 26 }, { autoAlpha: 1, y: 0, duration: .5, ease: "expo.out", stagger: .05 }, 12.3);
-    const target = btns[L.s5.pick] || btns[0];
-    const tx = target.offsetLeft + target.offsetWidth / 2 + target.offsetParent.offsetLeft;
-    const ty = target.offsetTop + target.offsetHeight / 2 + target.offsetParent.offsetTop;
-    tl.fromTo(".finger", { autoAlpha: 0, x: tx + 140, y: ty + 300 }, { autoAlpha: 1, x: tx, y: ty, duration: .7, ease: "power3.out" }, 12.75);
-    tl.to(".finger", { scale: .78, duration: .1, yoyo: true, repeat: 1 }, 13.45);
-    tl.to(target, { scale: .94, duration: .1, yoyo: true, repeat: 1 }, 13.45);
-    tl.fromTo(target.querySelector(".fill"), { scale: 0 }, { scale: 1, duration: .5, ease: "power2.out" }, 13.5);
-    tl.to(target.querySelector("span"), { color: "#fff", duration: .2 }, 13.55);
-    tl.to(".finger", { autoAlpha: 0, duration: .3 }, 13.75);
-    tl.fromTo("#scr5 .toast", { autoAlpha: 0, y: 80 }, { autoAlpha: 1, y: 0, duration: .6, ease: "expo.out" }, 13.85);
-    tl.to("#okPath", { attr: { "stroke-dashoffset": 0 }, duration: .4, ease: "power2.out" }, 14.05);
+    gsap.set(["#rp-spam-on", "#rp-chip-on"], { opacity: 0 });
+    const [sx, sy] = centerOf("rp-spam-hit"), [cx, cy] = centerOf("rp-chip-hit"), [ex, ey] = centerOf("rp-send");
+    const tap = (t, target) => {
+      tl.to(".finger", { scale: .78, duration: .09, yoyo: true, repeat: 1 }, t);
+      tl.to(target, { scale: .95, transformOrigin: "50% 50%", duration: .09, yoyo: true, repeat: 1 }, t);
+    };
+    zoom(12.35, 1.2, "50% 42%", .8);
+    tl.fromTo(".finger", { autoAlpha: 0, x: sx + 120, y: sy + 260 }, { autoAlpha: 1, x: sx, y: sy, duration: .55, ease: "power3.out" }, 12.4);
+    tap(12.95, "#rp-spam-on");
+    tl.fromTo("#rp-spam-on", { opacity: 0 }, { opacity: 1, duration: .18 }, 12.97);
+    tl.to(".finger", { x: cx, y: cy, duration: .3, ease: "power3.inOut" }, 13.02);
+    tap(13.3, "#rp-chip-on");
+    tl.fromTo("#rp-chip-on", { opacity: 0 }, { opacity: 1, duration: .18 }, 13.32);
+    tl.to(".finger", { x: ex, y: ey, duration: .3, ease: "power3.inOut" }, 13.37);
+    tap(13.65, "#rp-send");
+    tl.to(".finger", { autoAlpha: 0, duration: .25 }, 13.8);
+    tl.fromTo("#rp-toast", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: .55, ease: "expo.out" }, 13.78);
+    zoom(13.75, 1, "50% 42%", .7);
 
     // community network lighting up from the phone
     const net = $("#net"), svg = $("#netSvg");
-    const ox = V ? 540 : 1390, oy = V ? (IOS ? 1060 : 860) + 430 * 1.12 : 540;
+    const pw = $("#phoneWrap"), ps = V ? (IOS ? 1.4 : 1.25) : 1;
+    const ox = pw.offsetLeft + pw.offsetWidth / 2, oy = pw.offsetTop + (pw.offsetHeight * ps) / 2;
     const pts = [];
     for (let i = 0; i < 64; i++) {
       let x, y;
@@ -575,12 +529,13 @@ body.render #controls { display: none; }
     svg.innerHTML = lines;
     pts.forEach(([x, y]) => { const n = document.createElement("div"); n.className = "node"; n.style.left = x + "px"; n.style.top = y + "px"; n.dataset.d = Math.hypot(x - ox, y - oy); net.appendChild(n); });
     const maxD = Math.hypot(W, H);
+    const LIT = 13.85;
     tl.fromTo(net, { autoAlpha: 0 }, { autoAlpha: 1, duration: .8 }, 12.1);
-    $$(".node").forEach((n) => tl.to(n, { opacity: 1, scale: 1.5, background: "#FCD34D", boxShadow: "0 0 0 14px rgba(245,158,11,.0)", duration: .45, ease: "back.out(3)" }, 13.55 + (n.dataset.d / maxD) * 1.3));
-    $$("#netSvg line").forEach((l) => tl.to(l, { attr: { opacity: .9 }, stroke: "rgba(252,211,77,.7)", duration: .4 }, 13.55 + (l.dataset.d / maxD) * 1.3));
-    gsap.set(".plus", { left: ox + 225, top: oy - 340 });
-    tl.fromTo(".plus", { autoAlpha: 0, y: 40, scale: .6 }, { autoAlpha: 1, y: -30, scale: 1, duration: .6, ease: "back.out(2)" }, 13.55);
-    tl.to(".plus", { autoAlpha: 0, y: -90, duration: .5, ease: "power2.in" }, 14.35);
+    $$(".node").forEach((n) => tl.to(n, { opacity: 1, scale: 1.5, background: "#FCD34D", boxShadow: "0 0 0 14px rgba(245,158,11,.0)", duration: .45, ease: "back.out(3)" }, LIT + (n.dataset.d / maxD) * 1.05));
+    $$("#netSvg line").forEach((l) => tl.to(l, { attr: { opacity: .9 }, stroke: "rgba(252,211,77,.7)", duration: .4 }, LIT + (l.dataset.d / maxD) * 1.05));
+    gsap.set(".plus", { left: ox + (pw.offsetWidth * ps) / 2 + 10, top: oy - pw.offsetHeight * ps * .42 });
+    tl.fromTo(".plus", { autoAlpha: 0, y: 40, scale: .6 }, { autoAlpha: 1, y: -30, scale: 1, duration: .6, ease: "back.out(2)" }, LIT);
+    tl.to(".plus", { autoAlpha: 0, y: -90, duration: .5, ease: "power2.in" }, 14.55);
 
     /* ===== S6 — 15.0 → 17.6 : SMS shield ===== */
     copyOut("c5", 14.85);
@@ -588,22 +543,24 @@ body.render #controls { display: none; }
     tl.to(net, { autoAlpha: 0, duration: .6 }, 14.85);
     screenOut("#scr5", 14.9);
     screenIn("#scr6", 15.0);
-    const msgs = $$(".msg");
-    tl.fromTo(msgs, { autoAlpha: 0, x: 80 }, { autoAlpha: 1, x: 0, duration: .55, ease: "expo.out", stagger: .09 }, 15.2);
-    const scrH = $("#scr6").offsetHeight;
-    tl.fromTo("#scr6 .scan", { autoAlpha: 1, y: -120 }, { y: scrH, duration: .85, ease: "power1.inOut" }, 15.85);
-    tl.to("#scr6 .scan", { autoAlpha: 0, duration: .2 }, 16.6);
-    msgs.forEach((m) => {
-      const t = 15.85 + (m.offsetTop / scrH) * .85;
-      if (m.classList.contains("spam")) {
-        tl.to(m.querySelector(".msg-in"), { filter: "blur(6px)", duration: .25 }, t);
-        tl.fromTo(m.querySelector(".m-mask"), { autoAlpha: 0, scale: 1.1 }, { autoAlpha: 1, scale: 1, duration: .3, ease: "back.out(2)" }, t);
-        tl.to(m, { height: 0, marginBottom: 0, autoAlpha: 0, scale: .9, duration: .45, ease: "power3.inOut" }, 16.75);
-      } else {
-        tl.to(m.querySelector(".m-av"), { scale: 1.15, duration: .15, yoyo: true, repeat: 1 }, t);
-      }
+    // the shield switches on, the SMS arrive, the scan flags the scams
+    const knob = el("sms-knob");
+    gsap.set("#sms-track", { fill: "#CBD5E1" });
+    gsap.set(knob, { attr: { cx: +knob.getAttribute("cx") - 22 } });
+    gsap.set(["#sms-c0", "#sms-c1", "#sms-ok", "#sms-f0", "#sms-f1"], { opacity: 0 });
+    tl.to(knob, { attr: { cx: +knob.getAttribute("cx") + 22 }, duration: .25, ease: "power2.inOut" }, 15.35);
+    tl.to("#sms-track", { fill: "#10B981", duration: .25 }, 15.35);
+    ["#sms-c0", "#sms-c1", "#sms-ok"].forEach((id, i) => tl.fromTo(id, { opacity: 0, x: 60 }, { opacity: 1, x: 0, duration: .5, ease: "expo.out" }, 15.6 + i * .15));
+    const scrH = $("#scr6").offsetHeight, SCAN = 15.95, SCAN_D = 1.1;
+    tl.fromTo("#scr6 .scan", { autoAlpha: 1, y: -120 }, { y: scrH, duration: SCAN_D, ease: "none" }, SCAN);
+    tl.to("#scr6 .scan", { autoAlpha: 0, duration: .2 }, SCAN + SCAN_D - .1);
+    const passes = (id) => SCAN + (centerOf(id)[1] / (scrH + 120)) * SCAN_D; // when the scan line crosses it
+    ["0", "1"].forEach((i) => {
+      pop(`#sms-f${i}`, passes(`sms-c${i}`));
+      tl.fromTo(`#sms-c${i}`, { filter: "drop-shadow(0 0 0 rgba(239,68,68,0))" }, { filter: "drop-shadow(0 0 10px rgba(239,68,68,.55))", duration: .18, yoyo: true, repeat: 1 }, passes(`sms-c${i}`));
     });
-    tl.fromTo("#scr6 .folder", { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: .5, ease: "back.out(2)" }, 17.05);
+    tl.to("#sms-ok", { scale: 1.03, transformOrigin: "50% 50%", duration: .14, yoyo: true, repeat: 1 }, passes("sms-ok"));
+    zoom(16.0, 1.15, "50% 40%", 1.2);
 
     /* ===== S7 — 17.6 → 20.2 : values ===== */
     copyOut("c6", 17.55);

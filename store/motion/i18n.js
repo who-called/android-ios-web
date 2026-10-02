@@ -1,6 +1,7 @@
 // Every on-screen string of the promo film. Add a locale by copying the `fr`
 // block, translating it, and opening index.html?lang=<code>.
 // Phone numbers use ranges reserved for fiction (ARCEP 01 99 00…, US 555-01xx).
+// `app` = texts of the real app screens shown in the phone (rendered by store/screens.mjs).
 window.WC_I18N = {
   fr: {
     s1: {
@@ -22,38 +23,23 @@ window.WC_I18N = {
     },
     s4: {
       kicker: "Vérifier",
-      title: "Qui m'a appelé ?",
+      title: "Qui m'a appelé\u00a0?",
       sub: "Un indice de spam de 0 à 100, en un instant.",
-      search: "Rechercher un numéro",
-      number: "01 99 00 82 54",
-      scoreLabel: "Indice de spam",
-      verdict: "Probablement indésirable",
-      category: "Démarchage",
-      reports: "142 signalements",
-      last: "Dernier signalement il y a 3 min",
     },
     s5: {
       kicker: "Signaler",
       title: "5 secondes pour protéger tout le monde.",
-      question: "C'était quoi ?",
-      cats: ["Démarchage", "Arnaque", "Spam", "Sondage", "Fiable", "Autre"],
-      pick: 1,
-      thanks: "Merci ! Signalement anonyme envoyé.",
       plus: "+1",
     },
     s6: {
       kicker: "Bouclier SMS",
       title: "Les SMS d'arnaque, masqués.",
       sub: "Sans jamais lire vos messages.",
-      header: "Messages",
-      msgs: [
-        { from: "Livraison", text: "Votre colis est en attente. Réglez 1,99 € ici…", spam: true },
-        { from: "Maman", text: "On mange à 20h ? 🍝", spam: false },
-        { from: "Mon-CPF", text: "Vos droits CPF expirent ce soir, activez-les…", spam: true },
-        { from: "Remboursement", text: "Un remboursement vous attend, confirmez vos infos…", spam: true },
-      ],
-      masked: "Masqué",
-      folder: "Indésirables · 3 masqués",
+    },
+    // App screens (store/screens.mjs). French defaults = the store visuals; only the number differs.
+    app: {
+      lookup: { number: "+33 1 99 00 82 54" },
+      report: { number: "+33 1 99 00 82 54" },
     },
     s7: {
       words: ["Gratuit.", "Anonyme.", "Open source."],
@@ -89,36 +75,38 @@ window.WC_I18N = {
       kicker: "Check",
       title: "Who called me?",
       sub: "A 0–100 spam score, in an instant.",
-      search: "Search a number",
-      number: "(555) 019-8254",
-      scoreLabel: "Spam score",
-      verdict: "Likely unwanted",
-      category: "Telemarketing",
-      reports: "142 reports",
-      last: "Last report 3 min ago",
     },
     s5: {
       kicker: "Report",
       title: "5 seconds to protect everyone.",
-      question: "What was it?",
-      cats: ["Telemarketing", "Scam", "Spam", "Survey", "Trusted", "Other"],
-      pick: 1,
-      thanks: "Thanks! Anonymous report sent.",
       plus: "+1",
     },
     s6: {
       kicker: "SMS Shield",
       title: "Scam texts, hidden.",
       sub: "Without ever reading your messages.",
-      header: "Messages",
-      msgs: [
-        { from: "Delivery", text: "Your parcel is on hold. Pay $1.99 here…", spam: true },
-        { from: "Mom", text: "Dinner at 8? 🍝", spam: false },
-        { from: "IRS-Notice", text: "Final notice: your refund expires tonight…", spam: true },
-        { from: "Bank Alert", text: "Unusual activity, confirm your details…", spam: true },
-      ],
-      masked: "Hidden",
-      folder: "Junk · 3 hidden",
+    },
+    app: {
+      nav: ["Home", "Report", "Log", "Settings"],
+      lookup: {
+        title: "Check a number", sub: "Block list + community reputation", number: "+1 555-019-8254",
+        score: 87, scoreLabel: "spam score", src1: "DNC list", src2: "Community",
+        cat: "Telemarketing", catSub: "Most reported category", catCount: "182×", recent: "Latest reports",
+        rows: [["Scam", "2 h ago"], ["Telemarketing", "yesterday"], ["Silent call", "3 d ago"]],
+      },
+      report: {
+        title: "Report a number", sub: "Anonymous — no account needed", phoneLabel: "Phone number", number: "+1 555-019-8254",
+        spam: "Unwanted", spamIconDx: -48, legit: "Legitimate", legitIconDx: -61, catLabel: "Category",
+        chips: ["Telemarketing", "Scam", "Robocall", "Silent call", "Debt collector", "Survey", "Other"], selected: 0,
+        anonTitle: "100% anonymous", anonSub: "No account, no personal data.",
+        send: "Send report", sendIconDx: -67, sent: "Thanks! Anonymous report sent.",
+      },
+      sms: {
+        title: "SMS Shield", sub: "Filter unwanted texts too", onTitle: "SMS Shield on", onSub: "Unwanted texts are hidden",
+        today: "Today", masked: "Unwanted text hidden", filtered: "Filtered",
+        spam: [["+1 555-01xx · “Your parcel is on hold,", "tap here to pay $1.99 …”"], ["555-018x · “Final notice: your tax", "refund expires today …”"]],
+        legitFrom: "Mom", legitText: "“Still on for Sunday lunch?” · Delivered",
+      },
     },
     s7: {
       words: ["Free.", "Anonymous.", "Open source."],
@@ -154,36 +142,38 @@ window.WC_I18N = {
       kicker: "Verificar",
       title: "¿Quién me llamó?",
       sub: "Un índice de spam de 0 a 100, al instante.",
-      search: "Buscar un número",
-      number: "600 000 825",
-      scoreLabel: "Índice de spam",
-      verdict: "Probablemente no deseado",
-      category: "Publicidad",
-      reports: "142 avisos",
-      last: "Último aviso hace 3 min",
     },
     s5: {
       kicker: "Denunciar",
       title: "5 segundos para proteger a todos.",
-      question: "¿Qué era?",
-      cats: ["Publicidad", "Estafa", "Spam", "Encuesta", "Fiable", "Otro"],
-      pick: 1,
-      thanks: "¡Gracias! Aviso anónimo enviado.",
       plus: "+1",
     },
     s6: {
       kicker: "Escudo SMS",
       title: "SMS de estafa, ocultos.",
       sub: "Sin leer nunca tus mensajes.",
-      header: "Mensajes",
-      msgs: [
-        { from: "Envíos", text: "Tu paquete está retenido. Paga 1,99 € aquí…", spam: true },
-        { from: "Mamá", text: "¿Cenamos a las 9? 🍝", spam: false },
-        { from: "Hacienda", text: "Tu devolución caduca hoy, confírmala…", spam: true },
-        { from: "Banco", text: "Actividad inusual, verifica tus datos…", spam: true },
-      ],
-      masked: "Oculto",
-      folder: "No deseados · 3 ocultos",
+    },
+    app: {
+      nav: ["Inicio", "Denunciar", "Registro", "Ajustes"],
+      lookup: {
+        title: "Verificar un número", sub: "Reputación oficial + comunidad", number: "+34 600 000 825",
+        score: 87, scoreLabel: "índice de spam", src1: "Oficial", src2: "Comunidad",
+        cat: "Publicidad", catSub: "Categoría más denunciada", catCount: "182×", recent: "Últimos avisos",
+        rows: [["Estafa", "hace 2 h"], ["Publicidad", "ayer"], ["Llamada muda", "hace 3 d"]],
+      },
+      report: {
+        title: "Denunciar un número", sub: "Anónimo — sin cuenta", phoneLabel: "Número de teléfono", number: "+34 600 000 825",
+        spam: "No deseado", spamIconDx: -55, legit: "Legítimo", legitIconDx: -53, catLabel: "Categoría",
+        chips: ["Publicidad", "Estafa", "Robollamada", "Llamada muda", "Cobros", "Encuesta", "Otro"], selected: 0,
+        anonTitle: "100 % anónimo", anonSub: "Sin cuenta, sin datos personales.",
+        send: "Enviar la denuncia", sendIconDx: -100, sent: "¡Gracias! Aviso anónimo enviado.",
+      },
+      sms: {
+        title: "Escudo SMS", sub: "Filtra también los SMS no deseados", onTitle: "Escudo SMS activo", onSub: "Los SMS no deseados se ocultan",
+        today: "Hoy", masked: "SMS no deseado oculto", filtered: "Filtrado",
+        spam: [["6xx xxx xxx · «Tu paquete está retenido,", "paga 1,99 € aquí …»"], ["Hacienda · «Último aviso: tu devolución", "caduca hoy …»"]],
+        legitFrom: "Mamá", legitText: "«¿Comemos el domingo?» · Entregado",
+      },
     },
     s7: {
       words: ["Gratis.", "Anónimo.", "Código abierto."],
