@@ -60,7 +60,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           <h2 className="text-center text-2xl font-bold text-white sm:text-3xl">{t.video.title}</h2>
           <p className="mx-auto mt-2 max-w-xl text-center text-white/70">{t.video.subtitle}</p>
           <div className="mt-8">
-            <PromoVideo lang={lang} label={t.video.title} soundOnLabel={t.video.soundOn} soundOffLabel={t.video.soundOff} />
+            <PromoVideo lang={lang === "fr" ? "fr" : "en"} label={t.video.title} soundOnLabel={t.video.soundOn} soundOffLabel={t.video.soundOff} />
           </div>
         </div>
       </section>

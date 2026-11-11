@@ -14,8 +14,21 @@ import kotlin.random.Random
  *
  * Difficulty is a function of TIME (auto speed/density ramp) + a SURGE every 4 waves,
  * and score scales with the wave — so a player can't camp an easy level for points.
+ *
+ * On-screen texts (item names, combo/boss/surge pops) come from [labels], supplied
+ * by the UI layer from string resources so the engine itself stays Android-free.
  */
-class DefenseEngine {
+class DefenseEngine(private val labels: Labels) {
+    /** Localised texts the engine draws as floating "pops". */
+    class Labels(
+        val item: (String) -> String, // item id (rapid | spread | slow | repair | shield) → name
+        val combo: (Int) -> String,
+        val bossBonus: (Int) -> String,
+        val surge: (Int) -> String,
+        val boss: String,
+        val bonus: String,
+    )
+
     // entities ------------------------------------------------------------
     class Enemy(var x: Float, var y: Float, var r: Float, var vy: Float, var vx: Float,
                 var amp: Float, var hp: Int, val type: String, var t: Float, var bx: Float,
@@ -47,9 +60,6 @@ class DefenseEngine {
         private val FRIEND_GLYPHS = listOf("👵", "👨‍⚕️", "👶", "🧑‍🍳", "🐥", "👩‍🏫", "🧑‍🚒", "💚")
         // Item pool (Mario-Kart style) — shield is rare (1/9), so it's not spammy.
         private val ITEM_POOL = listOf("rapid", "spread", "slow", "repair", "rapid", "spread", "slow", "repair", "shield")
-        fun itemLabel(i: String) = when (i) {
-            "rapid" -> "TIR RAPIDE"; "spread" -> "TIR ×5"; "slow" -> "RALENTI"; "repair" -> "RÉPARATION"; else -> "BOUCLIER"
-        }
         fun itemGlyph(i: String) = when (i) {
             "rapid" -> "⚡"; "spread" -> "✳️"; "slow" -> "❄️"; "repair" -> "💚"; else -> "🛡️"
         }
@@ -162,7 +172,7 @@ class DefenseEngine {
                 reds.clear(); reds.addAll(kept)
             }
         }
-        pop(shipX, shipY - 44f, itemLabel(it), CY)
+        pop(shipX, shipY - 44f, labels.item(it), CY)
         item = null; charge = 0
     }
     private fun ring(x: Float, y: Float, c: Long, mx: Float) { rings.add(Ring(x, y, 8f, mx, 0f, 0.45f, c)) }
@@ -178,9 +188,9 @@ class DefenseEngine {
         val gain = ((8 + combo * 2) * waveMult()).toInt(); score += gain
         ring(e.x, e.y, comboColor(), e.r + 26f); burst(e.x, e.y, 0xFFFF8B96uL.toLong(), 12); pop(e.x, e.y - e.r, "+$gain", comboColor())
         earnCharge(1) // reds fill the item gauge
-        if (combo == 5 || combo == 10 || combo == 15 || combo == 25) { pop(w / 2, h * 0.36f, "COMBO ×$combo", AMBER); flash = max(flash, 0.35f) }
+        if (combo == 5 || combo == 10 || combo == 15 || combo == 25) { pop(w / 2, h * 0.36f, labels.combo(combo), AMBER); flash = max(flash, 0.35f) }
         if (e.type == "boss") { val b = (120 * waveMult()).toInt(); score += b; earnCharge(4)
-            pop(e.x, e.y, "BOSS +$b", AMBER); ring(e.x, e.y, AMBER, e.r + 90f); burst(e.x, e.y, AMBER, 30); flash = max(flash, 0.55f); shake = 12f }
+            pop(e.x, e.y, labels.bossBonus(b), AMBER); ring(e.x, e.y, AMBER, e.r + 90f); burst(e.x, e.y, AMBER, 30); flash = max(flash, 0.55f); shake = 12f }
         if (e.type == "split") { var k = -1; while (k <= 1) { makeRed(x = e.x, r0 = 15f, hp0 = 1, type0 = "normal", vx0 = k * 70f, vy0 = e.vy * 1.05f, y0 = e.y); k += 2 } }
     }
 
@@ -200,9 +210,9 @@ class DefenseEngine {
     fun update(dt: Float) {
         elapsed += dt; wave = 1 + floor(elapsed / 13f).toInt()
         if (wave != lastWave) { lastWave = wave
-            if (wave % 4 == 0) { flash = max(flash, 0.4f); pop(w / 2, h * 0.30f, "SURGE ×$wave", AMBER)
+            if (wave % 4 == 0) { flash = max(flash, 0.4f); pop(w / 2, h * 0.30f, labels.surge(wave), AMBER)
                 for (i in 0 until 5) makeRed(x = (i + 1) * w / 6, vx0 = 0f, vy0 = baseFall() * 1.05f, type0 = "normal", hp0 = 1) }
-            if (wave % 5 == 0) { pop(w / 2, h * 0.24f, "⚠ BOSS", SPAM); spawnBoss() } }
+            if (wave % 5 == 0) { pop(w / 2, h * 0.24f, labels.boss, SPAM); spawnBoss() } }
         val sd = if (slow > 0) 0.4f else 1f; if (slow > 0) slow -= dt; if (rapid > 0) rapid -= dt; if (spread > 0) spread -= dt; if (muzzle > 0) muzzle = max(0f, muzzle - dt)
         spawnT -= dt; pickT -= dt; eventT -= dt
         if (eventT <= 0) triggerEvent()
@@ -253,7 +263,7 @@ class DefenseEngine {
             if (fr.special) {
                 val dx = fr.x - shipX; val dy = fr.y - shipY
                 if (dx * dx + dy * dy < (fr.r + shipW * 0.6f) * (fr.r + shipW * 0.6f)) { friends.removeAt(p)
-                    earnCharge(CHARGE_FULL); ring(fr.x, fr.y, AMBER, fr.r + 30f); burst(fr.x, fr.y, AMBER, 20); pop(fr.x, fr.y, "BONUS 🎁", AMBER); score += 10; p--; continue
+                    earnCharge(CHARGE_FULL); ring(fr.x, fr.y, AMBER, fr.r + 30f); burst(fr.x, fr.y, AMBER, 20); pop(fr.x, fr.y, labels.bonus, AMBER); score += 10; p--; continue
                 }
             }
             if (fr.y > h + fr.r) friends.removeAt(p)

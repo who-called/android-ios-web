@@ -29,6 +29,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
+import androidx.annotation.StringRes
+import com.whocalled.android.R
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -38,16 +42,25 @@ import com.whocalled.android.ui.MainViewModel
 import com.whocalled.android.ui.components.BorderedCard
 import com.whocalled.android.ui.theme.WCColor
 
-private data class Period(val key: String, val label: String)
-private val PERIODS = listOf(Period("day", "Aujourd'hui"), Period("week", "Semaine"), Period("all", "Tout temps"))
+private data class Period(val key: String, @param:StringRes val labelRes: Int)
+private val PERIODS = listOf(
+    Period("day", R.string.leaderboard_period_day),
+    Period("week", R.string.leaderboard_period_week),
+    Period("all", R.string.leaderboard_period_all),
+)
 
+@Composable
 private fun dayLabel(day: Long, today: Long): String = when (today - day) {
-    0L -> "Aujourd'hui"; 1L -> "Hier"; else -> "il y a ${today - day} j"
+    0L -> stringResource(R.string.leaderboard_day_today)
+    1L -> stringResource(R.string.leaderboard_day_yesterday)
+    else -> stringResource(R.string.leaderboard_days_ago, today - day)
 }
 private fun medal(rank: Int) = when (rank) { 1 -> "🥇"; 2 -> "🥈"; 3 -> "🥉"; else -> "#$rank" }
 private fun gameName(game: String) = if (game == "trace") "TRACE" else "DEFENSE"
+@Composable
 private fun unitLabel(game: String, waves: Int): String =
-    if (game == "trace") "$waves grille${if (waves > 1) "s" else ""}" else "vague $waves"
+    if (game == "trace") pluralStringResource(R.plurals.leaderboard_unit_grids, waves, waves)
+    else stringResource(R.string.leaderboard_unit_wave, waves)
 
 @Composable
 fun LeaderboardScreen(viewModel: MainViewModel, game: String = "defense", onBack: () -> Unit) {
@@ -72,8 +85,8 @@ fun LeaderboardScreen(viewModel: MainViewModel, game: String = "defense", onBack
 
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Retour") }
-            Text("Classement ${gameName(game)}", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(R.string.common_back)) }
+            Text(stringResource(R.string.leaderboard_title, gameName(game)), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
         }
 
         // Period tabs.
@@ -81,7 +94,7 @@ fun LeaderboardScreen(viewModel: MainViewModel, game: String = "defense", onBack
             PERIODS.forEach { p ->
                 val sel = p.key == period
                 Text(
-                    p.label,
+                    stringResource(p.labelRes),
                     color = if (sel) WCColor.Blue else MaterialTheme.colorScheme.onSurfaceVariant,
                     fontWeight = if (sel) FontWeight.Bold else FontWeight.Normal,
                     modifier = Modifier.weight(1f)
@@ -96,12 +109,15 @@ fun LeaderboardScreen(viewModel: MainViewModel, game: String = "defense", onBack
         val players = board?.players ?: 0
         // Summary.
         BorderedCard(Modifier.fillMaxWidth().padding(top = 4.dp), accent = WCColor.Blue) {
-            Text(PERIODS.first { it.key == period }.label, fontWeight = FontWeight.Bold)
+            Text(stringResource(PERIODS.first { it.key == period }.labelRes), fontWeight = FontWeight.Bold)
             Text(
                 when {
-                    players > 0 -> "${players} joueur${if (players > 1) "s" else ""} · meilleur ${board?.bestScore} · médiane ${board?.medianScore}"
-                    localBest != null -> "1 joueur (toi) · meilleur ${localBest.score}"
-                    else -> "Sois le premier à marquer un score ! 🚀"
+                    players > 0 -> pluralStringResource(
+                        R.plurals.leaderboard_summary, players,
+                        players, board?.bestScore ?: 0, board?.medianScore ?: 0,
+                    )
+                    localBest != null -> stringResource(R.string.leaderboard_summary_solo, localBest.score)
+                    else -> stringResource(R.string.leaderboard_be_first)
                 },
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -113,7 +129,7 @@ fun LeaderboardScreen(viewModel: MainViewModel, game: String = "defense", onBack
         BorderedCard(Modifier.fillMaxWidth(), accent = WCColor.Emerald) {
             val you = board?.you
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("Ton classement", fontWeight = FontWeight.Bold, color = WCColor.Emerald, modifier = Modifier.weight(1f))
+                Text(stringResource(R.string.leaderboard_your_rank), fontWeight = FontWeight.Bold, color = WCColor.Emerald, modifier = Modifier.weight(1f))
                 // rank / total — reads "1/1" when you're the only player.
                 Text(
                     when {
@@ -125,23 +141,23 @@ fun LeaderboardScreen(viewModel: MainViewModel, game: String = "defense", onBack
                 )
             }
             when {
-                you != null -> Text("Top ${you.topPercent}% · ${you.score} pts (${unitLabel(game, you.waves)})")
-                localBest != null -> Text("${localBest.score} pts (${unitLabel(game, localBest.waves)})")
-                else -> Text("Pas encore joué sur cette période — lance une partie !", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                you != null -> Text(stringResource(R.string.leaderboard_you_top, you.topPercent, you.score, unitLabel(game, you.waves)))
+                localBest != null -> Text(stringResource(R.string.leaderboard_you_local, localBest.score, unitLabel(game, localBest.waves)))
+                else -> Text(stringResource(R.string.leaderboard_not_played), color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
 
         // Top list.
         Spacer(Modifier.height(12.dp))
-        Text("Top", fontWeight = FontWeight.Bold, modifier = Modifier.padding(vertical = 4.dp))
+        Text(stringResource(R.string.leaderboard_top), fontWeight = FontWeight.Bold, modifier = Modifier.padding(vertical = 4.dp))
         val top = board?.top ?: emptyList()
         if (top.isEmpty()) {
             // Never blank: show your own local best as the sole entry.
             if (localBest != null) {
                 LeaderRow("🥇", localBest.score, localBest.waves, mine = true, game = game)
-                Text("Ton score s'affichera dans le classement dès la synchro.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(top = 6.dp))
+                Text(stringResource(R.string.leaderboard_sync_pending), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(top = 6.dp))
             } else {
-                Text("Aucun score pour l'instant. À toi de jouer !", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(stringResource(R.string.leaderboard_no_scores), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         } else {
             top.forEach { e ->
@@ -152,15 +168,15 @@ fun LeaderboardScreen(viewModel: MainViewModel, game: String = "defense", onBack
 
         // Your history — server (with rank) if available, else local.
         Spacer(Modifier.height(18.dp))
-        Text("Ton historique", fontWeight = FontWeight.Bold, modifier = Modifier.padding(vertical = 4.dp))
+        Text(stringResource(R.string.leaderboard_history), fontWeight = FontWeight.Bold, modifier = Modifier.padding(vertical = 4.dp))
         if (history.isNotEmpty()) {
             history.forEach { h ->
-                HistoryRow(dayLabel(h.day, today), h.score, "#${h.rank}/${h.players} · top ${h.topPercent}%")
+                HistoryRow(dayLabel(h.day, today), h.score, stringResource(R.string.leaderboard_history_rank, h.rank, h.players, h.topPercent))
             }
         } else if (localHistory.isNotEmpty()) {
             localHistory.forEach { h -> HistoryRow(dayLabel(h.day, today), h.score, unitLabel(game, h.waves)) }
         } else {
-            Text("Joue une partie pour démarrer ton historique.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(stringResource(R.string.leaderboard_history_empty), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
 
         if (loading && board == null) {
@@ -180,7 +196,7 @@ private fun LeaderRow(rankLabel: String, score: Int, waves: Int, mine: Boolean, 
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(rankLabel, fontWeight = FontWeight.Bold, modifier = Modifier.padding(end = 12.dp))
-        Text("$score pts", fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
+        Text(stringResource(R.string.common_points, score), fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
         Text(unitLabel(game, waves), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
@@ -189,7 +205,7 @@ private fun LeaderRow(rankLabel: String, score: Int, waves: Int, mine: Boolean, 
 private fun HistoryRow(day: String, score: Int, trailing: String) {
     Row(Modifier.fillMaxWidth().padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
         Text(day, modifier = Modifier.weight(1f))
-        Text("$score pts", fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(end = 12.dp))
+        Text(stringResource(R.string.common_points, score), fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(end = 12.dp))
         Text(trailing, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }

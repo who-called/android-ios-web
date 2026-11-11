@@ -1,0 +1,454 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- WARN notification -->
+    <string name="warn_channel_name">Warnungen vor verdächtigen Anrufen</string>
+    <string name="warn_channel_desc">Benachrichtigt, wenn ein eingehender Anruf einen hohen Spam-Score hat.</string>
+    <string name="warn_title">⚠️ Verdächtiger Anruf — nicht blockiert</string>
+    <string name="warn_subtext">Who Called · das Telefon klingelt</string>
+
+    <!-- SMS shield -->
+    <string name="sms_blocked_channel_name">Ausgeblendete Spam-SMS</string>
+    <string name="sms_blocked_channel_desc">Benachrichtigt dezent, wenn die Benachrichtigung einer unerwünschten SMS ausgeblendet wird.</string>
+    <string name="sms_blocked_title">Unerwünschte SMS ausgeblendet</string>
+    <string name="sms_blocked_body">Benachrichtigung für %1$s ausgeblendet. Die Nachricht bleibt in deiner SMS-App.</string>
+    <string name="sms_listener_label">Who Called SMS-Schutz</string>
+
+    <!-- Blocked-call notification -->
+    <string name="call_blocked_channel_name">Blockierte Anrufe</string>
+    <string name="call_blocked_channel_desc">Benachrichtigt dezent, wenn ein unerwünschter Anruf blockiert wird.</string>
+    <string name="call_blocked_title">Anruf blockiert</string>
+    <string name="call_blocked_unknown">Unterdrückte Nummer</string>
+
+    <!-- Daily game reminder -->
+    <string name="reminder_channel_name">Spiel-Erinnerung</string>
+    <string name="reminder_channel_desc">Eine freundliche Erinnerung, einmal am Tag, an die Tages-Challenge. In den Einstellungen abschaltbar.</string>
+
+    <!-- Common -->
+    <string name="common_back">Zurück</string>
+    <string name="common_close">Schließen</string>
+    <string name="common_cancel">Abbrechen</string>
+    <string name="common_delete">Löschen</string>
+    <string name="common_edit">Ändern</string>
+    <string name="common_loading">Wird geladen…</string>
+    <string name="common_connecting">Verbindung zum Server…</string>
+    <string name="common_retry">Erneut versuchen</string>
+    <string name="common_points">%1$d Pkt.</string>
+    <string name="common_vote_spam">Unerwünscht</string>
+    <string name="common_vote_legit">Seriös</string>
+    <string name="common_status_blocked">Blockiert</string>
+    <string name="common_status_warned">Gewarnt</string>
+
+    <!-- Bottom navigation tabs (keep short) -->
+    <string name="tab_games">Spiele</string>
+
+    <!-- Daily game reminder notification (pairs of title + body, picked at random) -->
+    <string name="reminder_1_title">🧩 Die TRACE-Challenge des Tages wartet — 5 Rätsel, 3 Minuten.</string>
+    <string name="reminder_1_body">Klettere in der Rangliste nach oben, in deinem Tempo.</string>
+    <string name="reminder_2_title">🔥 Halte deine Serie am Leben</string>
+    <string name="reminder_2_body">Eine schnelle Runde reicht, um weiterzumachen.</string>
+    <string name="reminder_3_title">🏆 Vielleicht hat jemand deinen Score geknackt</string>
+    <string name="reminder_3_body">Hol dir die Spitze zurück — ganz entspannt.</string>
+    <string name="reminder_4_title">🛡️ Clevere Pause des Tages</string>
+    <string name="reminder_4_body">Lust auf eine Anti-Spam-Challenge zum Abschalten?</string>
+    <string name="reminder_5_title">✨ Neue Challenge verfügbar</string>
+    <string name="reminder_5_body">Heute gleiche Rätsel für alle — zeig, was du kannst!</string>
+
+    <!-- Playful blocked-call notification titles (opt-in). Built-in defaults: local language + English. -->
+    <string-array name="fun_blocked_default_titles">
+        <item>🥊 Spam K.O.!</item>
+        <item>🛡️ Netter Versuch, Spammer</item>
+        <item>🚫 Werbeanrufer abgewiesen</item>
+        <item>📵 Ein Störenfried weniger</item>
+        <item>☀️ Schon wieder ein Solaranlagen-Verkäufer blockiert</item>
+        <item>🥊 Spam knocked out!</item>
+        <item>🛡️ Nice try, spammer</item>
+        <item>🚫 Cold caller turned away</item>
+        <item>📵 One less nuisance</item>
+        <item>😎 Blocked — you\'re welcome</item>
+    </string-array>
+
+    <!-- Country scopes for the spam list -->
+    <string name="country_all">Alle Länder</string>
+    <string name="country_fr">Frankreich</string>
+    <string name="country_be">Belgien</string>
+    <string name="country_ch">Schweiz</string>
+    <string name="country_lu">Luxemburg</string>
+    <string name="country_es">Spanien</string>
+    <string name="country_it">Italien</string>
+    <string name="country_de">Deutschland</string>
+    <string name="country_gb">Vereinigtes Königreich</string>
+    <string name="country_pt">Portugal</string>
+    <string name="country_us">USA</string>
+    <string name="country_ca">Kanada</string>
+    <string name="country_ma">Marokko</string>
+    <string name="country_dz">Algerien</string>
+    <string name="country_tn">Tunesien</string>
+
+    <!-- Report categories -->
+    <string name="category_telemarketing">Werbeanruf</string>
+    <string name="category_scam">Betrug</string>
+    <string name="category_robocall">Automatischer Anruf</string>
+    <string name="category_silent">Stiller Anruf</string>
+    <string name="category_debt">Inkasso</string>
+    <string name="category_survey">Umfrage</string>
+    <string name="category_other">Sonstiges</string>
+    <string name="category_unknown">Unbekannt</string>
+
+    <!-- Call history sections -->
+    <string name="history_section_today">Heute</string>
+    <string name="history_section_yesterday">Gestern</string>
+    <string name="history_section_this_week">Diese Woche</string>
+    <string name="history_section_this_month">Diesen Monat</string>
+    <string name="history_section_older">Älter</string>
+
+    <!-- Relative time -->
+    <string name="time_just_now">gerade eben</string>
+    <string name="time_minutes_ago">vor %1$d Min.</string>
+    <string name="time_hours_ago">vor %1$d Std.</string>
+    <string name="time_yesterday">gestern</string>
+    <string name="time_days_ago">vor %1$d T.</string>
+
+    <!-- Errors and status messages (ViewModel / repository) -->
+    <string name="error_invalid_phone">Ungültige Nummer.</string>
+    <string name="error_network">Keine Verbindung. Versuch es erneut.</string>
+    <string name="error_server">Serverfehler (%1$d).</string>
+    <string name="error_unknown">Unbekannter Fehler.</string>
+    <string name="sync_up_to_date">Bereits aktuell ✓ Keine neuen Nummern.</string>
+    <plurals name="sync_done">
+        <item quantity="one">Update abgeschlossen 📥 %1$d Nummer aktualisiert.</item>
+        <item quantity="other">Update abgeschlossen 📥 %1$d Nummern aktualisiert.</item>
+    </plurals>
+    <string name="sync_failed">Update nicht möglich. Prüfe deine Verbindung und versuch es erneut.</string>
+    <string name="report_feedback_repeat">Schon notiert 😊 Kein Grund, nachzulegen — eine Meldung reicht!</string>
+    <string name="report_feedback_thanks">Danke! Meldung gespeichert 🛡️</string>
+    <string name="report_feedback_saved_locally">Lokal gespeichert. Senden an den Server fehlgeschlagen: %1$s</string>
+    <string name="privacy_erased">Deine Meldungen wurden gelöscht.</string>
+    <string name="privacy_erase_failed">Löschen fehlgeschlagen. Versuch es erneut.</string>
+    <string name="api_test_unreachable">Nicht erreichbar.</string>
+
+    <!-- Country picker (Home + Settings) -->
+    <string name="country_dialog_title">Überwachtes Land</string>
+
+    <!-- Home screen -->
+    <string name="home_sync_button">Liste aktualisieren</string>
+    <plurals name="home_sync_progress">
+        <item quantity="one">%1$s Nummer abgerufen…</item>
+        <item quantity="other">%1$s Nummern abgerufen…</item>
+    </plurals>
+    <string name="home_sms_on">Aktiv · unerwünschte SMS werden ausgeblendet</string>
+    <string name="home_sms_off">Benachrichtigungen unerwünschter SMS ausblenden</string>
+    <string name="home_covered_numbers">Abgedeckte Nummern</string>
+    <string name="home_auto_update">Auto-Update · %1$s</string>
+    <string name="home_blocked_calls">Blockierte Anrufe</string>
+    <string name="home_none_yet">Bisher keine</string>
+    <string name="home_update_today">heute aktualisiert</string>
+    <string name="home_update_yesterday">gestern aktualisiert</string>
+    <string name="home_update_days_ago">vor %1$d T. aktualisiert</string>
+    <string name="home_update_on">Aktualisiert am %1$s</string>
+    <string name="home_community_title">Community-Schutzschild</string>
+
+    <!-- Report screen -->
+    <string name="report_title">Nummer melden</string>
+    <string name="report_subtitle">Anonym — kein Konto, keine persönlichen Daten.</string>
+    <string name="report_phone_label">Nummer (z. B. +33 6 12 34 56 78)</string>
+    <string name="report_call_type">Art des Anrufs</string>
+    <string name="report_submit">Meldung senden</string>
+    <string name="report_allow">Erlauben</string>
+    <string name="report_empty_recent_title">Keine letzten Anrufe</string>
+
+    <!-- Number detail (call detail + number lookup) -->
+    <string name="detail_title">Nummerndetails</string>
+    <string name="detail_filtered_on">Gefiltert am</string>
+    <string name="detail_badge_community">Community</string>
+    <string name="detail_stats_top_reason">Am häufigsten: %1$s (%2$d %%)</string>
+    <string name="detail_stats_24h">24 Std.</string>
+    <string name="detail_stats_7d">7 T.</string>
+    <string name="detail_stats_30d">30 T.</string>
+    <string name="detail_stats_1y">1 Jahr</string>
+
+    <!-- My reports (Journal tab) -->
+    <string name="myreports_title">Meine Meldungen</string>
+    <string name="myreports_intro">Ändere deine Meinung oder lösche eine versehentliche Meldung.</string>
+    <string name="myreports_delete_title">Diese Meldung löschen?</string>
+    <string name="myreports_delete_body">Die Meldung zu +%1$s wird entfernt (lokal und von unseren Servern). Das kann nicht rückgängig gemacht werden.</string>
+    <string name="myreports_empty_title">Keine Meldungen</string>
+    <string name="myreports_empty_body">Deine Meldungen erscheinen hier. Melde eine unerwünschte Nummer, um die Community zu schützen.</string>
+    <string name="myreports_sync_sent">gesendet</string>
+    <string name="myreports_sync_failed">nicht gesendet</string>
+    <string name="myreports_sync_pending">ausstehend</string>
+    <string name="myreports_change_mind">Meinung ändern</string>
+
+    <!-- Filtered-call history -->
+    <string name="history_empty_title">Keine gefilterten Anrufe</string>
+    <string name="history_copied">Nummer kopiert</string>
+
+    <!-- SMS shield -->
+    <string name="sms_title">SMS-Schutz</string>
+    <string name="sms_subtitle">Unerwünschte SMS ausblenden</string>
+    <string name="sms_access_required">Zugriff auf Benachrichtigungen nötig</string>
+    <string name="sms_access_body">Um unerwünschte SMS auszublenden, erlaube Who Called den Zugriff auf Benachrichtigungen. Wir lesen nie den Inhalt deiner Nachrichten: Wir blenden nur die Benachrichtigung eines unerwünschten Absenders aus. Die SMS bleibt in deiner Nachrichten-App.</string>
+    <string name="sms_access_button">Zugriff auf Benachrichtigungen aktivieren</string>
+    <string name="sms_hide_title">Benachrichtigungen unerwünschter SMS ausblenden</string>
+    <string name="sms_hide_desc">Die Nachricht bleibt ungelesen in deiner SMS-App. Keine Nachricht wird gelesen oder gelöscht.</string>
+    <string name="sms_notify_title">Bei ausgeblendeter SMS benachrichtigen</string>
+    <string name="sms_notify_desc">Zeigt eine dezente Benachrichtigung, wenn eine unerwünschte SMS ausgeblendet wird.</string>
+    <string name="sms_how_title">So funktioniert\'s</string>
+    <string name="sms_how_body">Android erlaubt das Blockieren von SMS nur der Standard-Nachrichten-App. Who Called bleibt ein Filter: Wir blenden nur die Benachrichtigung von Absendern mit hohem Spam-Score aus – anhand derselben Liste wie bei Anrufen.</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Einstellungen</string>
+    <string name="settings_erase_dialog_title">Meine Daten löschen?</string>
+    <string name="settings_erase_dialog_body">Alle von diesem Gerät gesendeten Meldungen werden endgültig von unseren Servern gelöscht. Das kann nicht rückgängig gemacht werden.</string>
+    <string name="settings_section_filtering">Filter</string>
+    <string name="settings_block_title">Unerwünschte Anrufe blockieren</string>
+    <string name="settings_block_desc">Nummern mit hohem Spam-Score werden automatisch abgewiesen: Dein Telefon klingelt nicht.</string>
+    <string name="settings_warn_title">Im Zweifel warnen</string>
+    <string name="settings_warn_desc">Bei Nummern mit mittlerem Score (verdächtig, aber nicht sicher) klingelt das Telefon normal, doch eine Benachrichtigung warnt dich. Du entscheidest, ob du rangehst.</string>
+    <string name="settings_blocked_notif_title">Bei blockiertem Anruf benachrichtigen</string>
+    <string name="settings_blocked_notif_desc">Zeigt nach jedem blockierten unerwünschten Anruf eine dezente Benachrichtigung.</string>
+    <string name="settings_fun_title">Lustige Benachrichtigungen 😜</string>
+    <string name="settings_fun_desc">Witzige Nachrichten, wenn Spam blockiert wird („Spam K.O.!“). Standardmäßig aus.</string>
+    <string name="settings_fun_messages_title">Die Nachrichten 😜</string>
+    <string name="settings_fun_messages_desc">Hier sind alle Nachrichten, die abwechselnd erscheinen, wenn Spam blockiert wird. Füge eigene hinzu, bearbeite sie oder kehre zu den Standardnachrichten zurück.</string>
+    <string name="settings_fun_defaults">Standardnachrichten</string>
+    <string name="settings_fun_yours">Deine Nachrichten ✍️</string>
+    <string name="settings_fun_none">Noch keine eigenen Nachrichten — schreib unten deine erste.</string>
+    <string name="settings_fun_edit">Nachricht bearbeiten</string>
+    <string name="settings_fun_delete">Nachricht löschen</string>
+    <string name="settings_fun_placeholder">Z. B.: 🎣 Wieder ein Phishing am Haken!</string>
+    <string name="settings_fun_counter">%1$d/%2$d · Emojis willkommen 😄</string>
+    <string name="settings_fun_add">Hinzufügen</string>
+    <string name="settings_fun_reset">Zurücksetzen (Standardnachrichten wiederherstellen)</string>
+    <string name="settings_section_games">Spiele</string>
+    <string name="settings_reminder_title">Tägliche Spiel-Erinnerung 🎮</string>
+    <string name="settings_reminder_desc">Eine freundliche Erinnerung zwischen 18:30 und 20:30 Uhr, nie wenn du schon gespielt hast. Sie pausiert von selbst, wenn du sie mehrere Tage hintereinander ignorierst.</string>
+    <string name="settings_country_desc">Nur Nummern aus diesem Land herunterladen (kleinerer Cache). Automatisch erkannt, änderbar.</string>
+    <string name="settings_threshold">Blockier-Empfindlichkeit: %1$d %%</string>
+    <string name="settings_threshold_desc">Ab diesem Spam-Score wird eine Nummer blockiert. Darunter löst sie nur eine Warnung aus (wenn die Option oben aktiv ist). Je niedriger der Schwellenwert, desto mehr wird blockiert — mit dem Risiko einiger Fehlalarme.</string>
+    <string name="settings_section_info">Infos</string>
+    <string name="settings_link_privacy">Datenschutz</string>
+    <string name="settings_link_legal">Impressum</string>
+    <string name="settings_link_site">Offizielle Website</string>
+    <string name="settings_link_rate">App bewerten</string>
+    <string name="settings_link_source">Quellcode (Open Source)</string>
+    <string name="settings_link_contact">Kontakt</string>
+    <string name="settings_contact_subject">Who Called — Kontakt</string>
+    <string name="settings_section_data">Meine Daten</string>
+    <string name="settings_erase_title">Meine Meldungen löschen</string>
+    <string name="settings_erase_desc">Löscht endgültig alle von diesem Gerät gesendeten Meldungen. Gemäß deinem Recht auf Löschung (DSGVO).</string>
+    <string name="settings_erase_button">Meine Daten löschen</string>
+    <string name="settings_erasing">Wird gelöscht…</string>
+    <string name="settings_section_diagnostic">Diagnose</string>
+    <string name="settings_api_title">API-Verbindung</string>
+    <string name="settings_api_desc">Prüfe, ob die App den Who-Called-Server erreicht.</string>
+    <string name="settings_api_testing">Test läuft…</string>
+    <string name="settings_api_test">Verbindung testen</string>
+    <string name="settings_api_ok">API OK ✓ (%1$d ms)</string>
+    <string name="settings_api_failed">API nicht erreichbar ✗ — %1$s</string>
+    <string name="settings_free_title">Kostenlos und Open Source</string>
+    <string name="settings_free_body" formatted="false">Who Called ist 100 % kostenlos und der Code ist offen. 100 % anonym — kein Konto, keine persönlichen Daten. Nummern im internationalen Format.</string>
+    <string name="settings_version_hint">Doppeltippen, um die API zu testen</string>
+    <string name="settings_version_testing">API-Test…</string>
+
+    <!-- Settings: hidden notification debug card (long-press the version) -->
+    <string name="debug_title">Debug Benachrichtigungen</string>
+    <string name="debug_permission">Benachrichtigungsberechtigung: %1$s</string>
+    <string name="debug_permission_granted">erteilt ✓</string>
+    <string name="debug_permission_denied">VERWEIGERT ✗ — es wird nichts angezeigt</string>
+    <string name="debug_request">Anfordern</string>
+    <string name="debug_system_settings">Systemeinstellungen</string>
+    <string name="debug_blocked_standard">Anruf blockiert (Standard)</string>
+    <string name="debug_blocked_fun">Anruf blockiert (lustig)</string>
+    <string name="debug_sms">Unerwünschte SMS ausgeblendet</string>
+    <string name="debug_reminder">Tägliche Spiel-Erinnerung</string>
+    <string name="debug_hide_hint">Lange auf die Version drücken, um dieses Feld auszublenden.</string>
+
+    <!-- Games: shared -->
+    <string name="game_leaderboard_button">🏆 Rangliste</string>
+    <string name="game_start">Starten ▸</string>
+    <string name="game_share">Teilen</string>
+    <string name="game_replay">Nochmal</string>
+    <string name="game_quit">Beenden</string>
+    <string name="game_quit_title">Spiel beenden?</string>
+    <string name="game_daily_rank">Tagesrangliste · Top %1$d %%</string>
+    <plurals name="game_players_best">
+        <item quantity="one">%1$d Spieler · Bestwert %2$d</item>
+        <item quantity="other">%1$d Spieler · Bestwert %2$d</item>
+    </plurals>
+
+    <!-- Games hub -->
+    <string name="games_subtitle">Eine Challenge pro Tag, deine Platzierung</string>
+    <string name="games_defense_tagline">Arcade — zerstöre die Spam-Anrufe.</string>
+    <string name="games_trace_tagline">Puzzle — entlarve den versteckten Betrüger.</string>
+    <string name="games_practice">🎯 Freies TRACE-Training — ohne Wertung</string>
+    <string name="games_footer" formatted="false">Jeden Tag eine neue Challenge · 3 gewertete Runden / Tag · 100 % anonym.</string>
+    <string name="games_record">Rekord: %1$d Pkt.</string>
+    <string name="games_not_played">Noch nicht gespielt</string>
+    <string name="games_play_daily">Tages-Challenge spielen ▸</string>
+    <plurals name="games_play_attempts">
+        <item quantity="one">Spielen (noch %1$d gewerteter Versuch)</item>
+        <item quantity="other">Spielen (noch %1$d gewertete Versuche)</item>
+    </plurals>
+    <string name="games_replay_practice">Nochmal (Training)</string>
+
+    <!-- Daily streak screen -->
+    <string name="streak_title">Tagesserie</string>
+    <string name="streak_current">Aktuelle Serie</string>
+    <string name="streak_best">Beste Serie: %1$d</string>
+    <string name="streak_kept">Gut gemacht — Serie für heute gehalten! 🔥</string>
+    <string name="streak_keep_going">Spiel heute, um deine Serie fortzusetzen ☀️</string>
+    <string name="streak_milestone_reached">7-Tage-Meilenstein erreicht! 🎁</string>
+    <string name="streak_next_milestone">Nächster Meilenstein: 7 Tage 🎁</string>
+    <string name="streak_weekday_mon">MO</string>
+    <string name="streak_weekday_tue">DI</string>
+    <string name="streak_weekday_wed">MI</string>
+    <string name="streak_weekday_thu">DO</string>
+    <string name="streak_weekday_fri">FR</string>
+    <string name="streak_weekday_sat">SA</string>
+    <string name="streak_weekday_sun">SO</string>
+
+    <!-- Leaderboard screen -->
+    <string name="leaderboard_title">Rangliste %1$s</string>
+    <string name="leaderboard_period_day">Heute</string>
+    <string name="leaderboard_period_week">Woche</string>
+    <string name="leaderboard_period_all">Gesamt</string>
+    <string name="leaderboard_day_today">Heute</string>
+    <string name="leaderboard_day_yesterday">Gestern</string>
+    <string name="leaderboard_days_ago">vor %1$d T.</string>
+    <plurals name="leaderboard_unit_grids">
+        <item quantity="one">%1$d Rätsel</item>
+        <item quantity="other">%1$d Rätsel</item>
+    </plurals>
+    <string name="leaderboard_unit_wave">Welle %1$d</string>
+    <plurals name="leaderboard_summary">
+        <item quantity="one">%1$d Spieler · Bestwert %2$d · Median %3$d</item>
+        <item quantity="other">%1$d Spieler · Bestwert %2$d · Median %3$d</item>
+    </plurals>
+    <string name="leaderboard_summary_solo">1 Spieler (du) · Bestwert %1$d</string>
+    <string name="leaderboard_be_first">Sei der Erste mit einem Score! 🚀</string>
+    <string name="leaderboard_your_rank">Deine Platzierung</string>
+    <string name="leaderboard_you_top">Top %1$d %% · %2$d Pkt. (%3$s)</string>
+    <string name="leaderboard_you_local">%1$d Pkt. (%2$s)</string>
+    <string name="leaderboard_not_played">In diesem Zeitraum noch nicht gespielt — starte eine Runde!</string>
+    <string name="leaderboard_top">Top</string>
+    <string name="leaderboard_sync_pending">Dein Score erscheint nach der Synchronisierung in der Rangliste.</string>
+    <string name="leaderboard_no_scores">Noch keine Scores. Du bist dran!</string>
+    <string name="leaderboard_history">Dein Verlauf</string>
+    <string name="leaderboard_history_rank">#%1$d/%2$d · Top %3$d %%</string>
+    <string name="leaderboard_history_empty">Spiel eine Runde, um deinen Verlauf zu starten.</string>
+
+    <!-- DEFENSE game -->
+    <string name="defense_hud_score">SCORE</string>
+    <string name="defense_hud_wave">WELLE</string>
+    <string name="defense_item_ready">ITEM BEREIT — tippen</string>
+    <string name="defense_intro">Gedrückt halten zum Schießen, wischen zum Zielen.\nZerstöre die Unerwünschten — sie füllen deine ITEM-Leiste (selbst aktivieren!).\nGrüne Anrufe sind harmlos; schnapp dir die 🎁 für ein sofortiges Item.</string>
+    <string name="defense_game_over">Schild gefallen</string>
+    <plurals name="defense_result">
+        <item quantity="one">Welle %1$d · %2$d Spam blockiert</item>
+        <item quantity="other">Welle %1$d · %2$d Spams blockiert</item>
+    </plurals>
+    <string name="defense_share_text">who-called DEFENSE · %1$d Pkt. · Welle %2$d 🛡️\nBlockier auch du Spam 👉 %3$s</string>
+    <string name="defense_quit_body">Dein Fortschritt in der aktuellen Welle geht verloren.</string>
+    <string name="defense_incoming">ANRUF KOMMT…</string>
+    <string name="defense_item_rapid">SCHNELLFEUER</string>
+    <string name="defense_item_spread">SCHUSS ×5</string>
+    <string name="defense_item_slow">ZEITLUPE</string>
+    <string name="defense_item_repair">REPARATUR</string>
+    <string name="defense_item_shield">SCHILD</string>
+    <string name="defense_pop_combo">COMBO ×%1$d</string>
+    <string name="defense_pop_boss_bonus">BOSS +%1$d</string>
+    <string name="defense_pop_surge">ANSTURM ×%1$d</string>
+    <string name="defense_pop_boss">⚠ BOSS</string>
+    <string name="defense_pop_bonus">BONUS 🎁</string>
+
+    <!-- TRACE game -->
+    <string name="trace_mode_daily">Tages-Challenge</string>
+    <string name="trace_mode_practice">Training</string>
+    <string name="trace_tutorial">Tutorial</string>
+    <string name="trace_toast_error">−1 Leben · −%1$d Pkt.</string>
+    <string name="trace_toast_points">+%1$d Pkt.!</string>
+    <string name="trace_hint">💡 Tipp</string>
+    <string name="trace_hint_desc">Setzt einen Betrüger · −%1$d Pkt.</string>
+    <string name="trace_no_hints">Keine Tipps mehr</string>
+    <string name="trace_rules_title">DIE 3 REGELN</string>
+    <string name="trace_controls">1× tippen = ✗ sicher · 2× = Betrüger · 3× = löschen\nWische über das Raster, um mehrere ✗ zu setzen</string>
+    <string name="trace_resume">Fortsetzen ▸</string>
+    <string name="trace_intro_daily">Tages-Challenge · 5 Rätsel · 3 Leben</string>
+    <string name="trace_intro_practice">Freies Training · ohne Wertung</string>
+    <string name="trace_replay_tutorial">❓ Interaktives Tutorial nochmal ansehen</string>
+    <string name="trace_size">Größe: %1$d×%1$d</string>
+    <string name="trace_grid_solved">Rätsel %1$d gelöst!</string>
+    <string name="trace_score">Score: %1$d</string>
+    <string name="trace_next_grid">Nächstes Rätsel…</string>
+    <string name="trace_sprint_done">Sprint beendet!</string>
+    <plurals name="trace_all_grids">
+        <item quantity="one">%1$d Rätsel geknackt 🎉</item>
+        <item quantity="other">Alle %1$d Rätsel geknackt 🎉</item>
+    </plurals>
+    <string name="trace_no_lives">Keine Leben mehr…</string>
+    <plurals name="trace_partial">
+        <item quantity="one">Nicht schlimm — %1$d/%2$d Rätsel gelöst!</item>
+        <item quantity="other">Nicht schlimm — %1$d/%2$d Rätsel gelöst!</item>
+    </plurals>
+    <string name="trace_points">Punkte</string>
+    <string name="trace_share_text">who-called TRACE · %1$d Pkt. · %2$d/%3$d Rätsel 🛡️\nJag auch du die Spammer 👉 %4$s</string>
+    <string name="trace_new_grid">Neues Rätsel</string>
+    <string name="trace_quit_body">Dein Fortschritt in der aktuellen Challenge geht verloren.</string>
+    <string name="trace_rule_color">1 pro Farbe</string>
+    <string name="trace_rule_line">1 / Zeile &amp; Spalte</string>
+    <string name="trace_rule_adjacent">Nie nebeneinander</string>
+    <string name="trace_tap_label">Tippen:</string>
+    <string name="trace_safe">sicher</string>
+    <string name="trace_fraudster">Betrüger</string>
+    <string name="trace_loading">Challenge wird vorbereitet…</string>
+    <string name="trace_error_title">Challenge konnte nicht geladen werden</string>
+    <string name="trace_error_body">Prüfe deine Verbindung und versuch es erneut.</string>
+
+    <!-- TRACE villains (cosmetic fraudster per grid) -->
+    <string name="trace_villain_imp">Kobold</string>
+    <string name="trace_villain_demon">Dämon</string>
+    <string name="trace_villain_supervillain">Superschurke</string>
+    <string name="trace_villain_ninja">Ninja</string>
+    <string name="trace_villain_robot">Spam-Roboter</string>
+    <string name="trace_villain_alien">Alien</string>
+    <string name="trace_villain_scammer">Abzocker</string>
+    <string name="trace_villain_impostor">Hochstapler</string>
+
+    <!-- TRACE interactive tutorial -->
+    <string name="trace_tuto_title">TUTORIAL — %1$s So wird gespielt</string>
+    <string name="trace_tuto_step0">3 Regeln, mehr nicht:\n1 Betrüger pro Farbe -- 1 pro Zeile\nund Spalte -- nie nebeneinander</string>
+    <string name="trace_tuto_step1">Der rosa Bereich hat nur ein Feld:\nDort muss der Betrüger sein.\nDoppelt tippen, um ihn zu setzen.</string>
+    <string name="trace_tuto_step2">Diese Felder können nie einen\nBetrüger haben. Setz ein X\nauf die 3 leuchtenden Felder.</string>
+    <string name="trace_tuto_step3">1 Betrüger pro Zeile, 1 pro Spalte:\njeder an seinem Platz. Setz ein X\nauf die 3 leuchtenden Felder.</string>
+    <string name="trace_tuto_step4">Nie nebeneinander, auch nicht\ndiagonal. Setz ein X auf\ndie leuchtenden Felder.</string>
+    <string name="trace_tuto_step5">Zeile 2: nur ein freies Feld.\nDort muss der Betrüger sein.\nDoppelt tippen, um ihn zu setzen.</string>
+    <string name="trace_tuto_step6">Und wenn man sich irrt?\nTippe doppelt auf das rot\numrandete Feld.</string>
+    <string name="trace_tuto_step7">Ein 3. Tippen löscht.\nTippe das Feld erneut an.</string>
+    <string name="trace_tuto_step8_a">Nur noch 2 Betrüger.\nZeile 3: nur ein freies Feld.\nDoppelt antippen.</string>
+    <string name="trace_tuto_step8_b">Der letzte: Zeile 4!\nDoppelt antippen.</string>
+    <string name="trace_tuto_tap_again_place">Noch einmal tippen, um ihn zu setzen!</string>
+    <string name="trace_tuto_tap_again">Noch einmal tippen!</string>
+    <string name="trace_tuto_tap_again_ellipsis">Noch einmal tippen...</string>
+    <string name="trace_tuto_done1">Gut. 1 Betrüger pro Farbe.</string>
+    <string name="trace_tuto_done2">Genau. Jedes X schließt ein Feld aus.\nWeniger Felder = leichter,\nden nächsten zu finden.</string>
+    <string name="trace_tuto_done3">1 Betrüger pro Zeile, 1 pro Spalte.\nDie X sind dein Gedächtnis: verboten.</string>
+    <string name="trace_tuto_done4">Alles, was einen Betrüger berührt,\nist sicher: Wir markieren es mit X.</string>
+    <string name="trace_tuto_done5">Gut gemacht. Die X grenzen das Feld ein,\nbis nur noch ein mögliches\nFeld übrig bleibt. Das ist das ganze Prinzip.</string>
+    <string name="trace_tuto_done6">Falsch gesetzt: Er berührte einen Betrüger.\n-1 Leben, -200 Pkt.</string>
+    <string name="trace_tuto_done7">Gelöscht. Der Zyklus:\nleer, X, Betrüger, leer.</string>
+    <string name="trace_tuto_done8">Fertig. Jede Farbe, jede Zeile,\njede Spalte hat IHREN Betrüger.\nDu bist dran!</string>
+    <string name="trace_tuto_tap_glowing_any">Tippe auf ein leuchtendes Feld</string>
+    <string name="trace_tuto_tap_glowing">Tippe auf das leuchtende Feld</string>
+    <string name="trace_tuto_erased">Gelöscht</string>
+    <string name="trace_tuto_got_it">Verstanden ▸</string>
+    <string name="trace_tuto_skip">Überspringen</string>
+    <string name="trace_tuto_lets_go">Los geht\'s ▸</string>
+    <string name="trace_tuto_next">Weiter ▸</string>
+    <string name="nav_games">Spiele</string>
+    <string name="nav_settings">Einstellungen</string>
+    <string name="home_country_dialog_title">Überwachtes Land</string>
+    <string name="home_sync_connecting">Verbindung zum Server…</string>
+    <string name="home_sms_title">SMS-Schutz</string>
+    <string name="setup_skip">Überspringen</string>
+</resources>

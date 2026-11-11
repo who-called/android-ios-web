@@ -49,6 +49,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.res.stringArrayResource
+import androidx.compose.ui.res.stringResource
+import com.whocalled.android.R
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -75,6 +79,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun SettingsScreen(viewModel: MainViewModel) {
     val context = LocalContext.current
+    val resources = LocalResources.current
     val scope = rememberCoroutineScope()
     val privacy by viewModel.privacy.collectAsState()
     var showEraseDialog by remember { mutableStateOf(false) }
@@ -98,7 +103,7 @@ fun SettingsScreen(viewModel: MainViewModel) {
     if (showCountryDialog) {
         AlertDialog(
             onDismissRequest = { showCountryDialog = false },
-            title = { Text("Pays surveillé") },
+            title = { Text(stringResource(R.string.country_dialog_title)) },
             text = {
                 Column {
                     com.whocalled.android.data.Countries.list.forEach { c ->
@@ -111,7 +116,7 @@ fun SettingsScreen(viewModel: MainViewModel) {
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Text(c.flag, modifier = Modifier.padding(end = 10.dp))
-                            Text(c.name, modifier = Modifier.weight(1f))
+                            Text(stringResource(c.nameRes), modifier = Modifier.weight(1f))
                             if (c.dial == countryDial) {
                                 Icon(Icons.Rounded.Check, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                             }
@@ -119,23 +124,23 @@ fun SettingsScreen(viewModel: MainViewModel) {
                     }
                 }
             },
-            confirmButton = { TextButton(onClick = { showCountryDialog = false }) { Text("Fermer") } },
+            confirmButton = { TextButton(onClick = { showCountryDialog = false }) { Text(stringResource(R.string.common_close)) } },
         )
     }
 
     if (showEraseDialog) {
         AlertDialog(
             onDismissRequest = { showEraseDialog = false },
-            title = { Text("Supprimer mes données ?") },
-            text = { Text("Tous les signalements envoyés depuis cet appareil seront définitivement supprimés de nos serveurs. Cette action est irréversible.") },
+            title = { Text(stringResource(R.string.settings_erase_dialog_title)) },
+            text = { Text(stringResource(R.string.settings_erase_dialog_body)) },
             confirmButton = {
                 TextButton(onClick = {
                     showEraseDialog = false
                     viewModel.eraseMyData()
-                }) { Text("Supprimer", color = MaterialTheme.colorScheme.error) }
+                }) { Text(stringResource(R.string.common_delete), color = MaterialTheme.colorScheme.error) }
             },
             dismissButton = {
-                TextButton(onClick = { showEraseDialog = false }) { Text("Annuler") }
+                TextButton(onClick = { showEraseDialog = false }) { Text(stringResource(R.string.common_cancel)) }
             },
         )
     }
@@ -224,21 +229,21 @@ fun SettingsScreen(viewModel: MainViewModel) {
     fun email() {
         val intent = Intent(Intent.ACTION_SENDTO).apply {
             data = Uri.parse("mailto:${BuildConfig.CONTACT_EMAIL}")
-            putExtra(Intent.EXTRA_SUBJECT, "Who Called — contact")
+            putExtra(Intent.EXTRA_SUBJECT, resources.getString(R.string.settings_contact_subject))
         }
         context.startActivity(intent)
     }
 
     val apiTest by viewModel.apiTest.collectAsState()
 
-    ScrollableScreen(header = { GradientHeader(title = "Réglages") }) {
+    ScrollableScreen(header = { GradientHeader(title = stringResource(R.string.settings_title)) }) {
         // Filtering
         item {
-            SectionTitle("Filtrage")
+            SectionTitle(stringResource(R.string.settings_section_filtering))
             BorderedCard(Modifier.padding(horizontal = 16.dp)) {
                 ToggleRow(
-                    title = "Bloquer les appels indésirables",
-                    description = "Les numéros au score de spam élevé sont rejetés automatiquement : votre téléphone ne sonne pas.",
+                    title = stringResource(R.string.settings_block_title),
+                    description = stringResource(R.string.settings_block_desc),
                     checked = filtering,
                 ) {
                     filtering = it
@@ -246,8 +251,8 @@ fun SettingsScreen(viewModel: MainViewModel) {
                 }
                 HorizontalDivider(Modifier.padding(vertical = 4.dp))
                 ToggleRow(
-                    title = "M’alerter en cas de doute",
-                    description = "Pour les numéros au score moyen, le téléphone sonne et une alerte vous prévient. Vous décidez de répondre ou non.",
+                    title = stringResource(R.string.settings_warn_title),
+                    description = stringResource(R.string.settings_warn_desc),
                     checked = warn,
                 ) {
                     warn = it
@@ -257,8 +262,8 @@ fun SettingsScreen(viewModel: MainViewModel) {
                 if (warn) {
                     HorizontalDivider(Modifier.padding(vertical = 4.dp))
                     ToggleRow(
-                        title = "Bannière sur l’écran d’appel",
-                        description = "Affiche l’alerte par-dessus l’appel entrant. L’app Téléphone reste celle qui répond. Sans ça, la notification disparaît derrière l’écran d’appel.",
+                        title = stringResource(R.string.settings_overlay_title),
+                        description = stringResource(R.string.settings_overlay_desc),
                         checked = overlayGranted,
                     ) {
                         OverlayPermission.openSettings(context)
@@ -266,8 +271,8 @@ fun SettingsScreen(viewModel: MainViewModel) {
                 }
                 HorizontalDivider(Modifier.padding(vertical = 4.dp))
                 ToggleRow(
-                    title = "M’avertir d’un appel bloqué",
-                    description = "Affiche une notification discrète après chaque appel indésirable bloqué.",
+                    title = stringResource(R.string.settings_blocked_notif_title),
+                    description = stringResource(R.string.settings_blocked_notif_desc),
                     checked = blockedCallNotif,
                 ) {
                     blockedCallNotif = it
@@ -276,8 +281,8 @@ fun SettingsScreen(viewModel: MainViewModel) {
                 }
                 HorizontalDivider(Modifier.padding(vertical = 4.dp))
                 ToggleRow(
-                    title = "Notifications droles 😜",
-                    description = "Des messages fun quand un spam est bloqué (« Spam K.O. ! »). Désactivé par défaut.",
+                    title = stringResource(R.string.settings_fun_title),
+                    description = stringResource(R.string.settings_fun_desc),
                     checked = funNotifs,
                 ) {
                     funNotifs = it
@@ -290,23 +295,23 @@ fun SettingsScreen(viewModel: MainViewModel) {
                 if (funNotifs) {
                     HorizontalDivider(Modifier.padding(vertical = 4.dp))
                     Column(Modifier.fillMaxWidth().padding(vertical = 6.dp)) {
-                        Text("Les messages 😜", fontWeight = FontWeight.SemiBold)
+                        Text(stringResource(R.string.settings_fun_messages_title), fontWeight = FontWeight.SemiBold)
                         Text(
-                            "Voici tous les messages qui passent en rotation quand un spam est bloqué. Ajoutez les vôtres, modifiez-les ou revenez aux messages par défaut.",
+                            stringResource(R.string.settings_fun_messages_desc),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(top = 2.dp),
                         )
 
-                        // Built-in defaults (FR + EN) — always active, read-only.
+                        // Built-in defaults (UI language + EN) — always active, read-only.
                         Text(
-                            "Messages par défaut",
+                            stringResource(R.string.settings_fun_defaults),
                             style = MaterialTheme.typography.labelMedium,
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(top = 10.dp),
                         )
-                        NotificationHelper.defaultFunBlockedTitles.forEach { t ->
+                        stringArrayResource(R.array.fun_blocked_default_titles).forEach { t ->
                             Text(
                                 "•  $t",
                                 style = MaterialTheme.typography.bodyMedium,
@@ -316,7 +321,7 @@ fun SettingsScreen(viewModel: MainViewModel) {
 
                         // User's own phrases — editable / removable.
                         Text(
-                            "Vos messages ✍️",
+                            stringResource(R.string.settings_fun_yours),
                             style = MaterialTheme.typography.labelMedium,
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -324,7 +329,7 @@ fun SettingsScreen(viewModel: MainViewModel) {
                         )
                         if (funCustomTitles.isEmpty()) {
                             Text(
-                                "Aucun message perso pour l'instant — écrivez le vôtre ci-dessous.",
+                                stringResource(R.string.settings_fun_none),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.padding(top = 4.dp),
@@ -345,7 +350,7 @@ fun SettingsScreen(viewModel: MainViewModel) {
                                 }) {
                                     Icon(
                                         Icons.Rounded.Edit,
-                                        contentDescription = "Modifier ce message",
+                                        contentDescription = stringResource(R.string.settings_fun_edit),
                                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                     )
                                 }
@@ -355,7 +360,7 @@ fun SettingsScreen(viewModel: MainViewModel) {
                                 }) {
                                     Icon(
                                         Icons.Rounded.Close,
-                                        contentDescription = "Supprimer ce message",
+                                        contentDescription = stringResource(R.string.settings_fun_delete),
                                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                     )
                                 }
@@ -369,8 +374,8 @@ fun SettingsScreen(viewModel: MainViewModel) {
                                 value = newFunTitle,
                                 onValueChange = { newFunTitle = it.take(Preferences.MAX_FUN_TITLE_LEN) },
                                 modifier = Modifier.weight(1f),
-                                placeholder = { Text("Ex : 🎣 Encore un phishing à la ligne !") },
-                                supportingText = { Text("${newFunTitle.length}/${Preferences.MAX_FUN_TITLE_LEN} · emojis bienvenus 😄") },
+                                placeholder = { Text(stringResource(R.string.settings_fun_placeholder)) },
+                                supportingText = { Text(stringResource(R.string.settings_fun_counter, newFunTitle.length, Preferences.MAX_FUN_TITLE_LEN)) },
                                 singleLine = true,
                             )
                             TextButton(
@@ -383,7 +388,7 @@ fun SettingsScreen(viewModel: MainViewModel) {
                                     }
                                 },
                                 enabled = newFunTitle.isNotBlank(),
-                            ) { Text("Ajouter") }
+                            ) { Text(stringResource(R.string.settings_fun_add)) }
                         }
                         if (funCustomTitles.isNotEmpty()) {
                             TextButton(onClick = {
@@ -391,7 +396,7 @@ fun SettingsScreen(viewModel: MainViewModel) {
                                 newFunTitle = ""
                                 scope.launch { Preferences.clearFunCustomTitles(context) }
                             }) {
-                                Text("Réinitialiser (revenir aux messages par défaut)")
+                                Text(stringResource(R.string.settings_fun_reset))
                             }
                         }
                     }
@@ -401,11 +406,15 @@ fun SettingsScreen(viewModel: MainViewModel) {
 
         // Jeux — daily reminder (opt-in, and we respect the choice: off cancels it).
         item {
-            SectionTitle("Jeux")
+            SectionTitle(stringResource(R.string.settings_section_games))
             BorderedCard(Modifier.padding(horizontal = 16.dp)) {
                 ToggleRow(
-                    title = "Rappel quotidien pour jouer 🎮",
-                    description = "Un rappel bienveillant entre 18h30 et 20h30, jamais si vous avez déjà joué. Ignoré ${Preferences.REMINDER_IGNORED_LIMIT} soirs de suite, il se met en pause ${Preferences.REMINDER_SNOOZE_DAYS} jours puis réessaie.",
+                    title = stringResource(R.string.settings_reminder_title),
+                    description = stringResource(
+                        R.string.settings_reminder_desc,
+                        Preferences.REMINDER_IGNORED_LIMIT,
+                        Preferences.REMINDER_SNOOZE_DAYS,
+                    ),
                     checked = gameReminder,
                 ) { on ->
                     if (on) {
@@ -426,16 +435,16 @@ fun SettingsScreen(viewModel: MainViewModel) {
                     HorizontalDivider(Modifier.padding(vertical = 8.dp))
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.weight(1f).padding(end = 8.dp)) {
-                            Text("Rappels en pause", fontWeight = FontWeight.SemiBold)
+                            Text(stringResource(R.string.settings_reminder_paused_title), fontWeight = FontWeight.SemiBold)
                             val until = reminderSnoozedUntil
                             Text(
                                 if (until > 0L) {
                                     val date = java.time.LocalDate.ofEpochDay(until).format(
-                                        java.time.format.DateTimeFormatter.ofPattern("d MMMM", java.util.Locale.FRENCH),
+                                        java.time.format.DateTimeFormatter.ofPattern("d MMMM", com.whocalled.android.util.UiLocale.of(context)),
                                     )
-                                    "Plusieurs rappels sont restés sans réponse — reprise automatique le $date."
+                                    stringResource(R.string.settings_reminder_paused_until, date)
                                 } else {
-                                    "Plusieurs rappels sont restés sans réponse — reprise automatique dans quelques jours."
+                                    stringResource(R.string.settings_reminder_paused_soon)
                                 },
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -446,7 +455,7 @@ fun SettingsScreen(viewModel: MainViewModel) {
                             reminderIgnored = 0
                             reminderSnoozedUntil = 0L
                             GameReminderWorker.schedule(context)
-                        }) { Text("Reprendre") }
+                        }) { Text(stringResource(R.string.settings_reminder_resume)) }
                     }
                 }
             }
@@ -460,16 +469,16 @@ fun SettingsScreen(viewModel: MainViewModel) {
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Column(Modifier.weight(1f).padding(end = 12.dp)) {
-                        Text("Pays surveillé", fontWeight = FontWeight.SemiBold)
+                        Text(stringResource(R.string.country_dialog_title), fontWeight = FontWeight.SemiBold)
                         Text(
-                            "Ne télécharger que les numéros de ce pays (cache plus léger). Détecté automatiquement, modifiable.",
+                            stringResource(R.string.settings_country_desc),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(top = 2.dp),
                         )
                     }
                     val c = com.whocalled.android.data.Countries.byDial(countryDial)
-                    Text("${c.flag}  ${c.name}", fontWeight = FontWeight.Medium)
+                    Text("${c.flag}  ${stringResource(c.nameRes)}", fontWeight = FontWeight.Medium)
                 }
             }
         }
@@ -477,9 +486,9 @@ fun SettingsScreen(viewModel: MainViewModel) {
         // Threshold
         item {
             BorderedCard(Modifier.padding(horizontal = 16.dp)) {
-                Text("Sensibilité du blocage : ${threshold.toInt()} %", fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.settings_threshold, threshold.toInt()), fontWeight = FontWeight.SemiBold)
                 Text(
-                    "À partir de ce score de spam, un numéro est bloqué. En dessous, il déclenche seulement une alerte (si l’option ci-dessus est activée). Plus le seuil est bas, plus on bloque — au risque de quelques faux positifs.",
+                    stringResource(R.string.settings_threshold_desc),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -496,37 +505,37 @@ fun SettingsScreen(viewModel: MainViewModel) {
 
         // Legal & links
         item {
-            SectionTitle("Informations")
+            SectionTitle(stringResource(R.string.settings_section_info))
             BorderedCard(Modifier.padding(horizontal = 16.dp)) {
                 // Each link is shown only when its URL/value is configured (empty → hidden).
-                LinkRow("Confidentialité", Icons.Rounded.Lock, BuildConfig.PRIVACY_URL, ::open)
-                LinkRow("Mentions légales", Icons.Rounded.Description, BuildConfig.POLICY_URL, ::open)
-                LinkRow("Site officiel", Icons.Rounded.Language, BuildConfig.SITE_URL, ::open)
-                LinkRow("Source des préfixes ARCEP (arcep.fr)", Icons.Rounded.Gavel, BuildConfig.ARCEP_SOURCE_URL, ::open)
-                LinkRow("Noter l’application", Icons.Rounded.StarBorder, BuildConfig.RATE_URL, ::open)
-                LinkRow("Code source (open source)", Icons.Rounded.Code, BuildConfig.REPO_URL, ::open)
+                LinkRow(stringResource(R.string.settings_link_privacy), Icons.Rounded.Lock, BuildConfig.PRIVACY_URL, ::open)
+                LinkRow(stringResource(R.string.settings_link_legal), Icons.Rounded.Description, BuildConfig.POLICY_URL, ::open)
+                LinkRow(stringResource(R.string.settings_link_site), Icons.Rounded.Language, BuildConfig.SITE_URL, ::open)
+                LinkRow(stringResource(R.string.settings_link_arcep), Icons.Rounded.Gavel, BuildConfig.ARCEP_SOURCE_URL, ::open)
+                LinkRow(stringResource(R.string.settings_link_rate), Icons.Rounded.StarBorder, BuildConfig.RATE_URL, ::open)
+                LinkRow(stringResource(R.string.settings_link_source), Icons.Rounded.Code, BuildConfig.REPO_URL, ::open)
                 if (BuildConfig.CONTACT_EMAIL.isNotBlank()) {
-                    LinkRow("Nous contacter", Icons.Rounded.MailOutline) { email() }
+                    LinkRow(stringResource(R.string.settings_link_contact), Icons.Rounded.MailOutline) { email() }
                 }
             }
         }
 
         // Data / RGPD
         item {
-            SectionTitle("Mes données")
+            SectionTitle(stringResource(R.string.settings_section_data))
             BorderedCard(Modifier.padding(horizontal = 16.dp)) {
-                Text("Supprimer mes signalements", fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.settings_erase_title), fontWeight = FontWeight.SemiBold)
                 Text(
-                    "Efface définitivement tous les signalements envoyés depuis cet appareil. Conforme à votre droit à l’effacement (RGPD).",
+                    stringResource(R.string.settings_erase_desc),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(vertical = 4.dp),
                 )
                 TextButton(onClick = { showEraseDialog = true }) {
-                    Text("Supprimer mes données", color = MaterialTheme.colorScheme.error)
+                    Text(stringResource(R.string.settings_erase_button), color = MaterialTheme.colorScheme.error)
                 }
                 when (val p = privacy) {
-                    is LoadState.Loading -> Text("Suppression…", style = MaterialTheme.typography.bodySmall)
+                    is LoadState.Loading -> Text(stringResource(R.string.settings_erasing), style = MaterialTheme.typography.bodySmall)
                     is LoadState.Error -> Text(p.message, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
                     is LoadState.Success -> p.message?.let { Text(it, color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.bodySmall) }
                     else -> {}
@@ -537,11 +546,11 @@ fun SettingsScreen(viewModel: MainViewModel) {
         // Diagnostic — explicit, always-visible API connectivity test (no need to
         // scroll to the bottom; the version double-tap remains as a shortcut).
         item {
-            SectionTitle("Diagnostic")
+            SectionTitle(stringResource(R.string.settings_section_diagnostic))
             BorderedCard(Modifier.padding(horizontal = 16.dp)) {
-                Text("Connexion à l’API", fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.settings_api_title), fontWeight = FontWeight.SemiBold)
                 Text(
-                    "Vérifiez que l’application joint bien le serveur Who Called.",
+                    stringResource(R.string.settings_api_desc),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(vertical = 4.dp),
@@ -550,13 +559,13 @@ fun SettingsScreen(viewModel: MainViewModel) {
                     onClick = { viewModel.runApiTest() },
                     enabled = apiTest !is ApiTestState.Testing,
                 ) {
-                    Text(if (apiTest is ApiTestState.Testing) "Test en cours…" else "Tester la connexion")
+                    Text(stringResource(if (apiTest is ApiTestState.Testing) R.string.settings_api_testing else R.string.settings_api_test))
                 }
                 val (label, color) = when (val s = apiTest) {
                     is ApiTestState.Idle -> null to MaterialTheme.colorScheme.onSurfaceVariant
-                    is ApiTestState.Testing -> "Connexion au serveur…" to MaterialTheme.colorScheme.onSurfaceVariant
-                    is ApiTestState.Ok -> "API OK ✓ (${s.latencyMs} ms)" to WCColor.Emerald
-                    is ApiTestState.Failed -> "API injoignable ✗ — ${s.reason}" to WCColor.Coral
+                    is ApiTestState.Testing -> stringResource(R.string.common_connecting) to MaterialTheme.colorScheme.onSurfaceVariant
+                    is ApiTestState.Ok -> stringResource(R.string.settings_api_ok, s.latencyMs) to WCColor.Emerald
+                    is ApiTestState.Failed -> stringResource(R.string.settings_api_failed, s.reason) to WCColor.Coral
                 }
                 if (label != null) {
                     Text(
@@ -573,9 +582,9 @@ fun SettingsScreen(viewModel: MainViewModel) {
         // Free & open source note
         item {
             BorderedCard(Modifier.padding(horizontal = 16.dp), accent = MaterialTheme.colorScheme.primary) {
-                Text("Gratuit et open source", fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.settings_free_title), fontWeight = FontWeight.SemiBold)
                 Text(
-                    "Who Called est 100 % gratuit et son code est ouvert. 100 % anonyme — aucun compte, aucune donnée personnelle. Numéros au format international.",
+                    stringResource(R.string.settings_free_body),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = 4.dp),
@@ -587,10 +596,9 @@ fun SettingsScreen(viewModel: MainViewModel) {
         // sharing government info must clearly state they are not official).
         item {
             BorderedCard(Modifier.padding(horizontal = 16.dp)) {
-                Text("Application indépendante", fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.settings_independent_title), fontWeight = FontWeight.SemiBold)
                 Text(
-                    "Who Called n’est pas une application officielle : elle n’est pas affiliée à l’ARCEP ni à aucune entité gouvernementale, et ne représente aucun organisme public. " +
-                        "Les préfixes de démarchage utilisés proviennent du plan national de numérotation publié par l’ARCEP (lien « Source des préfixes ARCEP » ci-dessus).",
+                    stringResource(R.string.settings_independent_body),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = 4.dp),
@@ -625,10 +633,10 @@ fun SettingsScreen(viewModel: MainViewModel) {
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                 )
                 val (label, color) = when (val s = apiTest) {
-                    is ApiTestState.Idle -> "Double-tap pour tester l’API" to MaterialTheme.colorScheme.onSurfaceVariant
-                    is ApiTestState.Testing -> "Test de l’API…" to MaterialTheme.colorScheme.onSurfaceVariant
-                    is ApiTestState.Ok -> "API OK ✓ (${s.latencyMs} ms)" to WCColor.Emerald
-                    is ApiTestState.Failed -> "API injoignable ✗ — ${s.reason}" to WCColor.Coral
+                    is ApiTestState.Idle -> stringResource(R.string.settings_version_hint) to MaterialTheme.colorScheme.onSurfaceVariant
+                    is ApiTestState.Testing -> stringResource(R.string.settings_version_testing) to MaterialTheme.colorScheme.onSurfaceVariant
+                    is ApiTestState.Ok -> stringResource(R.string.settings_api_ok, s.latencyMs) to WCColor.Emerald
+                    is ApiTestState.Failed -> stringResource(R.string.settings_api_failed, s.reason) to WCColor.Coral
                 }
                 Text(
                     label,
@@ -645,64 +653,65 @@ fun SettingsScreen(viewModel: MainViewModel) {
         // permission, channel, heads-up — can be verified on-device.
         if (showNotifDebug) {
             item {
-                SectionTitle("Debug notifications")
+                SectionTitle(stringResource(R.string.debug_title))
                 BorderedCard(Modifier.padding(horizontal = 16.dp)) {
                     Text(
-                        "Autorisation notifications : " +
-                            if (notifsEnabled) "accordée ✓" else "REFUSÉE ✗ — rien ne s'affichera",
+                        stringResource(
+                            R.string.debug_permission,
+                            stringResource(if (notifsEnabled) R.string.debug_permission_granted else R.string.debug_permission_denied),
+                        ),
                         fontWeight = FontWeight.SemiBold,
                         color = if (notifsEnabled) WCColor.Emerald else MaterialTheme.colorScheme.error,
                     )
                     Text(
-                        "Affichage par-dessus : " +
-                            if (overlayGranted) "accordé ✓" else "refusé — la bannière d’appel ne s’affichera pas",
+                        stringResource(if (overlayGranted) R.string.debug_overlay_granted else R.string.debug_overlay_denied),
                         fontWeight = FontWeight.SemiBold,
                         color = if (overlayGranted) WCColor.Emerald else WCColor.Amber,
                         modifier = Modifier.padding(top = 4.dp),
                     )
                     if (!notifsEnabled) {
                         Row {
-                            TextButton(onClick = { askNotifPermissionIfNeeded() }) { Text("Demander") }
-                            TextButton(onClick = { openSystemNotificationSettings() }) { Text("Réglages système") }
+                            TextButton(onClick = { askNotifPermissionIfNeeded() }) { Text(stringResource(R.string.debug_request)) }
+                            TextButton(onClick = { openSystemNotificationSettings() }) { Text(stringResource(R.string.debug_system_settings)) }
                         }
                     }
                     if (!overlayGranted) {
                         TextButton(onClick = { OverlayPermission.openSettings(context) }) {
-                            Text("Autoriser l’affichage par-dessus")
+                            Text(stringResource(R.string.debug_overlay_allow))
                         }
                     }
                     Text(
-                        "Test caché — simule un appel suspect (notif + bannière 45 s) :",
+                        stringResource(R.string.debug_simulate_hint),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(top = 8.dp),
                     )
                     androidx.compose.material3.Button(onClick = {
                         NotificationHelper.showWarning(context, "+33612345678", 72, "telemarketing", null)
-                    }) { Text("Simuler un appel suspect") }
+                    }) { Text(stringResource(R.string.debug_simulate)) }
                     Text(
-                        "Autres tests :",
+                        stringResource(R.string.debug_other_tests),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(top = 8.dp),
                     )
                     androidx.compose.material3.OutlinedButton(onClick = {
                         NotificationHelper.showBlockedCall(context, "+33612345678", null, funMode = false)
-                    }) { Text("Appel bloqué (standard)") }
+                    }) { Text(stringResource(R.string.debug_blocked_standard)) }
                     androidx.compose.material3.OutlinedButton(onClick = {
                         NotificationHelper.showBlockedCall(context, "+33612345678", null, funMode = true, customTitles = funCustomTitles)
-                    }) { Text("Appel bloqué (fun)") }
+                    }) { Text(stringResource(R.string.debug_blocked_fun)) }
                     androidx.compose.material3.OutlinedButton(onClick = {
                         WarnOverlay.show(context, "+33612345678", 72, "telemarketing")
-                    }) { Text("Bannière overlay seule") }
+                    }) { Text(stringResource(R.string.debug_overlay_only)) }
                     androidx.compose.material3.OutlinedButton(onClick = {
                         NotificationHelper.showBlockedSms(context, "36777")
-                    }) { Text("SMS indésirable masqué") }
+                    }) { Text(stringResource(R.string.debug_sms)) }
                     androidx.compose.material3.OutlinedButton(onClick = {
                         NotificationHelper.showGameReminder(context)
-                    }) { Text("Rappel jeu quotidien") }
+                    }) { Text(stringResource(R.string.debug_reminder)) }
                     Text(
-                        "Long-press sur la version pour masquer ce panneau.",
+                        stringResource(R.string.debug_hide_hint),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(top = 4.dp),

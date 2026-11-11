@@ -22,7 +22,7 @@ export default async function PrivacyPage({ params }: { params: Promise<{ locale
   const { locale } = await params;
   const lang = toDictLocale(locale);
   const doc = getPrivacy(lang);
-  const updatedLabel = lang === "en" ? "Last updated" : "Dernière mise à jour";
+  const updatedLabel = getDict(lang).common.lastUpdated;
 
   return (
     <article className="mx-auto max-w-3xl px-4 py-12">

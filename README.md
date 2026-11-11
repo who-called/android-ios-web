@@ -40,7 +40,7 @@ cd android && ./gradlew :app:assembleDebug
 # iOS : ouvrir ios/ dans Xcode
 ```
 
-Chaque sous-projet a son propre README avec les détails.
+Chaque sous-projet a son propre README avec les détails. Langues et traductions : voir [`I18N.md`](I18N.md).
 
 ## Confidentialité & sécurité
 

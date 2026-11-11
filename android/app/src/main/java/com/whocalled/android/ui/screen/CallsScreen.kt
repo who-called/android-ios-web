@@ -31,7 +31,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.annotation.StringRes
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
+import com.whocalled.android.R
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -47,10 +51,10 @@ import com.whocalled.android.util.CallEvent
 import com.whocalled.android.util.CallEventAction
 import com.whocalled.android.util.CallDirection
 
-private enum class CallsFilter(val label: String) {
-    ALL("Tous"),
-    REVIEW("À vérifier"),
-    FILTERED("Filtrés"),
+private enum class CallsFilter(@param:StringRes val labelRes: Int) {
+    ALL(R.string.calls_filter_all),
+    REVIEW(R.string.calls_filter_review),
+    FILTERED(R.string.calls_filter_filtered),
 }
 
 /** Who Called's own journal of the incoming calls seen by the screening service. */
@@ -86,8 +90,8 @@ fun CallsScreen(
     ScrollableScreen(
         header = {
             GradientHeader(
-                title = "Appels récents",
-                subtitle = "Appels vus par le filtre · stockés sur votre téléphone",
+                title = stringResource(R.string.calls_title),
+                subtitle = stringResource(R.string.calls_subtitle),
             )
         },
     ) {
@@ -100,7 +104,7 @@ fun CallsScreen(
                     FilterChip(
                         selected = filter == option,
                         onClick = { filter = option },
-                        label = { Text(option.label) },
+                        label = { Text(stringResource(option.labelRes)) },
                     )
                 }
             }
@@ -111,21 +115,21 @@ fun CallsScreen(
                 EmptyState(
                     icon = Icons.AutoMirrored.Outlined.PhoneMissed,
                     title = when (filter) {
-                        CallsFilter.ALL -> "Aucun appel récent"
-                        CallsFilter.REVIEW -> "Aucun numéro à vérifier"
-                        CallsFilter.FILTERED -> "Aucun appel filtré"
+                        CallsFilter.ALL -> stringResource(R.string.report_empty_recent_title)
+                        CallsFilter.REVIEW -> stringResource(R.string.calls_empty_review_title)
+                        CallsFilter.FILTERED -> stringResource(R.string.history_empty_title)
                     },
                     subtitle = if (isScreeningRoleHeld)
-                        "Les prochains appels vus par le filtre apparaîtront ici."
+                        stringResource(R.string.calls_empty_body_on)
                     else
-                        "Activez le filtre d’appels pour voir qui vous appelle.",
+                        stringResource(R.string.calls_empty_body_off),
                     accent = WCColor.Blue,
                 )
             }
         } else {
             item {
                 Text(
-                    "Appui long sur un numéro pour le copier.",
+                    stringResource(R.string.calls_copy_hint),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(horizontal = 16.dp),
@@ -133,9 +137,9 @@ fun CallsScreen(
             }
 
             displayedSections.forEach { section ->
-                item(key = "header-${section.title}") {
+                item(key = "header-${section.titleRes}") {
                     Text(
-                        section.title,
+                        stringResource(section.titleRes),
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary,
@@ -152,7 +156,7 @@ fun CallsScreen(
                         onClick = { onCallClick(event) },
                         onLongClick = {
                             clipboard.setText(AnnotatedString("+${event.phone}"))
-                            Toast.makeText(context, "Numéro copié", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, context.getString(R.string.history_copied), Toast.LENGTH_SHORT).show()
                         },
                     )
                 }
@@ -169,11 +173,11 @@ private fun CallRow(
     onLongClick: () -> Unit,
 ) {
     val (label, color, icon) = when (event.action) {
-        CallEventAction.BLOCKED -> Triple("Bloqué", WCColor.Coral, Icons.Rounded.Block)
-        CallEventAction.WARNED -> Triple("Alerté", WCColor.Amber, Icons.Rounded.WarningAmber)
-        CallEventAction.REPORTED_SPAM -> Triple("Indésirable", WCColor.Coral, Icons.Rounded.Block)
-        CallEventAction.LEGITIMATE -> Triple("Légitime", WCColor.Emerald, Icons.Rounded.CheckCircle)
-        CallEventAction.UNKNOWN -> Triple("Non évalué", WCColor.Blue, Icons.Rounded.Search)
+        CallEventAction.BLOCKED -> Triple(stringResource(R.string.common_status_blocked), WCColor.Coral, Icons.Rounded.Block)
+        CallEventAction.WARNED -> Triple(stringResource(R.string.common_status_warned), WCColor.Amber, Icons.Rounded.WarningAmber)
+        CallEventAction.REPORTED_SPAM -> Triple(stringResource(R.string.common_vote_spam), WCColor.Coral, Icons.Rounded.Block)
+        CallEventAction.LEGITIMATE -> Triple(stringResource(R.string.common_vote_legit), WCColor.Emerald, Icons.Rounded.CheckCircle)
+        CallEventAction.UNKNOWN -> Triple(stringResource(R.string.calls_status_unknown), WCColor.Blue, Icons.Rounded.Search)
     }
     BorderedCard(
         Modifier
@@ -190,12 +194,16 @@ private fun CallRow(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
-                val attempts = if (event.attempts > 1) " · ${event.attempts} appels" else ""
+                val attempts = if (event.attempts > 1) {
+                    " · " + pluralStringResource(R.plurals.calls_attempts, event.attempts, event.attempts)
+                } else ""
+                val direction = stringResource(directionLabel(event.direction))
+                val context = LocalContext.current
                 Text(
                     buildString {
-                        append(directionLabel(event.direction))
+                        append(direction)
                         append(" · ")
-                        append(com.whocalled.android.util.RelativeTime.format(event.timestamp))
+                        append(com.whocalled.android.util.RelativeTime.format(context, event.timestamp))
                         append(attempts)
                     },
                     style = MaterialTheme.typography.bodySmall,
@@ -213,7 +221,7 @@ private fun CallRow(
             )
             Icon(
                 Icons.Rounded.ChevronRight,
-                contentDescription = "Voir le numéro",
+                contentDescription = stringResource(R.string.home_recent_see_number),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.size(20.dp),
             )
@@ -221,7 +229,8 @@ private fun CallRow(
     }
 }
 
-private fun directionLabel(direction: CallDirection): String = when (direction) {
-    CallDirection.INCOMING -> "Entrant"
-    CallDirection.BLOCKED -> "Bloqué"
+@StringRes
+private fun directionLabel(direction: CallDirection): Int = when (direction) {
+    CallDirection.INCOMING -> R.string.calls_direction_incoming
+    CallDirection.BLOCKED -> R.string.common_status_blocked
 }

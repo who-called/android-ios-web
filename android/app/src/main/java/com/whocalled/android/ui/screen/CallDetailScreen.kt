@@ -53,14 +53,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.whocalled.android.BuildConfig
+import com.whocalled.android.R
 import com.whocalled.android.data.ReportCategory
 import com.whocalled.android.network.LookupResponse
 import com.whocalled.android.ui.LoadState
@@ -75,9 +77,9 @@ import com.whocalled.android.ui.components.StatusBadge
 import com.whocalled.android.ui.theme.WCColor
 import com.whocalled.android.util.CallDirection
 import com.whocalled.android.util.CallEventAction
+import com.whocalled.android.util.UiLocale
 import java.text.DateFormat
 import java.util.Date
-import java.util.Locale
 
 private enum class NumberAction { CALL, SMS }
 
@@ -178,23 +180,23 @@ fun CallDetailScreen(
     pendingAction?.let { action ->
         AlertDialog(
             onDismissRequest = { pendingAction = null },
-            title = { Text(if (status == "block") "Numéro indésirable" else "Numéro suspect") },
+            title = { Text(if (status == "block") stringResource(R.string.detail_confirm_title_spam) else stringResource(R.string.detail_confirm_title_suspect)) },
             text = {
                 Text(
                     if (action == NumberAction.CALL)
-                        "Ce numéro présente un risque. Voulez-vous vraiment ouvrir le composeur ?"
+                        stringResource(R.string.detail_confirm_call_body)
                     else
-                        "Ce numéro présente un risque. Voulez-vous vraiment préparer un SMS ?",
+                        stringResource(R.string.detail_confirm_sms_body),
                 )
             },
             confirmButton = {
                 TextButton(onClick = {
                     pendingAction = null
                     launchNumberAction(action)
-                }) { Text("Continuer") }
+                }) { Text(stringResource(R.string.detail_confirm_continue)) }
             },
             dismissButton = {
-                TextButton(onClick = { pendingAction = null }) { Text("Annuler") }
+                TextButton(onClick = { pendingAction = null }) { Text(stringResource(R.string.common_cancel)) }
             },
         )
     }
@@ -217,23 +219,23 @@ fun CallDetailScreen(
     ) {
         item {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Retour") }
-                Text("Détail du numéro", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(R.string.common_back)) }
+                Text(stringResource(R.string.detail_title), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
             }
         }
 
         if (displayedPhone == null) {
-            item { Text("Chargement…") }
+            item { Text(stringResource(R.string.common_loading)) }
             return@LazyColumn
         }
 
         if (warnEvent != null) {
             item {
                 val categoryLabel = ReportCategory.fromApi(warnEvent.category)
-                    ?.takeIf { it != ReportCategory.OTHER }?.label
+                    ?.takeIf { it != ReportCategory.OTHER }?.labelRes?.let { stringResource(it) }
                 BorderedCard(accent = WCColor.Amber) {
                     Text(
-                        "Appel reçu ${formatReceivedAt(warnEvent.at)}",
+                        formatReceivedAt(context, warnEvent.at),
                         fontWeight = FontWeight.SemiBold,
                     )
                     Text(
@@ -284,10 +286,10 @@ fun CallDetailScreen(
                         ) {
                             StatusBadge(
                                 label = when (status) {
-                                    "block" -> "Indésirable"
-                                    "warn" -> "Suspect"
-                                    "allow" -> "Plutôt légitime"
-                                    else -> "Peu de données"
+                                    "block" -> stringResource(R.string.common_vote_spam)
+                                    "warn" -> stringResource(R.string.detail_status_suspect)
+                                    "allow" -> stringResource(R.string.detail_status_rather_legit)
+                                    else -> stringResource(R.string.detail_status_little_data)
                                 },
                                 color = statusColor,
                                 icon = when (status) {
@@ -322,7 +324,7 @@ fun CallDetailScreen(
                         modifier = Modifier.padding(top = 8.dp),
                     ) {
                         CircularProgressIndicator(Modifier.padding(end = 8.dp).size(14.dp), strokeWidth = 2.dp)
-                        Text("Statistiques…", style = MaterialTheme.typography.bodySmall)
+                        Text(stringResource(R.string.detail_stats_loading), style = MaterialTheme.typography.bodySmall)
                     }
                 }
             }
@@ -335,17 +337,17 @@ fun CallDetailScreen(
                     ActionTile(
                         Modifier.weight(1f),
                         Icons.Rounded.Phone,
-                        "Appeler",
+                        stringResource(R.string.detail_action_call),
                     ) { confirmOrLaunch(NumberAction.CALL) }
                     ActionTile(
                         Modifier.weight(1f),
                         Icons.AutoMirrored.Rounded.Message,
-                        "SMS",
+                        stringResource(R.string.detail_action_sms),
                     ) { confirmOrLaunch(NumberAction.SMS) }
                     ActionTile(
                         Modifier.weight(1f),
                         if (isBlocked) Icons.Rounded.LockOpen else Icons.Rounded.Block,
-                        if (isBlocked) "Autoriser" else "Bloquer",
+                        if (isBlocked) stringResource(R.string.report_allow) else stringResource(R.string.detail_action_block),
                         tint = if (isBlocked) WCColor.Emerald else WCColor.Coral,
                     ) {
                         if (isBlocked) viewModel.unblock(displayedPhone) else viewModel.block(displayedPhone)
@@ -353,7 +355,7 @@ fun CallDetailScreen(
                     ActionTile(
                         Modifier.weight(1f),
                         Icons.Rounded.ContentCopy,
-                        "Copier",
+                        stringResource(R.string.detail_action_copy),
                     ) { clipboard.setText(AnnotatedString("+$displayedPhone")) }
                 }
                 // Only surfaced once a personal rule actually exists — no line of
@@ -361,9 +363,9 @@ fun CallDetailScreen(
                 rule?.let {
                     Text(
                         if (it == "allow")
-                            "Toujours autorisé sur cet appareil."
+                            stringResource(R.string.detail_rule_always_allowed)
                         else
-                            "Bloqué sur cet appareil.",
+                            stringResource(R.string.detail_rule_blocked),
                         style = MaterialTheme.typography.bodySmall,
                         color = if (it == "allow") WCColor.Emerald else WCColor.Coral,
                         modifier = Modifier.padding(top = 4.dp),
@@ -375,7 +377,7 @@ fun CallDetailScreen(
         // 3) The contribution ask, kept above the fold.
         item {
             BorderedCard {
-                Text("Votre avis", fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.detail_your_opinion), fontWeight = FontWeight.SemiBold)
                 SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth().padding(top = 8.dp)) {
                     SegmentedButton(
                         selected = myVote == "spam",
@@ -388,7 +390,7 @@ fun CallDetailScreen(
                         enabled = report !is LoadState.Loading,
                         shape = SegmentedButtonDefaults.itemShape(0, 2),
                     ) {
-                        Text("Indésirable")
+                        Text(stringResource(R.string.common_vote_spam))
                     }
                     SegmentedButton(
                         selected = myVote == "legit",
@@ -396,7 +398,7 @@ fun CallDetailScreen(
                         enabled = report !is LoadState.Loading,
                         shape = SegmentedButtonDefaults.itemShape(1, 2),
                     ) {
-                        Text("Légitime")
+                        Text(stringResource(R.string.common_vote_legit))
                     }
                 }
                 // One optional tap: why is this number unwanted? A re-vote is
@@ -404,7 +406,7 @@ fun CallDetailScreen(
                 if (myVote == "spam") {
                     val myCategory = myReports.firstOrNull { it.phone == displayedPhone }?.category
                     Text(
-                        "Pourquoi ? (facultatif)",
+                        stringResource(R.string.detail_why_optional),
                         style = MaterialTheme.typography.labelLarge,
                         fontWeight = FontWeight.SemiBold,
                         modifier = Modifier.padding(top = 10.dp),
@@ -417,7 +419,7 @@ fun CallDetailScreen(
                                     viewModel.submitReport(displayedPhone, isSpam = true, c.api)
                                 },
                                 enabled = report !is LoadState.Loading,
-                                label = { Text(c.label) },
+                                label = { Text(stringResource(c.labelRes)) },
                             )
                         }
                     }
@@ -441,7 +443,8 @@ fun CallDetailScreen(
             item {
                 BorderedCard(accent = WCColor.Indigo) {
                     Text(
-                        "Plage officielle ARCEP" + (arcepMatch?.pattern?.let { " · $it" } ?: ""),
+                        arcepMatch?.pattern?.let { stringResource(R.string.detail_arcep_range_pattern, it) }
+                            ?: stringResource(R.string.detail_arcep_range),
                         fontWeight = FontWeight.SemiBold,
                     )
                     TextButton(
@@ -457,10 +460,10 @@ fun CallDetailScreen(
                             contentDescription = null,
                             modifier = Modifier.padding(end = 6.dp).size(16.dp),
                         )
-                        Text("Source officielle : plan de numérotation (arcep.fr)")
+                        Text(stringResource(R.string.detail_arcep_official_source))
                     }
                     Text(
-                        "Who Called est indépendante, non affiliée à l’ARCEP.",
+                        stringResource(R.string.detail_arcep_not_affiliated),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -472,7 +475,7 @@ fun CallDetailScreen(
         //    opened the screen for.
         item {
             ExpandableSection(
-                title = "Pourquoi cette évaluation",
+                title = stringResource(R.string.detail_why_evaluation),
                 subtitle = sourceHeadline(source, isArcep, hasCommunityData),
             ) {
                 Text(
@@ -488,25 +491,28 @@ fun CallDetailScreen(
         if (recentHistory.isNotEmpty() || call != null) {
             item {
                 ExpandableSection(
-                    title = "Vos appels avec ce numéro",
+                    title = stringResource(R.string.detail_your_calls),
                     subtitle = if (recentHistory.isEmpty()) null else
-                        "${recentHistory.size} sur 30 jours · $callsLast7Days sur 7 jours",
+                        stringResource(R.string.detail_your_calls_subtitle, recentHistory.size, callsLast7Days),
                 ) {
                     call?.let { filteredCall ->
                         DetailLine(
-                            "Type d’appel",
-                            ReportCategory.fromApi(lookup?.category ?: filteredCall.category)?.label ?: "Inconnu",
+                            stringResource(R.string.report_call_type),
+                            stringResource(
+                                ReportCategory.fromApi(lookup?.category ?: filteredCall.category)?.labelRes
+                                    ?: R.string.category_unknown,
+                            ),
                         )
                         DetailLine(
-                            if (filteredCall.action == "allowed") "Reçu le" else "Filtré le",
-                            DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT, Locale.FRANCE)
+                            if (filteredCall.action == "allowed") stringResource(R.string.detail_received_on) else stringResource(R.string.detail_filtered_on),
+                            DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT, UiLocale.of(context))
                                 .format(Date(filteredCall.timestamp)),
                         )
                     }
                     recentHistory.forEach { event ->
                         DetailLine(
                             callHistoryLabel(event.direction),
-                            com.whocalled.android.util.RelativeTime.format(event.timestamp),
+                            com.whocalled.android.util.RelativeTime.format(context, event.timestamp),
                         )
                     }
                 }
@@ -545,10 +551,10 @@ private fun ActionTile(
 @Composable
 fun SourceBadge(source: String, isArcep: Boolean, hasCommunityData: Boolean) {
     when {
-        source == "mixed" -> StatusBadge("ARCEP + communauté", WCColor.Indigo, Icons.Rounded.Gavel)
-        isArcep -> StatusBadge("ARCEP", WCColor.Indigo, Icons.Rounded.Gavel)
-        hasCommunityData -> StatusBadge("Communauté", WCColor.Slate, Icons.Rounded.Group)
-        else -> StatusBadge("Aucune donnée", WCColor.Blue, Icons.Rounded.Search)
+        source == "mixed" -> StatusBadge(stringResource(R.string.detail_badge_mixed), WCColor.Indigo, Icons.Rounded.Gavel)
+        isArcep -> StatusBadge(stringResource(R.string.detail_badge_arcep), WCColor.Indigo, Icons.Rounded.Gavel)
+        hasCommunityData -> StatusBadge(stringResource(R.string.detail_badge_community), WCColor.Slate, Icons.Rounded.Group)
+        else -> StatusBadge(stringResource(R.string.detail_badge_none), WCColor.Blue, Icons.Rounded.Search)
     }
 }
 
@@ -556,21 +562,30 @@ fun SourceBadge(source: String, isArcep: Boolean, hasCommunityData: Boolean) {
  * The raw community counts and the reliability of the verdict, condensed into one
  * readable line — this used to be a card with two big numbers and a paragraph.
  */
-private fun communitySummary(stats: LookupResponse): AnnotatedString = buildAnnotatedString {
-    withStyle(SpanStyle(color = WCColor.Coral, fontWeight = FontWeight.Bold)) {
-        append("${stats.reportCountSpam}")
+@Composable
+private fun communitySummary(stats: LookupResponse): AnnotatedString {
+    val spam = pluralStringResource(R.plurals.detail_spam_count, stats.reportCountSpam, stats.reportCountSpam)
+    val legit = pluralStringResource(R.plurals.detail_legit_count, stats.reportCountLegit, stats.reportCountLegit)
+    val confidence = confidenceSummary(stats.confidenceLevel ?: "none")
+    return buildAnnotatedString {
+        appendCount(spam, stats.reportCountSpam, WCColor.Coral)
+        append("  ·  ")
+        appendCount(legit, stats.reportCountLegit, WCColor.Emerald)
+        append("  ·  ")
+        append(confidence)
     }
-    append(" indésirable${plural(stats.reportCountSpam)}")
-    append("  ·  ")
-    withStyle(SpanStyle(color = WCColor.Emerald, fontWeight = FontWeight.Bold)) {
-        append("${stats.reportCountLegit}")
-    }
-    append(" légitime${plural(stats.reportCountLegit)}")
-    append("  ·  ")
-    append(confidenceSummary(stats.confidenceLevel ?: "none"))
 }
 
-private fun plural(n: Int) = if (n > 1) "s" else ""
+/** Appends a resolved "N label" string, keeping only the number N coloured and bold. */
+private fun AnnotatedString.Builder.appendCount(text: String, count: Int, color: Color) {
+    val start = length
+    append(text)
+    val number = count.toString()
+    val at = text.indexOf(number)
+    if (at >= 0) {
+        addStyle(SpanStyle(color = color, fontWeight = FontWeight.Bold), start + at, start + at + number.length)
+    }
+}
 
 /** Everything that was spread over the old stats card, now inside the fold. */
 @Composable
@@ -583,7 +598,7 @@ private fun EvaluationDetail(stats: LookupResponse) {
         modifier = Modifier.padding(top = 8.dp),
     )
     Text(
-        "Les nombres affichés sont les avis bruts ; le verdict pondère aussi leur récence et la réputation des contributeurs.",
+        stringResource(R.string.detail_raw_counts_note),
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = Modifier.padding(top = 6.dp),
@@ -593,9 +608,9 @@ private fun EvaluationDetail(stats: LookupResponse) {
     stats.topReason
         ?.takeIf { it.category != "unknown" && it.count > 0 }
         ?.let { top ->
-            val label = ReportCategory.fromApi(top.category)?.label ?: top.category
+            val label = ReportCategory.fromApi(top.category)?.labelRes?.let { stringResource(it) } ?: top.category
             Text(
-                "Le plus souvent : $label (${top.share} %)",
+                stringResource(R.string.detail_stats_top_reason, label, top.share),
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.SemiBold,
                 color = WCColor.Coral,
@@ -605,23 +620,25 @@ private fun EvaluationDetail(stats: LookupResponse) {
 
     val frequency = stats.frequency
     if (frequency.last1y > 0) {
-        Text("Activité des avis", fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(top = 12.dp))
+        Text(stringResource(R.string.detail_reviews_activity), fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(top = 12.dp))
         Row(Modifier.fillMaxWidth().padding(top = 6.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-            Stat("24 h", frequency.last24h.toString(), MaterialTheme.colorScheme.primary)
-            Stat("7 j", frequency.last7d.toString(), MaterialTheme.colorScheme.primary)
-            Stat("30 j", frequency.last30d.toString(), MaterialTheme.colorScheme.primary)
-            Stat("1 an", frequency.last1y.toString(), MaterialTheme.colorScheme.primary)
+            Stat(stringResource(R.string.detail_stats_24h), frequency.last24h.toString(), MaterialTheme.colorScheme.primary)
+            Stat(stringResource(R.string.detail_stats_7d), frequency.last7d.toString(), MaterialTheme.colorScheme.primary)
+            Stat(stringResource(R.string.detail_stats_30d), frequency.last30d.toString(), MaterialTheme.colorScheme.primary)
+            Stat(stringResource(R.string.detail_stats_1y), frequency.last1y.toString(), MaterialTheme.colorScheme.primary)
         }
     }
 }
 
+@Composable
 private fun sourceHeadline(source: String, isArcep: Boolean, hasCommunityData: Boolean): String = when {
-    source == "mixed" -> "ARCEP et avis de la communauté"
-    isArcep -> "Plage officielle ARCEP"
-    hasCommunityData -> "Avis de la communauté"
-    else -> "Aucune donnée communautaire"
+    source == "mixed" -> stringResource(R.string.detail_headline_mixed)
+    isArcep -> stringResource(R.string.detail_arcep_range)
+    hasCommunityData -> stringResource(R.string.detail_headline_community)
+    else -> stringResource(R.string.detail_headline_none)
 }
 
+@Composable
 private fun sourceExplanation(
     source: String,
     isArcep: Boolean,
@@ -629,65 +646,68 @@ private fun sourceExplanation(
     arcepPattern: String?,
 ): String = when {
     source == "mixed" ->
-        "Ce numéro correspond à une plage ARCEP et possède aussi des avis communautaires. Le verdict tient compte des deux."
+        stringResource(R.string.detail_explanation_mixed)
     isArcep ->
-        "Ce numéro correspond à un préfixe de la liste officielle des démarcheurs (ARCEP / opérateurs)" +
-            (arcepPattern?.let { " : $it" } ?: "") +
-            ". Cette source est distincte des avis communautaires."
+        arcepPattern?.let { stringResource(R.string.detail_explanation_arcep_pattern, it) }
+            ?: stringResource(R.string.detail_explanation_arcep)
     hasCommunityData ->
-        "Le verdict combine les avis récents, leur volume et la réputation des contributeurs."
+        stringResource(R.string.detail_explanation_community)
     else ->
-        "L’absence d’avis ne signifie pas que ce numéro est fiable. Restez prudent avant de rappeler."
+        stringResource(R.string.detail_explanation_none)
 }
 
-private fun formatReceivedAt(timestamp: Long): String {
-    val time = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.getDefault()).format(Date(timestamp))
+private fun formatReceivedAt(context: android.content.Context, timestamp: Long): String {
+    val time = DateFormat.getTimeInstance(DateFormat.SHORT, UiLocale.of(context)).format(Date(timestamp))
     val then = java.util.Calendar.getInstance().apply { timeInMillis = timestamp }
     val now = java.util.Calendar.getInstance()
     val sameDay = now.get(java.util.Calendar.DAY_OF_YEAR) == then.get(java.util.Calendar.DAY_OF_YEAR) &&
         now.get(java.util.Calendar.YEAR) == then.get(java.util.Calendar.YEAR)
     return if (sameDay) {
-        "aujourd’hui à $time"
+        context.getString(R.string.detail_received_today, time)
     } else {
-        val date = DateFormat.getDateInstance(DateFormat.SHORT, Locale.getDefault()).format(Date(timestamp))
-        "le $date à $time"
+        val date = DateFormat.getDateInstance(DateFormat.SHORT, UiLocale.of(context)).format(Date(timestamp))
+        context.getString(R.string.detail_received_on_date, date, time)
     }
 }
 
-private fun warnScoreExplanation(score: Int, categoryLabel: String?): String {
-    val what = categoryLabel?.let { "$score % · $it" } ?: "$score %"
-    return "Score $what. Des signalements existent, mais pas assez pour bloquer automatiquement. L’appel a sonné : c’était à vous de répondre ou de refuser."
-}
+@Composable
+private fun warnScoreExplanation(score: Int, categoryLabel: String?): String =
+    categoryLabel?.let { stringResource(R.string.detail_warn_score_explanation_category, score, it) }
+        ?: stringResource(R.string.detail_warn_score_explanation, score)
 
+@Composable
 private fun verdictExplanation(status: String, confidenceLevel: String): String = when (status) {
-    "block" -> if (confidenceLevel == "high") "Forte convergence vers un appel indésirable."
-        else "Évalué comme indésirable, avec encore peu de recul."
-    "warn" -> "Des avis négatifs existent, mais le verdict reste à confirmer."
-    "allow" -> if (confidenceLevel == "high") "Les avis convergent vers un numéro légitime."
-        else "Tendance plutôt légitime, avec encore peu d’avis."
-    else -> "Pas assez d’éléments pour évaluer ce numéro."
+    "block" -> if (confidenceLevel == "high") stringResource(R.string.detail_verdict_block_high)
+        else stringResource(R.string.detail_verdict_block)
+    "warn" -> stringResource(R.string.detail_verdict_warn)
+    "allow" -> if (confidenceLevel == "high") stringResource(R.string.detail_verdict_allow_high)
+        else stringResource(R.string.detail_verdict_allow)
+    else -> stringResource(R.string.detail_verdict_unknown)
 }
 
 /** Inline form of the reliability label, for the one-line summary. */
+@Composable
 private fun confidenceSummary(level: String): String = when (level) {
-    "official" -> "source officielle"
-    "high" -> "fiabilité élevée"
-    "medium" -> "fiabilité moyenne"
-    "low" -> "fiabilité faible"
-    else -> "fiabilité non évaluée"
+    "official" -> stringResource(R.string.detail_confidence_official)
+    "high" -> stringResource(R.string.detail_confidence_high)
+    "medium" -> stringResource(R.string.detail_confidence_medium)
+    "low" -> stringResource(R.string.detail_confidence_low)
+    else -> stringResource(R.string.detail_confidence_none)
 }
 
+@Composable
 private fun confidenceExplanation(level: String, confidence: Int?): String = when (level) {
-    "official" -> "Le statut provient d’une plage officielle, pas d’un calcul communautaire."
-    "high" -> "Le volume pondéré d’avis est suffisant pour une évaluation solide (${confidence ?: 100} %)."
-    "medium" -> "Plusieurs avis existent, mais davantage de recul est utile (${confidence ?: 0} %)."
-    "low" -> "Trop peu d’avis pondérés pour conclure avec assurance (${confidence ?: 0} %)."
-    else -> "Aucun avis pondéré exploitable pour le moment."
+    "official" -> stringResource(R.string.detail_confidence_official_body)
+    "high" -> stringResource(R.string.detail_confidence_high_body, confidence ?: 100)
+    "medium" -> stringResource(R.string.detail_confidence_medium_body, confidence ?: 0)
+    "low" -> stringResource(R.string.detail_confidence_low_body, confidence ?: 0)
+    else -> stringResource(R.string.detail_confidence_none_body)
 }
 
+@Composable
 private fun callHistoryLabel(direction: CallDirection): String = when (direction) {
-    CallDirection.INCOMING -> "Entrant"
-    CallDirection.BLOCKED -> "Bloqué"
+    CallDirection.INCOMING -> stringResource(R.string.calls_direction_incoming)
+    CallDirection.BLOCKED -> stringResource(R.string.common_status_blocked)
 }
 
 @Composable

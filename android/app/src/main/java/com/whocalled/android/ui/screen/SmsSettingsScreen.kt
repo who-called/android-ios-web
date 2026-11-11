@@ -21,6 +21,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.whocalled.android.R
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -47,13 +49,13 @@ fun SmsSettingsScreen(viewModel: MainViewModel, onBack: () -> Unit) {
     ScrollableScreen(
         header = {
             GradientHeader(
-                title = "Bouclier SMS",
-                subtitle = "Masquez les SMS indésirables",
+                title = stringResource(R.string.sms_title),
+                subtitle = stringResource(R.string.sms_subtitle),
                 leading = {
                     IconButton(onClick = onBack, modifier = Modifier.padding(end = 4.dp)) {
                         Icon(
                             Icons.AutoMirrored.Rounded.ArrowBack,
-                            contentDescription = "Retour",
+                            contentDescription = stringResource(R.string.common_back),
                             tint = androidx.compose.ui.graphics.Color.White,
                         )
                     }
@@ -65,17 +67,15 @@ fun SmsSettingsScreen(viewModel: MainViewModel, onBack: () -> Unit) {
         if (!accessGranted) {
             item {
                 BorderedCard(Modifier.padding(horizontal = 16.dp), accent = WCColor.Coral) {
-                    Text("Accès aux notifications requis", fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.sms_access_required), fontWeight = FontWeight.Bold)
                     Text(
-                        "Pour masquer les SMS indésirables, autorisez Who Called à accéder aux notifications. " +
-                            "Nous ne lisons jamais le contenu de vos messages : nous masquons seulement la notification " +
-                            "d’un expéditeur indésirable. Le SMS reste dans votre application de messagerie.",
+                        stringResource(R.string.sms_access_body),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(vertical = 8.dp),
                     )
                     Button(onClick = { NotificationAccess.openSettings(context) }) {
-                        Text("Activer l’accès aux notifications")
+                        Text(stringResource(R.string.sms_access_button))
                     }
                 }
             }
@@ -91,7 +91,7 @@ fun SmsSettingsScreen(viewModel: MainViewModel, onBack: () -> Unit) {
                         modifier = Modifier.size(28.dp),
                     )
                     Text(
-                        "Bouclier SMS",
+                        stringResource(R.string.sms_title),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.weight(1f).padding(start = 10.dp),
@@ -99,15 +99,15 @@ fun SmsSettingsScreen(viewModel: MainViewModel, onBack: () -> Unit) {
                 }
                 HorizontalDivider(Modifier.padding(vertical = 12.dp))
                 ToggleRow(
-                    title = "Masquer les notifications de SMS indésirables",
-                    description = "Le message reste dans votre application SMS, marqué comme non lu. Aucun message n’est lu ni supprimé.",
+                    title = stringResource(R.string.sms_hide_title),
+                    description = stringResource(R.string.sms_hide_desc),
                     checked = smsOn,
                     enabled = accessGranted,
                 ) { viewModel.setSmsBlockingEnabled(it) }
                 HorizontalDivider(Modifier.padding(vertical = 4.dp))
                 ToggleRow(
-                    title = "M’avertir d’un SMS masqué",
-                    description = "Affiche une notification discrète quand un SMS indésirable est masqué.",
+                    title = stringResource(R.string.sms_notify_title),
+                    description = stringResource(R.string.sms_notify_desc),
                     checked = notify,
                     enabled = smsOn,
                 ) { viewModel.setBlockedSmsNotification(it) }
@@ -116,11 +116,9 @@ fun SmsSettingsScreen(viewModel: MainViewModel, onBack: () -> Unit) {
 
         item {
             BorderedCard(Modifier.padding(horizontal = 16.dp)) {
-                Text("Comment ça marche", fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.sms_how_title), fontWeight = FontWeight.SemiBold)
                 Text(
-                    "Android ne permet pas de bloquer un SMS sans devenir votre application de messagerie par défaut. " +
-                        "Who Called reste un filtre : nous masquons seulement la notification des expéditeurs au score de spam élevé, " +
-                        "à partir de la même liste que pour les appels.",
+                    stringResource(R.string.sms_how_body),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = 4.dp),

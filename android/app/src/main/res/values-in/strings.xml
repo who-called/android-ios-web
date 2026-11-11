@@ -1,0 +1,445 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Bahasa Indonesia (Android legacy qualifier "in"). Source language is French (values/). Keep keys in sync. -->
+<resources>
+    <!-- WARN notification -->
+    <string name="warn_channel_name">Peringatan panggilan mencurigakan</string>
+    <string name="warn_channel_desc">Memberi tahu saat panggilan masuk memiliki skor spam tinggi.</string>
+    <string name="warn_title">⚠️ Panggilan mencurigakan — tidak diblokir</string>
+    <string name="warn_subtext">Who Called · ponsel sedang berdering</string>
+
+    <!-- SMS shield -->
+    <string name="sms_blocked_channel_name">SMS tidak diinginkan disembunyikan</string>
+    <string name="sms_blocked_channel_desc">Memberi tahu secara halus saat notifikasi SMS tidak diinginkan disembunyikan.</string>
+    <string name="sms_blocked_title">SMS tidak diinginkan disembunyikan</string>
+    <string name="sms_blocked_body">Notifikasi dari %1$s disembunyikan. Pesan tetap ada di aplikasi SMS Anda.</string>
+    <string name="sms_listener_label">Perisai SMS Who Called</string>
+
+    <!-- Blocked-call notification -->
+    <string name="call_blocked_channel_name">Panggilan diblokir</string>
+    <string name="call_blocked_channel_desc">Memberi tahu secara halus saat panggilan tidak diinginkan diblokir.</string>
+    <string name="call_blocked_title">Panggilan diblokir</string>
+    <string name="call_blocked_unknown">Nomor tersembunyi</string>
+
+    <!-- Daily game reminder -->
+    <string name="reminder_channel_name">Pengingat permainan</string>
+    <string name="reminder_channel_desc">Pengingat ramah, sekali sehari, untuk memainkan tantangan harian. Dapat dinonaktifkan di pengaturan.</string>
+
+    <!-- Common -->
+    <string name="common_back">Kembali</string>
+    <string name="common_close">Tutup</string>
+    <string name="common_cancel">Batal</string>
+    <string name="common_delete">Hapus</string>
+    <string name="common_edit">Ubah</string>
+    <string name="common_loading">Memuat…</string>
+    <string name="common_connecting">Menghubungkan ke server…</string>
+    <string name="common_retry">Coba lagi</string>
+    <string name="common_points">%1$d poin</string>
+    <string name="common_vote_spam">Tidak diinginkan</string>
+    <string name="common_vote_legit">Sah</string>
+    <string name="common_status_blocked">Diblokir</string>
+    <string name="common_status_warned">Diperingatkan</string>
+
+    <!-- Bottom navigation tabs (keep short) -->
+    <string name="tab_games">Game</string>
+
+    <!-- Daily game reminder notification (pairs of title + body, picked at random) -->
+    <string name="reminder_1_title">🧩 Tantangan TRACE hari ini menunggumu — 5 kisi, 3 menit.</string>
+    <string name="reminder_1_body">Naiki papan peringkat, sesuai iramamu.</string>
+    <string name="reminder_2_title">🔥 Jaga rentetanmu tetap hidup</string>
+    <string name="reminder_2_body">Satu permainan singkat sudah cukup untuk terus melaju.</string>
+    <string name="reminder_3_title">🏆 Mungkin ada yang mengalahkan skormu</string>
+    <string name="reminder_3_body">Giliranmu merebut posisi teratas lagi, dengan sportif.</string>
+    <string name="reminder_4_title">🛡️ Jeda cerdas hari ini</string>
+    <string name="reminder_4_body">Tantangan anti-spam untuk menyegarkan pikiran?</string>
+    <string name="reminder_5_title">✨ Tantangan baru tersedia</string>
+    <string name="reminder_5_body">Kisi yang sama untuk semua orang hari ini — tunjukkan kemampuanmu!</string>
+
+    <!-- Playful blocked-call notification titles (opt-in). Built-in defaults: local language + English. -->
+    <string-array name="fun_blocked_default_titles">
+        <item>🥊 Spam K.O.!</item>
+        <item>🛡️ Usaha bagus, spammer</item>
+        <item>🚫 Telemarketer ditolak</item>
+        <item>📵 Satu pengganggu berkurang</item>
+        <item>☀️ Satu lagi penjual panel surya diblokir</item>
+        <item>🥊 Spam knocked out!</item>
+        <item>🛡️ Nice try, spammer</item>
+        <item>🚫 Cold caller turned away</item>
+        <item>📵 One less nuisance</item>
+        <item>😎 Blocked — you\'re welcome</item>
+    </string-array>
+
+    <!-- Country scopes for the spam list -->
+    <string name="country_all">Semua negara</string>
+    <string name="country_fr">Prancis</string>
+    <string name="country_be">Belgia</string>
+    <string name="country_ch">Swiss</string>
+    <string name="country_lu">Luksemburg</string>
+    <string name="country_es">Spanyol</string>
+    <string name="country_it">Italia</string>
+    <string name="country_de">Jerman</string>
+    <string name="country_gb">Britania Raya</string>
+    <string name="country_pt">Portugal</string>
+    <string name="country_us">Amerika Serikat</string>
+    <string name="country_ca">Kanada</string>
+    <string name="country_ma">Maroko</string>
+    <string name="country_dz">Aljazair</string>
+    <string name="country_tn">Tunisia</string>
+
+    <!-- Report categories -->
+    <string name="category_telemarketing">Telemarketing</string>
+    <string name="category_scam">Penipuan</string>
+    <string name="category_robocall">Panggilan otomatis</string>
+    <string name="category_silent">Panggilan senyap</string>
+    <string name="category_debt">Penagihan utang</string>
+    <string name="category_survey">Survei</string>
+    <string name="category_other">Lainnya</string>
+    <string name="category_unknown">Tidak diketahui</string>
+
+    <!-- Call history sections -->
+    <string name="history_section_today">Hari ini</string>
+    <string name="history_section_yesterday">Kemarin</string>
+    <string name="history_section_this_week">Minggu ini</string>
+    <string name="history_section_this_month">Bulan ini</string>
+    <string name="history_section_older">Lebih lama</string>
+
+    <!-- Relative time -->
+    <string name="time_just_now">baru saja</string>
+    <string name="time_minutes_ago">%1$d mnt lalu</string>
+    <string name="time_hours_ago">%1$d jam lalu</string>
+    <string name="time_yesterday">kemarin</string>
+    <string name="time_days_ago">%1$d hr lalu</string>
+
+    <!-- Errors and status messages (ViewModel / repository) -->
+    <string name="error_invalid_phone">Nomor tidak valid.</string>
+    <string name="error_network">Tidak ada koneksi. Coba lagi.</string>
+    <string name="error_server">Kesalahan server (%1$d).</string>
+    <string name="error_unknown">Kesalahan tidak diketahui.</string>
+    <string name="sync_up_to_date">Sudah terbaru ✓ Tidak ada nomor baru.</string>
+    <plurals name="sync_done">
+        <item quantity="other">Pembaruan selesai 📥 %1$d nomor diperbarui.</item>
+    </plurals>
+    <string name="sync_failed">Gagal memperbarui. Periksa koneksi Anda lalu coba lagi.</string>
+    <string name="report_feedback_repeat">Sudah kami catat 😊 Tidak perlu diulang — satu laporan sudah cukup!</string>
+    <string name="report_feedback_thanks">Terima kasih! Laporan tersimpan 🛡️</string>
+    <string name="report_feedback_saved_locally">Disimpan secara lokal. Gagal mengirim ke server: %1$s</string>
+    <string name="privacy_erased">Laporan Anda telah dihapus.</string>
+    <string name="privacy_erase_failed">Gagal menghapus. Coba lagi.</string>
+    <string name="api_test_unreachable">Tidak dapat dijangkau.</string>
+
+    <!-- Country picker (Home + Settings) -->
+    <string name="country_dialog_title">Negara yang dipantau</string>
+
+    <!-- Home screen -->
+    <string name="home_sync_button">Perbarui daftar</string>
+    <plurals name="home_sync_progress">
+        <item quantity="other">%1$s nomor diambil…</item>
+    </plurals>
+    <string name="home_sms_on">Aktif · SMS tidak diinginkan disembunyikan</string>
+    <string name="home_sms_off">Sembunyikan notifikasi SMS tidak diinginkan</string>
+    <string name="home_covered_numbers">Nomor yang tercakup</string>
+    <string name="home_auto_update">Pembaruan otomatis · %1$s</string>
+    <string name="home_blocked_calls">Panggilan diblokir</string>
+    <string name="home_none_yet">Belum ada</string>
+    <string name="home_update_today">diperbarui hari ini</string>
+    <string name="home_update_yesterday">diperbarui kemarin</string>
+    <string name="home_update_days_ago">diperbarui %1$d hr lalu</string>
+    <string name="home_update_on">Diperbarui %1$s</string>
+    <string name="home_community_title">Perisai komunitas</string>
+
+    <!-- Report screen -->
+    <string name="report_title">Laporkan nomor</string>
+    <string name="report_subtitle">Anonim — tanpa akun, tanpa data pribadi.</string>
+    <string name="report_phone_label">Nomor (mis. +33 6 12 34 56 78)</string>
+    <string name="report_call_type">Jenis panggilan</string>
+    <string name="report_submit">Kirim laporan</string>
+    <string name="report_allow">Izinkan</string>
+    <string name="report_empty_recent_title">Tidak ada panggilan terbaru</string>
+
+    <!-- Number detail (call detail + number lookup) -->
+    <string name="detail_title">Detail nomor</string>
+    <string name="detail_filtered_on">Disaring pada</string>
+    <string name="detail_badge_community">Komunitas</string>
+    <string name="detail_stats_top_reason">Paling sering: %1$s (%2$d%%)</string>
+    <string name="detail_stats_24h">24 jam</string>
+    <string name="detail_stats_7d">7 hr</string>
+    <string name="detail_stats_30d">30 hr</string>
+    <string name="detail_stats_1y">1 thn</string>
+
+    <!-- My reports (Journal tab) -->
+    <string name="myreports_title">Laporan saya</string>
+    <string name="myreports_intro">Ubah pendapat Anda atau hapus laporan yang dibuat secara keliru.</string>
+    <string name="myreports_delete_title">Hapus laporan ini?</string>
+    <string name="myreports_delete_body">Laporan untuk +%1$s akan dihapus (secara lokal dan dari server kami). Tindakan ini tidak dapat dibatalkan.</string>
+    <string name="myreports_empty_title">Belum ada laporan</string>
+    <string name="myreports_empty_body">Laporan Anda akan muncul di sini. Laporkan nomor tidak diinginkan untuk melindungi komunitas.</string>
+    <string name="myreports_sync_sent">terkirim</string>
+    <string name="myreports_sync_failed">tidak terkirim</string>
+    <string name="myreports_sync_pending">menunggu</string>
+    <string name="myreports_change_mind">Ubah pendapat</string>
+
+    <!-- Filtered-call history -->
+    <string name="history_empty_title">Tidak ada panggilan yang disaring</string>
+    <string name="history_copied">Nomor disalin</string>
+
+    <!-- SMS shield -->
+    <string name="sms_title">Perisai SMS</string>
+    <string name="sms_subtitle">Sembunyikan SMS tidak diinginkan</string>
+    <string name="sms_access_required">Akses notifikasi diperlukan</string>
+    <string name="sms_access_body">Untuk menyembunyikan SMS tidak diinginkan, izinkan Who Called mengakses notifikasi. Kami tidak pernah membaca isi pesan Anda: kami hanya menyembunyikan notifikasi dari pengirim yang tidak diinginkan. SMS tetap ada di aplikasi pesan Anda.</string>
+    <string name="sms_access_button">Aktifkan akses notifikasi</string>
+    <string name="sms_hide_title">Sembunyikan notifikasi SMS tidak diinginkan</string>
+    <string name="sms_hide_desc">Pesan tetap ada di aplikasi SMS Anda, ditandai belum dibaca. Tidak ada pesan yang dibaca atau dihapus.</string>
+    <string name="sms_notify_title">Beri tahu saya tentang SMS yang disembunyikan</string>
+    <string name="sms_notify_desc">Menampilkan notifikasi halus saat SMS tidak diinginkan disembunyikan.</string>
+    <string name="sms_how_title">Cara kerjanya</string>
+    <string name="sms_how_body">Android tidak mengizinkan pemblokiran SMS tanpa menjadi aplikasi pesan default Anda. Who Called tetap berfungsi sebagai filter: kami hanya menyembunyikan notifikasi dari pengirim dengan skor spam tinggi, berdasarkan daftar yang sama dengan panggilan.</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Pengaturan</string>
+    <string name="settings_erase_dialog_title">Hapus data saya?</string>
+    <string name="settings_erase_dialog_body">Semua laporan yang dikirim dari perangkat ini akan dihapus permanen dari server kami. Tindakan ini tidak dapat dibatalkan.</string>
+    <string name="settings_section_filtering">Penyaringan</string>
+    <string name="settings_block_title">Blokir panggilan tidak diinginkan</string>
+    <string name="settings_block_desc">Nomor dengan skor spam tinggi otomatis ditolak: ponsel Anda tidak berdering.</string>
+    <string name="settings_warn_title">Peringatkan saya jika ragu</string>
+    <string name="settings_warn_desc">Untuk nomor dengan skor sedang (mencurigakan tetapi belum pasti), ponsel berdering seperti biasa tetapi notifikasi akan memperingatkan Anda. Anda yang memutuskan untuk menjawab atau tidak.</string>
+    <string name="settings_blocked_notif_title">Beri tahu saya tentang panggilan yang diblokir</string>
+    <string name="settings_blocked_notif_desc">Menampilkan notifikasi halus setelah setiap panggilan tidak diinginkan diblokir.</string>
+    <string name="settings_fun_title">Notifikasi lucu 😜</string>
+    <string name="settings_fun_desc">Pesan seru saat spam diblokir (\"Spam K.O.!\"). Nonaktif secara default.</string>
+    <string name="settings_fun_messages_title">Pesan-pesannya 😜</string>
+    <string name="settings_fun_messages_desc">Berikut semua pesan yang ditampilkan bergiliran saat spam diblokir. Tambahkan pesan Anda sendiri, ubah, atau kembali ke pesan default.</string>
+    <string name="settings_fun_defaults">Pesan default</string>
+    <string name="settings_fun_yours">Pesan Anda ✍️</string>
+    <string name="settings_fun_none">Belum ada pesan pribadi — tulis pesan Anda di bawah.</string>
+    <string name="settings_fun_edit">Ubah pesan ini</string>
+    <string name="settings_fun_delete">Hapus pesan ini</string>
+    <string name="settings_fun_placeholder">Mis.: 🎣 Satu lagi phishing terpancing!</string>
+    <string name="settings_fun_counter">%1$d/%2$d · emoji dipersilakan 😄</string>
+    <string name="settings_fun_add">Tambah</string>
+    <string name="settings_fun_reset">Atur ulang (kembali ke pesan default)</string>
+    <string name="settings_section_games">Game</string>
+    <string name="settings_reminder_title">Pengingat harian untuk bermain 🎮</string>
+    <string name="settings_reminder_desc">Pengingat ramah antara pukul 18.30 dan 20.30, tidak pernah jika Anda sudah bermain. Pengingat berhenti sendiri jika Anda mengabaikannya beberapa hari berturut-turut.</string>
+    <string name="settings_country_desc">Hanya unduh nomor dari negara ini (cache lebih ringan). Terdeteksi otomatis, dapat diubah.</string>
+    <string name="settings_threshold">Sensitivitas pemblokiran: %1$d%%</string>
+    <string name="settings_threshold_desc">Mulai dari skor spam ini, nomor akan diblokir. Di bawahnya, nomor hanya memicu peringatan (jika opsi di atas aktif). Semakin rendah ambang batasnya, semakin banyak yang diblokir — dengan risiko beberapa positif palsu.</string>
+    <string name="settings_section_info">Informasi</string>
+    <string name="settings_link_privacy">Privasi</string>
+    <string name="settings_link_legal">Informasi hukum</string>
+    <string name="settings_link_site">Situs resmi</string>
+    <string name="settings_link_rate">Beri nilai aplikasi</string>
+    <string name="settings_link_source">Kode sumber (open source)</string>
+    <string name="settings_link_contact">Hubungi kami</string>
+    <string name="settings_contact_subject">Who Called — kontak</string>
+    <string name="settings_section_data">Data saya</string>
+    <string name="settings_erase_title">Hapus laporan saya</string>
+    <string name="settings_erase_desc">Menghapus permanen semua laporan yang dikirim dari perangkat ini. Sesuai dengan hak Anda untuk menghapus data (GDPR).</string>
+    <string name="settings_erase_button">Hapus data saya</string>
+    <string name="settings_erasing">Menghapus…</string>
+    <string name="settings_section_diagnostic">Diagnostik</string>
+    <string name="settings_api_title">Koneksi API</string>
+    <string name="settings_api_desc">Periksa apakah aplikasi dapat menjangkau server Who Called.</string>
+    <string name="settings_api_testing">Sedang menguji…</string>
+    <string name="settings_api_test">Uji koneksi</string>
+    <string name="settings_api_ok">API OK ✓ (%1$d ms)</string>
+    <string name="settings_api_failed">API tidak dapat dijangkau ✗ — %1$s</string>
+    <string name="settings_free_title">Gratis dan open source</string>
+    <string name="settings_free_body" formatted="false">Who Called 100% gratis dan kodenya terbuka. 100% anonim — tanpa akun, tanpa data pribadi. Nomor dalam format internasional.</string>
+    <string name="settings_version_hint">Ketuk dua kali untuk menguji API</string>
+    <string name="settings_version_testing">Menguji API…</string>
+
+    <!-- Settings: hidden notification debug card (long-press the version) -->
+    <string name="debug_title">Debug notifikasi</string>
+    <string name="debug_permission">Izin notifikasi: %1$s</string>
+    <string name="debug_permission_granted">diberikan ✓</string>
+    <string name="debug_permission_denied">DITOLAK ✗ — tidak ada yang akan muncul</string>
+    <string name="debug_request">Minta</string>
+    <string name="debug_system_settings">Pengaturan sistem</string>
+    <string name="debug_blocked_standard">Panggilan diblokir (standar)</string>
+    <string name="debug_blocked_fun">Panggilan diblokir (lucu)</string>
+    <string name="debug_sms">SMS tidak diinginkan disembunyikan</string>
+    <string name="debug_reminder">Pengingat game harian</string>
+    <string name="debug_hide_hint">Tekan lama versi aplikasi untuk menyembunyikan panel ini.</string>
+
+    <!-- Games: shared -->
+    <string name="game_leaderboard_button">🏆 Peringkat</string>
+    <string name="game_start">Mulai ▸</string>
+    <string name="game_share">Bagikan</string>
+    <string name="game_replay">Main lagi</string>
+    <string name="game_quit">Keluar</string>
+    <string name="game_quit_title">Keluar dari permainan?</string>
+    <string name="game_daily_rank">Peringkat hari ini · top %1$d%%</string>
+    <plurals name="game_players_best">
+        <item quantity="other">%1$d pemain · terbaik %2$d</item>
+    </plurals>
+
+    <!-- Games hub -->
+    <string name="games_subtitle">Satu tantangan sehari, peringkatmu</string>
+    <string name="games_defense_tagline">Arkade — hancurkan panggilan spam.</string>
+    <string name="games_trace_tagline">Teka-teki — bongkar penipu yang bersembunyi.</string>
+    <string name="games_practice">🎯 Latihan bebas TRACE — tanpa peringkat</string>
+    <string name="games_footer" formatted="false">Tantangan baru setiap hari · 3 permainan berperingkat / hari · 100% anonim.</string>
+    <string name="games_record">Rekor: %1$d poin</string>
+    <string name="games_not_played">Belum dimainkan</string>
+    <string name="games_play_daily">Mainkan tantangan hari ini ▸</string>
+    <plurals name="games_play_attempts">
+        <item quantity="other">Main (sisa %1$d percobaan berperingkat)</item>
+    </plurals>
+    <string name="games_replay_practice">Main lagi (latihan)</string>
+
+    <!-- Daily streak screen -->
+    <string name="streak_title">Rentetan harian</string>
+    <string name="streak_current">Rentetan saat ini</string>
+    <string name="streak_best">Rentetan terbaik: %1$d</string>
+    <string name="streak_kept">Mantap — rentetan terjaga hari ini! 🔥</string>
+    <string name="streak_keep_going">Main hari ini untuk melanjutkan rentetanmu ☀️</string>
+    <string name="streak_milestone_reached">Pencapaian 7 hari tercapai! 🎁</string>
+    <string name="streak_next_milestone">Pencapaian berikutnya: 7 hari 🎁</string>
+    <string name="streak_weekday_mon">SEN</string>
+    <string name="streak_weekday_tue">SEL</string>
+    <string name="streak_weekday_wed">RAB</string>
+    <string name="streak_weekday_thu">KAM</string>
+    <string name="streak_weekday_fri">JUM</string>
+    <string name="streak_weekday_sat">SAB</string>
+    <string name="streak_weekday_sun">MIN</string>
+
+    <!-- Leaderboard screen -->
+    <string name="leaderboard_title">Peringkat %1$s</string>
+    <string name="leaderboard_period_day">Hari ini</string>
+    <string name="leaderboard_period_week">Minggu</string>
+    <string name="leaderboard_period_all">Sepanjang masa</string>
+    <string name="leaderboard_day_today">Hari ini</string>
+    <string name="leaderboard_day_yesterday">Kemarin</string>
+    <string name="leaderboard_days_ago">%1$d hr lalu</string>
+    <plurals name="leaderboard_unit_grids">
+        <item quantity="other">%1$d kisi</item>
+    </plurals>
+    <string name="leaderboard_unit_wave">gelombang %1$d</string>
+    <plurals name="leaderboard_summary">
+        <item quantity="other">%1$d pemain · terbaik %2$d · median %3$d</item>
+    </plurals>
+    <string name="leaderboard_summary_solo">1 pemain (kamu) · terbaik %1$d</string>
+    <string name="leaderboard_be_first">Jadilah yang pertama mencetak skor! 🚀</string>
+    <string name="leaderboard_your_rank">Peringkatmu</string>
+    <string name="leaderboard_you_top">Top %1$d%% · %2$d poin (%3$s)</string>
+    <string name="leaderboard_you_local">%1$d poin (%2$s)</string>
+    <string name="leaderboard_not_played">Belum bermain pada periode ini — mulai permainan!</string>
+    <string name="leaderboard_top">Top</string>
+    <string name="leaderboard_sync_pending">Skormu akan muncul di papan peringkat setelah sinkronisasi.</string>
+    <string name="leaderboard_no_scores">Belum ada skor. Giliranmu bermain!</string>
+    <string name="leaderboard_history">Riwayatmu</string>
+    <string name="leaderboard_history_rank">#%1$d/%2$d · top %3$d%%</string>
+    <string name="leaderboard_history_empty">Mainkan satu permainan untuk memulai riwayatmu.</string>
+
+    <!-- DEFENSE game -->
+    <string name="defense_hud_score">SKOR</string>
+    <string name="defense_hud_wave">GELOMBANG</string>
+    <string name="defense_item_ready">ITEM SIAP — ketuk</string>
+    <string name="defense_intro">Tahan untuk menembak, geser untuk membidik.\nHancurkan yang tidak diinginkan — mereka mengisi meteran ITEM-mu (aktifkan sendiri!).\nPanggilan hijau itu ramah; tangkap 🎁 untuk item langsung.</string>
+    <string name="defense_game_over">Perisai runtuh</string>
+    <plurals name="defense_result">
+        <item quantity="other">Gelombang %1$d · %2$d spam diblokir</item>
+    </plurals>
+    <string name="defense_share_text">who-called DEFENSE · %1$d poin · Gelombang %2$d 🛡️\nAyo blokir spam juga 👉 %3$s</string>
+    <string name="defense_quit_body">Kemajuanmu di gelombang ini akan hilang.</string>
+    <string name="defense_incoming">DATANG…</string>
+    <string name="defense_item_rapid">TEMBAK CEPAT</string>
+    <string name="defense_item_spread">TEMBAK ×5</string>
+    <string name="defense_item_slow">GERAK LAMBAT</string>
+    <string name="defense_item_repair">PERBAIKAN</string>
+    <string name="defense_item_shield">PERISAI</string>
+    <string name="defense_pop_combo">KOMBO ×%1$d</string>
+    <string name="defense_pop_boss_bonus">BOS +%1$d</string>
+    <string name="defense_pop_surge">SERBUAN ×%1$d</string>
+    <string name="defense_pop_boss">⚠ BOS</string>
+    <string name="defense_pop_bonus">BONUS 🎁</string>
+
+    <!-- TRACE game -->
+    <string name="trace_mode_daily">Tantangan hari ini</string>
+    <string name="trace_mode_practice">Latihan</string>
+    <string name="trace_tutorial">Tutorial</string>
+    <string name="trace_toast_error">−1 nyawa · −%1$d poin</string>
+    <string name="trace_toast_points">+%1$d poin!</string>
+    <string name="trace_hint">💡 Petunjuk</string>
+    <string name="trace_hint_desc">Menempatkan satu penipu · −%1$d poin</string>
+    <string name="trace_no_hints">Petunjuk habis</string>
+    <string name="trace_rules_title">3 ATURAN</string>
+    <string name="trace_controls">1 ketuk = ✗ aman · 2 ketuk = penipu · 3 ketuk = hapus\nGeser jari di kisi untuk memasang beberapa ✗ sekaligus</string>
+    <string name="trace_resume">Lanjutkan ▸</string>
+    <string name="trace_intro_daily">Tantangan hari ini · 5 kisi · 3 nyawa</string>
+    <string name="trace_intro_practice">Latihan bebas · tanpa peringkat</string>
+    <string name="trace_replay_tutorial">❓ Lihat lagi tutorial interaktif</string>
+    <string name="trace_size">Ukuran: %1$d×%1$d</string>
+    <string name="trace_grid_solved">Kisi %1$d terpecahkan!</string>
+    <string name="trace_score">Skor: %1$d</string>
+    <string name="trace_next_grid">Kisi berikutnya…</string>
+    <string name="trace_sprint_done">Sprint selesai!</string>
+    <plurals name="trace_all_grids">
+        <item quantity="other">Semua %1$d kisi berhasil dinetralkan 🎉</item>
+    </plurals>
+    <string name="trace_no_lives">Nyawa habis…</string>
+    <plurals name="trace_partial">
+        <item quantity="other">Tidak apa-apa — %1$d/%2$d kisi terpecahkan!</item>
+    </plurals>
+    <string name="trace_points">poin</string>
+    <string name="trace_share_text">who-called TRACE · %1$d poin · %2$d/%3$d kisi 🛡️\nAyo buru spammer juga 👉 %4$s</string>
+    <string name="trace_new_grid">Kisi baru</string>
+    <string name="trace_quit_body">Kemajuanmu di tantangan ini akan hilang.</string>
+    <string name="trace_rule_color">1 per warna</string>
+    <string name="trace_rule_line">1 / baris &amp; kolom</string>
+    <string name="trace_rule_adjacent">Tidak boleh bersebelahan</string>
+    <string name="trace_tap_label">Ketuk:</string>
+    <string name="trace_safe">aman</string>
+    <string name="trace_fraudster">penipu</string>
+    <string name="trace_loading">Menyiapkan tantangan…</string>
+    <string name="trace_error_title">Tidak dapat memuat tantangan</string>
+    <string name="trace_error_body">Periksa koneksimu lalu coba lagi.</string>
+
+    <!-- TRACE villains (cosmetic fraudster per grid) -->
+    <string name="trace_villain_imp">Setan kecil</string>
+    <string name="trace_villain_demon">Iblis</string>
+    <string name="trace_villain_supervillain">Penjahat super</string>
+    <string name="trace_villain_ninja">Ninja</string>
+    <string name="trace_villain_robot">Robot spam</string>
+    <string name="trace_villain_alien">Alien</string>
+    <string name="trace_villain_scammer">Penipu</string>
+    <string name="trace_villain_impostor">Peniru</string>
+
+    <!-- TRACE interactive tutorial -->
+    <string name="trace_tuto_title">TUTORIAL — %1$s Cara bermain</string>
+    <string name="trace_tuto_step0">Hanya 3 aturan:\n1 penipu per warna -- 1 per baris\ndan kolom -- tidak boleh bersebelahan</string>
+    <string name="trace_tuto_step1">Zona merah muda hanya punya satu kotak:\npenipunya pasti di sana.\nKetuk dua kali untuk menempatkannya.</string>
+    <string name="trace_tuto_step2">Kotak-kotak ini tidak mungkin\nberisi penipu. Pasang X\npada 3 kotak yang menyala.</string>
+    <string name="trace_tuto_step3">1 penipu per baris, 1 per kolom:\nmasing-masing punya tempatnya. Pasang X\npada 3 kotak yang menyala.</string>
+    <string name="trace_tuto_step4">Tidak boleh bersebelahan, bahkan\nsecara diagonal. Pasang X pada\nkotak yang menyala.</string>
+    <string name="trace_tuto_step5">Baris 2: hanya satu kotak kosong.\nPenipunya pasti di sana.\nKetuk dua kali untuk menempatkannya.</string>
+    <string name="trace_tuto_step6">Bagaimana kalau salah?\nKetuk dua kali kotak berbingkai\nmerah.</string>
+    <string name="trace_tuto_step7">Ketukan ke-3 menghapus.\nKetuk kotak itu lagi.</string>
+    <string name="trace_tuto_step8_a">Tinggal 2 penipu.\nBaris 3: hanya satu kotak kosong.\nKetuk dua kali.</string>
+    <string name="trace_tuto_step8_b">Yang terakhir: baris 4!\nKetuk dua kali.</string>
+    <string name="trace_tuto_tap_again_place">Satu ketukan lagi untuk menempatkannya!</string>
+    <string name="trace_tuto_tap_again">Satu ketukan lagi!</string>
+    <string name="trace_tuto_tap_again_ellipsis">Satu ketukan lagi...</string>
+    <string name="trace_tuto_done1">Bagus. 1 penipu per warna.</string>
+    <string name="trace_tuto_done2">Nah. Setiap X menyingkirkan satu kotak.\nSemakin sedikit kotak = semakin mudah\nmenemukan yang berikutnya.</string>
+    <string name="trace_tuto_done3">1 penipu per baris, 1 per kolom.\nTanda X adalah ingatanmu: terlarang.</string>
+    <string name="trace_tuto_done4">Semua yang menyentuh penipu\npasti aman: tandai dengan X.</string>
+    <string name="trace_tuto_done5">Mantap. Tanda X mempersempit pilihan\nsampai hanya tersisa satu\nkotak yang mungkin. Itulah intinya.</string>
+    <string name="trace_tuto_done6">Salah tempat: menyentuh penipu.\n-1 nyawa, -200 poin.</string>
+    <string name="trace_tuto_done7">Terhapus. Siklusnya:\nkosong, X, penipu, kosong.</string>
+    <string name="trace_tuto_done8">Selesai. Setiap warna, setiap baris,\nsetiap kolom punya penipunya SENDIRI.\nGiliranmu bermain!</string>
+    <string name="trace_tuto_tap_glowing_any">Ketuk kotak yang menyala</string>
+    <string name="trace_tuto_tap_glowing">Ketuk kotak yang menyala itu</string>
+    <string name="trace_tuto_erased">Terhapus</string>
+    <string name="trace_tuto_got_it">Mengerti ▸</string>
+    <string name="trace_tuto_skip">Lewati</string>
+    <string name="trace_tuto_lets_go">Ayo mulai ▸</string>
+    <string name="trace_tuto_next">Berikutnya ▸</string>
+    <string name="nav_games">Game</string>
+    <string name="nav_settings">Pengaturan</string>
+    <string name="home_country_dialog_title">Negara yang dipantau</string>
+    <string name="home_sync_connecting">Menghubungkan ke server…</string>
+    <string name="home_sms_title">Perisai SMS</string>
+    <string name="setup_skip">Lewati</string>
+</resources>

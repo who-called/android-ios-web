@@ -2,13 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDict } from "@/i18n/dictionaries";
-import { alternatesFor, toDictLocale, urlLocales } from "@/i18n/locales";
+import { alternatesFor, toDictLocale, publishedLocales } from "@/i18n/locales";
 
 export function generateStaticParams() {
   // Slugs are shared across locales; build all combinations.
   const slugs = getDict("fr").guides.items.map((g) => g.slug);
   const params: { locale: string; slug: string }[] = [];
-  for (const locale of urlLocales) for (const slug of slugs) params.push({ locale, slug });
+  for (const locale of publishedLocales) for (const slug of slugs) params.push({ locale, slug });
   return params;
 }
 

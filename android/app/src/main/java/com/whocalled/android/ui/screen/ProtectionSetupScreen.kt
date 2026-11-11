@@ -62,6 +62,11 @@ import androidx.core.view.WindowCompat
 import com.whocalled.android.ui.theme.WCColor
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import androidx.annotation.StringRes
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import com.whocalled.android.R
+import com.whocalled.android.util.UiLocale
 import java.text.NumberFormat
 
 private enum class SetupStep {
@@ -89,6 +94,7 @@ fun ProtectionSetupScreen(
     onFinished: () -> Unit,
 ) {
     val view = LocalView.current
+    val context = LocalContext.current
     val darkTheme = isSystemInDarkTheme()
     DisposableEffect(darkTheme) {
         val window = (view.context as Activity).window
@@ -118,10 +124,13 @@ fun ProtectionSetupScreen(
 
     fun bravoFor(step: SetupStep): String = when (step) {
         SetupStep.SCREENING -> coveredNumbers?.takeIf { it > 0 }?.let {
-            "✓ Filtre activé · ${NumberFormat.getInstance().format(it)} numéros prêts"
-        } ?: "✓ Filtre d’appels activé"
-        SetupStep.NOTIFICATIONS -> "✓ Alertes activées"
-        SetupStep.OVERLAY -> "✓ Bannière sur l’écran d’appel"
+            context.getString(
+                R.string.setup_done_screening_count,
+                NumberFormat.getInstance(UiLocale.of(context)).format(it),
+            )
+        } ?: context.getString(R.string.setup_done_screening)
+        SetupStep.NOTIFICATIONS -> context.getString(R.string.setup_done_notifications)
+        SetupStep.OVERLAY -> context.getString(R.string.setup_done_overlay)
     }
 
     // Always start at step 0 so notifications is never jumped over.
@@ -211,7 +220,7 @@ fun ProtectionSetupScreen(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    "Étape $displayStep/${steps.size}",
+                    stringResource(R.string.setup_step, displayStep, steps.size),
                     fontSize = 14.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = WCColor.Amber,
@@ -220,7 +229,7 @@ fun ProtectionSetupScreen(
                     onClick = onFinished,
                     modifier = Modifier.heightIn(min = 40.dp),
                 ) {
-                    Text("Passer", color = WCColor.Muted, fontWeight = FontWeight.Medium)
+                    Text(stringResource(R.string.setup_skip), color = WCColor.Muted, fontWeight = FontWeight.Medium)
                 }
             }
             LinearProgressIndicator(
@@ -286,7 +295,7 @@ fun ProtectionSetupScreen(
                         shape = RoundedCornerShape(14.dp),
                     ) {
                         Text(
-                            if (currentGranted) "Continuer" else copy.cta,
+                            stringResource(if (currentGranted) R.string.setup_continue else copy.cta),
                             fontWeight = FontWeight.SemiBold,
                             fontSize = 16.sp,
                         )
@@ -296,12 +305,12 @@ fun ProtectionSetupScreen(
                         modifier = Modifier.fillMaxWidth(),
                     ) {
                         Text(
-                            if (current == SetupStep.SCREENING) "Continuer sans bloquer" else "Plus tard",
+                            stringResource(if (current == SetupStep.SCREENING) R.string.setup_continue_without else R.string.setup_later),
                             color = WCColor.Muted,
                         )
                     }
                     Text(
-                        "Modifiable dans Réglages. Sans autorisation, jeux et recherche restent disponibles.",
+                        stringResource(R.string.setup_footer),
                         fontSize = 12.sp,
                         color = WCColor.Muted,
                         textAlign = TextAlign.Center,
@@ -330,7 +339,7 @@ private fun CompletionPane(coveredNumbers: Long?) {
         )
         Spacer(Modifier.height(12.dp))
         Text(
-            "Vous êtes protégé",
+            stringResource(R.string.setup_complete_title),
             fontSize = 22.sp,
             fontWeight = FontWeight.Bold,
             color = WCColor.Ink,
@@ -338,8 +347,11 @@ private fun CompletionPane(coveredNumbers: Long?) {
         )
         Text(
             coveredNumbers?.takeIf { it > 0 }?.let {
-                "${NumberFormat.getInstance().format(it)} numéros prêts à filtrer"
-            } ?: "Votre bouclier Who Called est prêt",
+                stringResource(
+                    R.string.setup_complete_count,
+                    NumberFormat.getInstance(UiLocale.of(LocalContext.current)).format(it),
+                )
+            } ?: stringResource(R.string.setup_complete_ready),
             fontSize = 14.sp,
             color = WCColor.Muted,
             textAlign = TextAlign.Center,
@@ -390,12 +402,12 @@ private fun AdaptiveStepBody(
             Text(
                 if (alreadyGranted) {
                     when (step) {
-                        SetupStep.SCREENING -> "Protection déjà activée"
-                        SetupStep.NOTIFICATIONS -> "Alertes déjà activées"
-                        SetupStep.OVERLAY -> "Bannière déjà autorisée"
+                        SetupStep.SCREENING -> stringResource(R.string.setup_already_screening)
+                        SetupStep.NOTIFICATIONS -> stringResource(R.string.setup_already_notifications)
+                        SetupStep.OVERLAY -> stringResource(R.string.setup_already_overlay)
                     }
                 } else {
-                    copy.title
+                    stringResource(copy.title)
                 },
                 fontSize = titleSize,
                 fontWeight = FontWeight.Bold,
@@ -406,9 +418,9 @@ private fun AdaptiveStepBody(
             )
             Text(
                 if (alreadyGranted) {
-                    "Cette autorisation est déjà en place. Continuez pour l’étape suivante."
+                    stringResource(R.string.setup_already_body)
                 } else {
-                    copy.body
+                    stringResource(copy.body)
                 },
                 fontSize = bodySize,
                 color = WCColor.Muted,
@@ -426,34 +438,31 @@ private fun AdaptiveStepBody(
 private data class StepCopy(
     val icon: ImageVector,
     val accent: androidx.compose.ui.graphics.Color,
-    val title: String,
-    val body: String,
-    val cta: String,
+    @param:StringRes val title: Int,
+    @param:StringRes val body: Int,
+    @param:StringRes val cta: Int,
 )
 
 private fun stepCopy(step: SetupStep): StepCopy = when (step) {
     SetupStep.SCREENING -> StepCopy(
         icon = Icons.Rounded.PhoneLocked,
         accent = WCColor.Coral,
-        title = "Activez votre bouclier",
-        body = "Who Called ne peut rien bloquer tant que le filtre d’appels système n’est pas activé. " +
-            "Quelques secondes · révocable à tout moment.",
-        cta = "Activer la protection",
+        title = R.string.setup_screening_title,
+        body = R.string.setup_screening_body,
+        cta = R.string.setup_screening_cta,
     )
     SetupStep.NOTIFICATIONS -> StepCopy(
         icon = Icons.Rounded.NotificationsActive,
         accent = WCColor.Amber,
-        title = "Restez informé",
-        body = "Sans notifications, la protection reste silencieuse : pas d’alerte sur un appel suspect, " +
-            "ni de confirmation quand un numéro est bloqué.",
-        cta = "Activer les alertes",
+        title = R.string.setup_notifications_title,
+        body = R.string.setup_notifications_body,
+        cta = R.string.setup_notifications_cta,
     )
     SetupStep.OVERLAY -> StepCopy(
         icon = Icons.Rounded.Layers,
         accent = WCColor.Amber,
-        title = "Alerte visible pendant l’appel",
-        body = "L’app Téléphone recouvre la notification. Autorisez l’affichage par-dessus pour garder " +
-            "le score spam à l’écran pendant que ça sonne — sans bloquer l’appel, ni devenir le composeur.",
-        cta = "Autoriser l’affichage",
+        title = R.string.home_overlay_title,
+        body = R.string.setup_overlay_body,
+        cta = R.string.home_overlay_cta,
     )
 }

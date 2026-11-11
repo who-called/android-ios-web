@@ -30,6 +30,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import com.whocalled.android.R
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.whocalled.android.ui.MainViewModel
@@ -54,27 +57,27 @@ fun MyReportsScreen(
     pendingDelete?.let { phone ->
         AlertDialog(
             onDismissRequest = { pendingDelete = null },
-            title = { Text("Supprimer ce signalement ?") },
-            text = { Text("Le signalement de +$phone sera retiré de cet appareil. S'il avait été envoyé, un vote correctif préviendra nos serveurs. Cette action est irréversible.") },
+            title = { Text(stringResource(R.string.myreports_delete_title)) },
+            text = { Text(stringResource(R.string.myreports_delete_body, phone)) },
             confirmButton = {
                 TextButton(onClick = {
                     viewModel.deleteReport(phone)
                     pendingDelete = null
-                }) { Text("Supprimer", color = MaterialTheme.colorScheme.error) }
+                }) { Text(stringResource(R.string.common_delete), color = MaterialTheme.colorScheme.error) }
             },
-            dismissButton = { TextButton(onClick = { pendingDelete = null }) { Text("Annuler") } },
+            dismissButton = { TextButton(onClick = { pendingDelete = null }) { Text(stringResource(R.string.common_cancel)) } },
         )
     }
 
     ScrollableScreen(
         header = {
             GradientHeader(
-                title = "Mes signalements",
+                title = stringResource(R.string.myreports_title),
                 leading = {
                     IconButton(onClick = onBack) {
                         Icon(
                             Icons.AutoMirrored.Rounded.ArrowBack,
-                            contentDescription = "Retour",
+                            contentDescription = stringResource(R.string.common_back),
                             tint = Color.White,
                         )
                     }
@@ -84,7 +87,7 @@ fun MyReportsScreen(
     ) {
         item {
             Text(
-                "Changez d’avis ou supprimez un signalement fait par erreur.",
+                stringResource(R.string.myreports_intro),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 16.dp),
@@ -107,8 +110,8 @@ fun MyReportsScreen(
             item {
                 EmptyState(
                     icon = Icons.Rounded.Flag,
-                    title = "Aucun signalement",
-                    subtitle = "Vos signalements apparaîtront ici. Signalez un numéro indésirable pour protéger la communauté.",
+                    title = stringResource(R.string.myreports_empty_title),
+                    subtitle = stringResource(R.string.myreports_empty_body),
                 )
             }
         } else {
@@ -120,22 +123,26 @@ fun MyReportsScreen(
                     ) {
                         Column(Modifier.weight(1f)) {
                             Text("+${report.phone}", fontWeight = FontWeight.Bold)
-                            val vote = if (report.vote == "spam") "Indésirable" else "Légitime"
-                            val sync = when (report.syncState) {
-                                "synced" -> "envoyé"
-                                "failed" -> "non envoyé"
-                                else -> "en attente"
-                            }
+                            val vote = stringResource(
+                                if (report.vote == "spam") R.string.common_vote_spam else R.string.common_vote_legit,
+                            )
+                            val sync = stringResource(
+                                when (report.syncState) {
+                                    "synced" -> R.string.myreports_sync_sent
+                                    "failed" -> R.string.myreports_sync_failed
+                                    else -> R.string.myreports_sync_pending
+                                },
+                            )
                             Text(
                                 "$vote · $sync · ${
-                                    com.whocalled.android.util.RelativeTime.format(report.updatedAt)
+                                    com.whocalled.android.util.RelativeTime.format(LocalContext.current, report.updatedAt)
                                 }",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = if (report.syncState == "failed") MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                             if (report.syncState == "failed") {
                                 TextButton(onClick = { viewModel.retryPending() }) {
-                                    Text("Renvoyer maintenant")
+                                    Text(stringResource(R.string.myreports_resend_now))
                                 }
                             }
                         }
@@ -148,11 +155,11 @@ fun MyReportsScreen(
                                 category = report.category,
                             )
                         }) {
-                            Icon(Icons.Rounded.SwapHoriz, contentDescription = "Changer d’avis")
+                            Icon(Icons.Rounded.SwapHoriz, contentDescription = stringResource(R.string.myreports_change_mind))
                         }
                         // Delete a mistaken report — via confirmation, not a direct tap.
                         IconButton(onClick = { pendingDelete = report.phone }) {
-                            Icon(Icons.Rounded.Delete, contentDescription = "Supprimer", tint = MaterialTheme.colorScheme.error)
+                            Icon(Icons.Rounded.Delete, contentDescription = stringResource(R.string.common_delete), tint = MaterialTheme.colorScheme.error)
                         }
                     }
                 }

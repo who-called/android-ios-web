@@ -35,6 +35,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.annotation.StringRes
+import com.whocalled.android.R
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
@@ -50,10 +53,12 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 
 private fun gameName(game: String) = if (game == "trace") "TRACE" else "DEFENSE"
-private fun weekdayFr(date: LocalDate): String = when (date.dayOfWeek) {
-    DayOfWeek.MONDAY -> "LUN"; DayOfWeek.TUESDAY -> "MAR"; DayOfWeek.WEDNESDAY -> "MER"
-    DayOfWeek.THURSDAY -> "JEU"; DayOfWeek.FRIDAY -> "VEN"; DayOfWeek.SATURDAY -> "SAM"
-    DayOfWeek.SUNDAY -> "DIM"
+@StringRes
+private fun weekdayRes(date: LocalDate): Int = when (date.dayOfWeek) {
+    DayOfWeek.MONDAY -> R.string.streak_weekday_mon; DayOfWeek.TUESDAY -> R.string.streak_weekday_tue
+    DayOfWeek.WEDNESDAY -> R.string.streak_weekday_wed; DayOfWeek.THURSDAY -> R.string.streak_weekday_thu
+    DayOfWeek.FRIDAY -> R.string.streak_weekday_fri; DayOfWeek.SATURDAY -> R.string.streak_weekday_sat
+    DayOfWeek.SUNDAY -> R.string.streak_weekday_sun
 }
 
 /**
@@ -100,9 +105,9 @@ fun StreakScreen(game: String, onBack: () -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, "Retour") }
+            IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, stringResource(R.string.common_back)) }
             Column(Modifier.weight(1f)) {
-                Text("Série quotidienne", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.streak_title), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                 Text(gameName(game), style = MaterialTheme.typography.bodySmall, color = WCColor.Amber, fontWeight = FontWeight.SemiBold)
             }
         }
@@ -111,11 +116,11 @@ fun StreakScreen(game: String, onBack: () -> Unit) {
         Text("☀️", fontSize = 110.sp, modifier = Modifier.scale(pulse))
         Spacer(Modifier.height(12.dp))
         Text("$streak", fontSize = 64.sp, fontWeight = FontWeight.Black, color = WCColor.Amber, modifier = Modifier.scale(numScale))
-        Text("Série actuelle", color = WCColor.Amber, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
+        Text(stringResource(R.string.streak_current), color = WCColor.Amber, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
 
         Spacer(Modifier.height(10.dp))
         Text(
-            "Meilleure série : $best",
+            stringResource(R.string.streak_best, best),
             style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier
@@ -133,7 +138,7 @@ fun StreakScreen(game: String, onBack: () -> Unit) {
                 val isToday = d == today
                 Column(Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
-                        weekdayFr(date),
+                        stringResource(weekdayRes(date)),
                         style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold,
                         color = if (isToday) WCColor.Amber else MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -154,14 +159,13 @@ fun StreakScreen(game: String, onBack: () -> Unit) {
 
         Spacer(Modifier.height(24.dp))
         Text(
-            if (playedToday) "Bien joué — série tenue aujourd'hui ! 🔥"
-            else "Joue aujourd'hui pour continuer ta série ☀️",
+            stringResource(if (playedToday) R.string.streak_kept else R.string.streak_keep_going),
             textAlign = TextAlign.Center, fontWeight = FontWeight.SemiBold,
             color = if (playedToday) WCColor.Emerald else MaterialTheme.colorScheme.onSurface,
         )
         Spacer(Modifier.height(6.dp))
         Text(
-            if (streak >= 7) "Palier 7 jours atteint ! 🎁" else "Prochain palier : 7 jours 🎁",
+            stringResource(if (streak >= 7) R.string.streak_milestone_reached else R.string.streak_next_milestone),
             style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }

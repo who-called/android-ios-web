@@ -1,8 +1,10 @@
 package com.whocalled.android.ui
 
 import android.app.Application
+import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.whocalled.android.R
 import com.whocalled.android.data.CallLogEntity
 import com.whocalled.android.data.MyReportEntity
 import com.whocalled.android.data.RepoError
@@ -32,6 +34,25 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     private val db = WhoCalledDatabase.get(app)
     private val filteredCalls = db.callLogDao().observeRecent()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    // User-facing messages are resolved from string resources (current app locale).
+    private fun str(@StringRes id: Int, vararg args: Any): String =
+        getApplication<Application>().getString(id, *args)
+
+    private fun syncMessage(updated: Int): String =
+        if (updated == 0) str(R.string.sync_up_to_date)
+        else getApplication<Application>().resources
+            .getQuantityString(R.plurals.sync_done, updated, updated)
+
+    /** Localised, user-facing text for a repository failure. */
+    private fun userMessage(error: Throwable, @StringRes fallback: Int = R.string.error_unknown): String =
+        when (error) {
+            is RepoError.InvalidPhone -> str(R.string.error_invalid_phone)
+            is RepoError.Network -> str(R.string.error_network)
+            is RepoError.Server -> str(R.string.error_server, error.code)
+            is RepoError.Unknown -> error.error.message ?: str(R.string.error_unknown)
+            else -> error.message ?: str(fallback)
+        }
 
     // Home protection stats.
     val blockedCount: StateFlow<Int> =
@@ -287,10 +308,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
             _syncProgress.value = 0
             repo.syncList { _syncProgress.value = it }.fold(
                 onSuccess = {
-                    _sync.value = LoadState.Success(
-                        if (it == 0) "Déjà à jour ✓ Aucun nouveau numéro."
-                        else "Mise à jour terminée 📥 $it numéro(s) actualisé(s).",
-                    )
+                    _sync.value = LoadState.Success(syncMessage(it))
                 },
                 onFailure = { _sync.value = LoadState.Error(syncErrorMessage(it)) },
             )
@@ -305,10 +323,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
             repo.setCountry(dial)
             repo.syncList { _syncProgress.value = it }.fold(
                 onSuccess = {
-                    _sync.value = LoadState.Success(
-                        if (it == 0) "Déjà à jour ✓ Aucun nouveau numéro."
-                        else "Mise à jour terminée 📥 $it numéro(s) actualisé(s).",
-                    )
+                    _sync.value = LoadState.Success(syncMessage(it))
                 },
                 onFailure = { _sync.value = LoadState.Error(syncErrorMessage(it)) },
             )
@@ -327,13 +342,13 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
      */
     private fun syncErrorMessage(error: Throwable): String = when {
         error is RepoError.Server && error.code == 429 ->
-            "Trop de mises à jour depuis ce réseau. Patientez quelques minutes puis réessayez."
+            str(R.string.sync_error_rate_limited)
         error is RepoError.Server ->
-            "Le serveur a refusé la mise à jour (erreur ${error.code}). Réessayez plus tard."
+            str(R.string.sync_error_server, error.code)
         error is RepoError.Network ->
-            "Mise à jour impossible. Vérifiez votre connexion et réessayez."
+            str(R.string.sync_failed)
         else ->
-            "Mise à jour impossible. Réessayez dans un instant."
+            str(R.string.sync_error_generic)
     }
 
     fun submitReport(phone: String, isSpam: Boolean, category: String? = null) {
@@ -350,10 +365,10 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
                 onSuccess = {
                     _report.value = LoadState.Success(
                         when {
-                            isRepeat -> "C'est bien noté 😊 Pas besoin d'insister — un signalement suffit !"
-                            isFlip -> "Avis mis à jour ✓"
-                            isRefine -> "Merci, précision enregistrée ✓"
-                            else -> "Merci ! Signalement enregistré 🛡️"
+                            isRepeat -> str(R.string.report_feedback_repeat)
+                            isFlip -> str(R.string.report_feedback_flip)
+                            isRefine -> str(R.string.report_feedback_refine)
+                            else -> str(R.string.report_feedback_thanks)
                         },
                     )
                     if (normalized != null && normalized == _detailPhone.value) {
@@ -372,11 +387,11 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
      */
     private fun reportErrorMessage(error: Throwable): String = when {
         error is RepoError.InvalidPhone ->
-            "Numéro invalide — vérifiez le format."
+            str(R.string.report_error_invalid_phone)
         error is RepoError.Server && error.code == 429 ->
-            "Limite quotidienne de signalements atteinte. Votre avis est gardé sur l'appareil et sera renvoyé automatiquement."
+            str(R.string.report_error_daily_limit)
         else ->
-            "Enregistré localement. Envoi au serveur échoué : ${error.message}"
+            str(R.string.report_feedback_saved_locally, userMessage(error))
     }
 
     fun deleteReport(phone: String) {
@@ -401,8 +416,8 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch {
             _privacy.value = LoadState.Loading
             repo.eraseMyData().fold(
-                onSuccess = { _privacy.value = LoadState.Success("Vos signalements ont été supprimés.") },
-                onFailure = { _privacy.value = LoadState.Error("Échec de la suppression. Réessayez.") },
+                onSuccess = { _privacy.value = LoadState.Success(str(R.string.privacy_erased)) },
+                onFailure = { _privacy.value = LoadState.Error(str(R.string.privacy_erase_failed)) },
             )
         }
     }
@@ -574,7 +589,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
             _apiTest.value = ApiTestState.Testing
             repo.pingApi().fold(
                 onSuccess = { _apiTest.value = ApiTestState.Ok(it) },
-                onFailure = { _apiTest.value = ApiTestState.Failed(it.message ?: "Injoignable.") },
+                onFailure = { _apiTest.value = ApiTestState.Failed(userMessage(it, R.string.api_test_unreachable)) },
             )
         }
     }

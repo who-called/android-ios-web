@@ -21,6 +21,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
+import com.whocalled.android.R
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -56,12 +59,12 @@ fun GamesScreen(
         Preferences.resetReminderIgnored(context)
     }
 
-    ScrollableScreen(header = { GradientHeader(title = "Jeux", subtitle = "Un défi par jour, ton classement") }) {
+    ScrollableScreen(header = { GradientHeader(title = stringResource(R.string.tab_games), subtitle = stringResource(R.string.games_subtitle)) }) {
         item {
             GameCard(
                 emoji = "🛡️",
                 title = "DEFENSE",
-                tagline = "Arcade — détruis les appels spam.",
+                tagline = stringResource(R.string.games_defense_tagline),
                 accent = WCColor.Coral,
                 state = defense,
                 today = today,
@@ -73,7 +76,7 @@ fun GamesScreen(
             GameCard(
                 emoji = "🕵️",
                 title = "TRACE",
-                tagline = "Puzzle — démasque le fraudeur caché.",
+                tagline = stringResource(R.string.games_trace_tagline),
                 accent = WCColor.Blue,
                 state = trace,
                 today = today,
@@ -84,7 +87,7 @@ fun GamesScreen(
         item {
             // Practice lives outside the cards so both games present identically.
             Text(
-                "🎯 Entraînement libre TRACE — non classé",
+                stringResource(R.string.games_practice),
                 style = MaterialTheme.typography.bodySmall,
                 fontWeight = FontWeight.SemiBold,
                 color = WCColor.Blue,
@@ -97,7 +100,7 @@ fun GamesScreen(
         }
         item {
             Text(
-                "Nouveau défi chaque jour · 3 parties classées / jour · 100 % anonyme.",
+                stringResource(R.string.games_footer),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 22.dp, vertical = 8.dp),
@@ -151,7 +154,7 @@ private fun GameCard(
         Spacer(Modifier.size(10.dp))
         val best = state?.bestScoreAllTime ?: 0
         Text(
-            if (best > 0) "Record : $best pts" else "Pas encore joué",
+            if (best > 0) stringResource(R.string.games_record, best) else stringResource(R.string.games_not_played),
             style = MaterialTheme.typography.bodySmall,
             fontWeight = FontWeight.SemiBold,
         )
@@ -159,9 +162,9 @@ private fun GameCard(
         Button(onClick = onPlay, modifier = Modifier.fillMaxWidth()) {
             Text(
                 when {
-                    !playedToday -> "Jouer le défi du jour ▸"
-                    attemptsLeft > 0 -> "Jouer ($attemptsLeft essai${if (attemptsLeft > 1) "s" else ""} classé${if (attemptsLeft > 1) "s" else ""} restant${if (attemptsLeft > 1) "s" else ""})"
-                    else -> "Rejouer (entraînement)"
+                    !playedToday -> stringResource(R.string.games_play_daily)
+                    attemptsLeft > 0 -> pluralStringResource(R.plurals.games_play_attempts, attemptsLeft, attemptsLeft)
+                    else -> stringResource(R.string.games_replay_practice)
                 },
                 fontWeight = FontWeight.Bold,
             )

@@ -1,12 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
-import { urlLocales, defaultUrlLocale } from "@/i18n/locales";
+import {
+  fallbackUrlLocale,
+  isPublished,
+  localeForPhone,
+  negotiateLocale,
+  urlLocales,
+} from "@/i18n/locales";
 
 const PUBLIC_FILE = /\.(.*)$/;
 
 /**
  * Locale routing: every page lives under /<locale>/... (e.g. /fr-FR/verifier).
- * Requests without a locale prefix are redirected — to the Accept-Language
- * match if available, otherwise to the default (fr-FR).
+ * Requests without a locale prefix are redirected to, in order:
+ *   1. the best published Accept-Language match (drafts are never auto-selected);
+ *   2. on /numero/<phone> and /prefixe/<intl>, the language of the number's
+ *      country (a +34 number → es-ES);
+ *   3. English (en-US).
  */
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
@@ -25,14 +34,25 @@ export function middleware(req: NextRequest) {
   }
 
   // Already localized?
-  const hasLocale = urlLocales.some(
+  const current = urlLocales.find(
     (l) => pathname === `/${l}` || pathname.startsWith(`/${l}/`),
   );
-  if (hasLocale) return;
+  if (current) {
+    // Draft locales: reachable for review, but never indexed — a header covers
+    // every page, whatever robots value the page's own metadata sets.
+    if (!isPublished(current)) {
+      const res = NextResponse.next();
+      res.headers.set("X-Robots-Tag", "noindex, nofollow");
+      return res;
+    }
+    return;
+  }
 
-  // Detect from Accept-Language, default to fr-FR.
-  const accept = req.headers.get("accept-language") ?? "";
-  const locale = accept.toLowerCase().startsWith("en") ? "en-US" : defaultUrlLocale;
+  const phone = /^\/(?:numero|prefixe)\/\+?(\d+)/.exec(pathname)?.[1];
+  const locale =
+    negotiateLocale(req.headers.get("accept-language")) ??
+    (phone ? localeForPhone(phone) : null) ??
+    fallbackUrlLocale;
 
   const url = req.nextUrl.clone();
   url.pathname = `/${locale}${pathname === "/" ? "" : pathname}`;

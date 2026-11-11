@@ -1,0 +1,454 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- WARN notification -->
+    <string name="warn_channel_name">Waarschuwingen voor verdachte oproepen</string>
+    <string name="warn_channel_desc">Meldt wanneer een inkomende oproep een hoge spamscore heeft.</string>
+    <string name="warn_title">⚠️ Verdachte oproep — niet geblokkeerd</string>
+    <string name="warn_subtext">Who Called · de telefoon gaat over</string>
+
+    <!-- SMS shield -->
+    <string name="sms_blocked_channel_name">Verborgen ongewenste sms\'jes</string>
+    <string name="sms_blocked_channel_desc">Meldt discreet wanneer de melding van een ongewenste sms wordt verborgen.</string>
+    <string name="sms_blocked_title">Ongewenste sms verborgen</string>
+    <string name="sms_blocked_body">Melding verborgen voor %1$s. Het bericht blijft in je sms-app.</string>
+    <string name="sms_listener_label">Who Called sms-schild</string>
+
+    <!-- Blocked-call notification -->
+    <string name="call_blocked_channel_name">Geblokkeerde oproepen</string>
+    <string name="call_blocked_channel_desc">Meldt discreet wanneer een ongewenste oproep wordt geblokkeerd.</string>
+    <string name="call_blocked_title">Oproep geblokkeerd</string>
+    <string name="call_blocked_unknown">Afgeschermd nummer</string>
+
+    <!-- Daily game reminder -->
+    <string name="reminder_channel_name">Spelherinnering</string>
+    <string name="reminder_channel_desc">Een vriendelijke herinnering, één keer per dag, om de uitdaging te spelen. Uit te zetten in de instellingen.</string>
+
+    <!-- Common -->
+    <string name="common_back">Terug</string>
+    <string name="common_close">Sluiten</string>
+    <string name="common_cancel">Annuleren</string>
+    <string name="common_delete">Verwijderen</string>
+    <string name="common_edit">Wijzigen</string>
+    <string name="common_loading">Laden…</string>
+    <string name="common_connecting">Verbinden met server…</string>
+    <string name="common_retry">Opnieuw proberen</string>
+    <string name="common_points">%1$d ptn</string>
+    <string name="common_vote_spam">Ongewenst</string>
+    <string name="common_vote_legit">Betrouwbaar</string>
+    <string name="common_status_blocked">Geblokkeerd</string>
+    <string name="common_status_warned">Gewaarschuwd</string>
+
+    <!-- Bottom navigation tabs (keep short) -->
+    <string name="tab_games">Spellen</string>
+
+    <!-- Daily game reminder notification (pairs of title + body, picked at random) -->
+    <string name="reminder_1_title">🧩 De TRACE-uitdaging van vandaag wacht — 5 puzzels, 3 minuten.</string>
+    <string name="reminder_1_body">Klim in het klassement, in je eigen tempo.</string>
+    <string name="reminder_2_title">🔥 Houd je reeks in leven</string>
+    <string name="reminder_2_body">Eén snel potje is genoeg om door te gaan.</string>
+    <string name="reminder_3_title">🏆 Misschien heeft iemand je score verbeterd</string>
+    <string name="reminder_3_body">Pak de leiding terug, heel sportief.</string>
+    <string name="reminder_4_title">🛡️ Slimme pauze van de dag</string>
+    <string name="reminder_4_body">Zin in een anti-spamuitdaging om even te ontspannen?</string>
+    <string name="reminder_5_title">✨ Nieuwe uitdaging beschikbaar</string>
+    <string name="reminder_5_body">Vandaag dezelfde puzzels voor iedereen — laat zien wat je kunt!</string>
+
+    <!-- Playful blocked-call notification titles (opt-in). Built-in defaults: local language + English. -->
+    <string-array name="fun_blocked_default_titles">
+        <item>🥊 Spam K.O.!</item>
+        <item>🛡️ Goed geprobeerd, spammer</item>
+        <item>🚫 Telemarketeer afgewezen</item>
+        <item>📵 Weer een stoorzender minder</item>
+        <item>☀️ Alweer een zonnepanelenverkoper geblokkeerd</item>
+        <item>🥊 Spam knocked out!</item>
+        <item>🛡️ Nice try, spammer</item>
+        <item>🚫 Cold caller turned away</item>
+        <item>📵 One less nuisance</item>
+        <item>😎 Blocked — you\'re welcome</item>
+    </string-array>
+
+    <!-- Country scopes for the spam list -->
+    <string name="country_all">Alle landen</string>
+    <string name="country_fr">Frankrijk</string>
+    <string name="country_be">België</string>
+    <string name="country_ch">Zwitserland</string>
+    <string name="country_lu">Luxemburg</string>
+    <string name="country_es">Spanje</string>
+    <string name="country_it">Italië</string>
+    <string name="country_de">Duitsland</string>
+    <string name="country_gb">Verenigd Koninkrijk</string>
+    <string name="country_pt">Portugal</string>
+    <string name="country_us">Verenigde Staten</string>
+    <string name="country_ca">Canada</string>
+    <string name="country_ma">Marokko</string>
+    <string name="country_dz">Algerije</string>
+    <string name="country_tn">Tunesië</string>
+
+    <!-- Report categories -->
+    <string name="category_telemarketing">Telemarketing</string>
+    <string name="category_scam">Oplichting</string>
+    <string name="category_robocall">Automatische oproep</string>
+    <string name="category_silent">Stille oproep</string>
+    <string name="category_debt">Incasso</string>
+    <string name="category_survey">Enquête</string>
+    <string name="category_other">Overig</string>
+    <string name="category_unknown">Onbekend</string>
+
+    <!-- Call history sections -->
+    <string name="history_section_today">Vandaag</string>
+    <string name="history_section_yesterday">Gisteren</string>
+    <string name="history_section_this_week">Deze week</string>
+    <string name="history_section_this_month">Deze maand</string>
+    <string name="history_section_older">Ouder</string>
+
+    <!-- Relative time -->
+    <string name="time_just_now">zojuist</string>
+    <string name="time_minutes_ago">%1$d min geleden</string>
+    <string name="time_hours_ago">%1$d u geleden</string>
+    <string name="time_yesterday">gisteren</string>
+    <string name="time_days_ago">%1$d d geleden</string>
+
+    <!-- Errors and status messages (ViewModel / repository) -->
+    <string name="error_invalid_phone">Ongeldig nummer.</string>
+    <string name="error_network">Geen verbinding. Probeer het opnieuw.</string>
+    <string name="error_server">Serverfout (%1$d).</string>
+    <string name="error_unknown">Onbekende fout.</string>
+    <string name="sync_up_to_date">Al up-to-date ✓ Geen nieuwe nummers.</string>
+    <plurals name="sync_done">
+        <item quantity="one">Update voltooid 📥 %1$d nummer bijgewerkt.</item>
+        <item quantity="other">Update voltooid 📥 %1$d nummers bijgewerkt.</item>
+    </plurals>
+    <string name="sync_failed">Bijwerken mislukt. Controleer je verbinding en probeer het opnieuw.</string>
+    <string name="report_feedback_repeat">Genoteerd 😊 Niet nodig om aan te dringen — één melding is genoeg!</string>
+    <string name="report_feedback_thanks">Bedankt! Melding opgeslagen 🛡️</string>
+    <string name="report_feedback_saved_locally">Lokaal opgeslagen. Versturen naar de server mislukt: %1$s</string>
+    <string name="privacy_erased">Je meldingen zijn verwijderd.</string>
+    <string name="privacy_erase_failed">Verwijderen mislukt. Probeer het opnieuw.</string>
+    <string name="api_test_unreachable">Onbereikbaar.</string>
+
+    <!-- Country picker (Home + Settings) -->
+    <string name="country_dialog_title">Bewaakt land</string>
+
+    <!-- Home screen -->
+    <string name="home_sync_button">Lijst bijwerken</string>
+    <plurals name="home_sync_progress">
+        <item quantity="one">%1$s nummer opgehaald…</item>
+        <item quantity="other">%1$s nummers opgehaald…</item>
+    </plurals>
+    <string name="home_sms_on">Actief · ongewenste sms\'jes worden verborgen</string>
+    <string name="home_sms_off">Verberg meldingen van ongewenste sms\'jes</string>
+    <string name="home_covered_numbers">Gedekte nummers</string>
+    <string name="home_auto_update">Automatische update · %1$s</string>
+    <string name="home_blocked_calls">Geblokkeerde oproepen</string>
+    <string name="home_none_yet">Nog geen</string>
+    <string name="home_update_today">vandaag bijgewerkt</string>
+    <string name="home_update_yesterday">gisteren bijgewerkt</string>
+    <string name="home_update_days_ago">%1$d d geleden bijgewerkt</string>
+    <string name="home_update_on">Bijgewerkt op %1$s</string>
+    <string name="home_community_title">Communityschild</string>
+
+    <!-- Report screen -->
+    <string name="report_title">Een nummer melden</string>
+    <string name="report_subtitle">Anoniem — geen account, geen persoonsgegevens.</string>
+    <string name="report_phone_label">Nummer (bijv. +33 6 12 34 56 78)</string>
+    <string name="report_call_type">Soort oproep</string>
+    <string name="report_submit">Melding versturen</string>
+    <string name="report_allow">Toestaan</string>
+    <string name="report_empty_recent_title">Geen recente oproepen</string>
+
+    <!-- Number detail (call detail + number lookup) -->
+    <string name="detail_title">Nummerdetails</string>
+    <string name="detail_filtered_on">Gefilterd op</string>
+    <string name="detail_badge_community">Community</string>
+    <string name="detail_stats_top_reason">Meestal: %1$s (%2$d%%)</string>
+    <string name="detail_stats_24h">24 u</string>
+    <string name="detail_stats_7d">7 d</string>
+    <string name="detail_stats_30d">30 d</string>
+    <string name="detail_stats_1y">1 jaar</string>
+
+    <!-- My reports (Journal tab) -->
+    <string name="myreports_title">Mijn meldingen</string>
+    <string name="myreports_intro">Verander van gedachten of verwijder een melding die je per ongeluk deed.</string>
+    <string name="myreports_delete_title">Deze melding verwijderen?</string>
+    <string name="myreports_delete_body">De melding van +%1$s wordt verwijderd (lokaal en van onze servers). Dit kan niet ongedaan worden gemaakt.</string>
+    <string name="myreports_empty_title">Geen meldingen</string>
+    <string name="myreports_empty_body">Je meldingen verschijnen hier. Meld een ongewenst nummer om de community te beschermen.</string>
+    <string name="myreports_sync_sent">verstuurd</string>
+    <string name="myreports_sync_failed">niet verstuurd</string>
+    <string name="myreports_sync_pending">in afwachting</string>
+    <string name="myreports_change_mind">Van gedachten veranderen</string>
+
+    <!-- Filtered-call history -->
+    <string name="history_empty_title">Geen gefilterde oproepen</string>
+    <string name="history_copied">Nummer gekopieerd</string>
+
+    <!-- SMS shield -->
+    <string name="sms_title">Sms-schild</string>
+    <string name="sms_subtitle">Verberg ongewenste sms\'jes</string>
+    <string name="sms_access_required">Toegang tot meldingen vereist</string>
+    <string name="sms_access_body">Om ongewenste sms\'jes te verbergen, geef je Who Called toegang tot meldingen. We lezen nooit de inhoud van je berichten: we verbergen alleen de melding van een ongewenste afzender. De sms blijft in je berichten-app.</string>
+    <string name="sms_access_button">Toegang tot meldingen aanzetten</string>
+    <string name="sms_hide_title">Meldingen van ongewenste sms\'jes verbergen</string>
+    <string name="sms_hide_desc">Het bericht blijft in je sms-app, gemarkeerd als ongelezen. Geen enkel bericht wordt gelezen of verwijderd.</string>
+    <string name="sms_notify_title">Laat het me weten bij een verborgen sms</string>
+    <string name="sms_notify_desc">Toont een discrete melding wanneer een ongewenste sms wordt verborgen.</string>
+    <string name="sms_how_title">Zo werkt het</string>
+    <string name="sms_how_body">Android laat je geen sms blokkeren zonder je standaard berichten-app te worden. Who Called blijft een filter: we verbergen alleen de melding van afzenders met een hoge spamscore, op basis van dezelfde lijst als voor oproepen.</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Instellingen</string>
+    <string name="settings_erase_dialog_title">Mijn gegevens verwijderen?</string>
+    <string name="settings_erase_dialog_body">Alle meldingen die vanaf dit toestel zijn verstuurd, worden definitief van onze servers verwijderd. Dit kan niet ongedaan worden gemaakt.</string>
+    <string name="settings_section_filtering">Filteren</string>
+    <string name="settings_block_title">Ongewenste oproepen blokkeren</string>
+    <string name="settings_block_desc">Nummers met een hoge spamscore worden automatisch geweigerd: je telefoon gaat niet over.</string>
+    <string name="settings_warn_title">Waarschuw me bij twijfel</string>
+    <string name="settings_warn_desc">Bij nummers met een gemiddelde score (verdacht maar niet zeker) gaat de telefoon gewoon over, maar een melding waarschuwt je. Jij beslist of je opneemt.</string>
+    <string name="settings_blocked_notif_title">Laat het me weten bij een geblokkeerde oproep</string>
+    <string name="settings_blocked_notif_desc">Toont een discrete melding na elke geblokkeerde ongewenste oproep.</string>
+    <string name="settings_fun_title">Grappige meldingen 😜</string>
+    <string name="settings_fun_desc">Leuke berichten wanneer spam wordt geblokkeerd (‘Spam K.O.!’). Standaard uit.</string>
+    <string name="settings_fun_messages_title">De berichten 😜</string>
+    <string name="settings_fun_messages_desc">Hier zijn alle berichten die afwisselend verschijnen wanneer spam wordt geblokkeerd. Voeg je eigen toe, bewerk ze of ga terug naar de standaardberichten.</string>
+    <string name="settings_fun_defaults">Standaardberichten</string>
+    <string name="settings_fun_yours">Jouw berichten ✍️</string>
+    <string name="settings_fun_none">Nog geen eigen berichten — schrijf hieronder je eerste.</string>
+    <string name="settings_fun_edit">Dit bericht bewerken</string>
+    <string name="settings_fun_delete">Dit bericht verwijderen</string>
+    <string name="settings_fun_placeholder">Bijv.: 🎣 Weer een phishing aan de haak!</string>
+    <string name="settings_fun_counter">%1$d/%2$d · emoji\'s welkom 😄</string>
+    <string name="settings_fun_add">Toevoegen</string>
+    <string name="settings_fun_reset">Resetten (terug naar de standaardberichten)</string>
+    <string name="settings_section_games">Spellen</string>
+    <string name="settings_reminder_title">Dagelijkse speelherinnering 🎮</string>
+    <string name="settings_reminder_desc">Een vriendelijke herinnering tussen 18.30 en 20.30 uur, nooit als je al hebt gespeeld. Hij pauzeert vanzelf als je hem een paar dagen achter elkaar negeert.</string>
+    <string name="settings_country_desc">Alleen nummers uit dit land downloaden (lichtere cache). Automatisch gedetecteerd, aanpasbaar.</string>
+    <string name="settings_threshold">Blokkeergevoeligheid: %1$d%%</string>
+    <string name="settings_threshold_desc">Vanaf deze spamscore wordt een nummer geblokkeerd. Daaronder geeft het alleen een waarschuwing (als de optie hierboven aanstaat). Hoe lager de drempel, hoe meer er wordt geblokkeerd — met het risico op enkele valse positieven.</string>
+    <string name="settings_section_info">Informatie</string>
+    <string name="settings_link_privacy">Privacy</string>
+    <string name="settings_link_legal">Juridische informatie</string>
+    <string name="settings_link_site">Officiële website</string>
+    <string name="settings_link_rate">App beoordelen</string>
+    <string name="settings_link_source">Broncode (open source)</string>
+    <string name="settings_link_contact">Contact opnemen</string>
+    <string name="settings_contact_subject">Who Called — contact</string>
+    <string name="settings_section_data">Mijn gegevens</string>
+    <string name="settings_erase_title">Mijn meldingen verwijderen</string>
+    <string name="settings_erase_desc">Wist definitief alle meldingen die vanaf dit toestel zijn verstuurd. Volgens je recht op gegevenswissing (AVG).</string>
+    <string name="settings_erase_button">Mijn gegevens verwijderen</string>
+    <string name="settings_erasing">Verwijderen…</string>
+    <string name="settings_section_diagnostic">Diagnose</string>
+    <string name="settings_api_title">API-verbinding</string>
+    <string name="settings_api_desc">Controleer of de app de Who Called-server bereikt.</string>
+    <string name="settings_api_testing">Test bezig…</string>
+    <string name="settings_api_test">Verbinding testen</string>
+    <string name="settings_api_ok">API OK ✓ (%1$d ms)</string>
+    <string name="settings_api_failed">API onbereikbaar ✗ — %1$s</string>
+    <string name="settings_free_title">Gratis en open source</string>
+    <string name="settings_free_body" formatted="false">Who Called is 100% gratis en de code is open. 100% anoniem — geen account, geen persoonsgegevens. Nummers in internationaal formaat.</string>
+    <string name="settings_version_hint">Dubbeltik om de API te testen</string>
+    <string name="settings_version_testing">API testen…</string>
+
+    <!-- Settings: hidden notification debug card (long-press the version) -->
+    <string name="debug_title">Debug meldingen</string>
+    <string name="debug_permission">Toestemming voor meldingen: %1$s</string>
+    <string name="debug_permission_granted">verleend ✓</string>
+    <string name="debug_permission_denied">GEWEIGERD ✗ — er wordt niets getoond</string>
+    <string name="debug_request">Aanvragen</string>
+    <string name="debug_system_settings">Systeeminstellingen</string>
+    <string name="debug_blocked_standard">Oproep geblokkeerd (standaard)</string>
+    <string name="debug_blocked_fun">Oproep geblokkeerd (grappig)</string>
+    <string name="debug_sms">Ongewenste sms verborgen</string>
+    <string name="debug_reminder">Dagelijkse spelherinnering</string>
+    <string name="debug_hide_hint">Houd de versie lang ingedrukt om dit paneel te verbergen.</string>
+
+    <!-- Games: shared -->
+    <string name="game_leaderboard_button">🏆 Klassement</string>
+    <string name="game_start">Starten ▸</string>
+    <string name="game_share">Delen</string>
+    <string name="game_replay">Opnieuw spelen</string>
+    <string name="game_quit">Stoppen</string>
+    <string name="game_quit_title">Spel stoppen?</string>
+    <string name="game_daily_rank">Dagklassement · top %1$d%%</string>
+    <plurals name="game_players_best">
+        <item quantity="one">%1$d speler · beste %2$d</item>
+        <item quantity="other">%1$d spelers · beste %2$d</item>
+    </plurals>
+
+    <!-- Games hub -->
+    <string name="games_subtitle">Eén uitdaging per dag, jouw klassement</string>
+    <string name="games_defense_tagline">Arcade — vernietig de spamoproepen.</string>
+    <string name="games_trace_tagline">Puzzel — ontmasker de verborgen oplichter.</string>
+    <string name="games_practice">🎯 Vrije TRACE-training — niet geklasseerd</string>
+    <string name="games_footer" formatted="false">Elke dag een nieuwe uitdaging · 3 geklasseerde potjes / dag · 100% anoniem.</string>
+    <string name="games_record">Record: %1$d ptn</string>
+    <string name="games_not_played">Nog niet gespeeld</string>
+    <string name="games_play_daily">Speel de uitdaging van vandaag ▸</string>
+    <plurals name="games_play_attempts">
+        <item quantity="one">Spelen (nog %1$d geklasseerde poging)</item>
+        <item quantity="other">Spelen (nog %1$d geklasseerde pogingen)</item>
+    </plurals>
+    <string name="games_replay_practice">Opnieuw spelen (training)</string>
+
+    <!-- Daily streak screen -->
+    <string name="streak_title">Dagelijkse reeks</string>
+    <string name="streak_current">Huidige reeks</string>
+    <string name="streak_best">Beste reeks: %1$d</string>
+    <string name="streak_kept">Goed gedaan — reeks vandaag behouden! 🔥</string>
+    <string name="streak_keep_going">Speel vandaag om je reeks voort te zetten ☀️</string>
+    <string name="streak_milestone_reached">Mijlpaal van 7 dagen bereikt! 🎁</string>
+    <string name="streak_next_milestone">Volgende mijlpaal: 7 dagen 🎁</string>
+    <string name="streak_weekday_mon">MA</string>
+    <string name="streak_weekday_tue">DI</string>
+    <string name="streak_weekday_wed">WO</string>
+    <string name="streak_weekday_thu">DO</string>
+    <string name="streak_weekday_fri">VR</string>
+    <string name="streak_weekday_sat">ZA</string>
+    <string name="streak_weekday_sun">ZO</string>
+
+    <!-- Leaderboard screen -->
+    <string name="leaderboard_title">Klassement %1$s</string>
+    <string name="leaderboard_period_day">Vandaag</string>
+    <string name="leaderboard_period_week">Week</string>
+    <string name="leaderboard_period_all">Aller tijden</string>
+    <string name="leaderboard_day_today">Vandaag</string>
+    <string name="leaderboard_day_yesterday">Gisteren</string>
+    <string name="leaderboard_days_ago">%1$d d geleden</string>
+    <plurals name="leaderboard_unit_grids">
+        <item quantity="one">%1$d puzzel</item>
+        <item quantity="other">%1$d puzzels</item>
+    </plurals>
+    <string name="leaderboard_unit_wave">golf %1$d</string>
+    <plurals name="leaderboard_summary">
+        <item quantity="one">%1$d speler · beste %2$d · mediaan %3$d</item>
+        <item quantity="other">%1$d spelers · beste %2$d · mediaan %3$d</item>
+    </plurals>
+    <string name="leaderboard_summary_solo">1 speler (jij) · beste %1$d</string>
+    <string name="leaderboard_be_first">Zet als eerste een score neer! 🚀</string>
+    <string name="leaderboard_your_rank">Jouw positie</string>
+    <string name="leaderboard_you_top">Top %1$d%% · %2$d ptn (%3$s)</string>
+    <string name="leaderboard_you_local">%1$d ptn (%2$s)</string>
+    <string name="leaderboard_not_played">Nog niet gespeeld in deze periode — start een potje!</string>
+    <string name="leaderboard_top">Top</string>
+    <string name="leaderboard_sync_pending">Je score verschijnt in het klassement zodra er is gesynchroniseerd.</string>
+    <string name="leaderboard_no_scores">Nog geen scores. Jij bent aan de beurt!</string>
+    <string name="leaderboard_history">Jouw geschiedenis</string>
+    <string name="leaderboard_history_rank">#%1$d/%2$d · top %3$d%%</string>
+    <string name="leaderboard_history_empty">Speel een potje om je geschiedenis te starten.</string>
+
+    <!-- DEFENSE game -->
+    <string name="defense_hud_score">SCORE</string>
+    <string name="defense_hud_wave">GOLF</string>
+    <string name="defense_item_ready">ITEM KLAAR — tik</string>
+    <string name="defense_intro">Houd ingedrukt om te schieten, veeg om te richten.\nVernietig de ongewenste oproepen — ze vullen je ITEM-meter (zelf activeren!).\nGroene oproepen zijn vriendelijk; vang de 🎁 voor een direct item.</string>
+    <string name="defense_game_over">Schild gevallen</string>
+    <plurals name="defense_result">
+        <item quantity="one">Golf %1$d · %2$d spam geblokkeerd</item>
+        <item quantity="other">Golf %1$d · %2$d spams geblokkeerd</item>
+    </plurals>
+    <string name="defense_share_text">who-called DEFENSE · %1$d ptn · Golf %2$d 🛡️\nBlokkeer ook spam 👉 %3$s</string>
+    <string name="defense_quit_body">Je verliest je voortgang in de huidige golf.</string>
+    <string name="defense_incoming">INKOMEND…</string>
+    <string name="defense_item_rapid">SNELVUUR</string>
+    <string name="defense_item_spread">SCHOT ×5</string>
+    <string name="defense_item_slow">SLOWMOTION</string>
+    <string name="defense_item_repair">REPARATIE</string>
+    <string name="defense_item_shield">SCHILD</string>
+    <string name="defense_pop_combo">COMBO ×%1$d</string>
+    <string name="defense_pop_boss_bonus">BAAS +%1$d</string>
+    <string name="defense_pop_surge">STORMLOOP ×%1$d</string>
+    <string name="defense_pop_boss">⚠ BAAS</string>
+    <string name="defense_pop_bonus">BONUS 🎁</string>
+
+    <!-- TRACE game -->
+    <string name="trace_mode_daily">Uitdaging van de dag</string>
+    <string name="trace_mode_practice">Training</string>
+    <string name="trace_tutorial">Tutorial</string>
+    <string name="trace_toast_error">−1 leven · −%1$d ptn</string>
+    <string name="trace_toast_points">+%1$d ptn!</string>
+    <string name="trace_hint">💡 Hint</string>
+    <string name="trace_hint_desc">Plaatst een oplichter · −%1$d ptn</string>
+    <string name="trace_no_hints">Geen hints meer</string>
+    <string name="trace_rules_title">DE 3 REGELS</string>
+    <string name="trace_controls">1 tik = ✗ veilig · 2 tikken = oplichter · 3 tikken = wissen\nVeeg over het raster om meerdere ✗ te zetten</string>
+    <string name="trace_resume">Hervatten ▸</string>
+    <string name="trace_intro_daily">Uitdaging van de dag · 5 puzzels · 3 levens</string>
+    <string name="trace_intro_practice">Vrije training · niet geklasseerd</string>
+    <string name="trace_replay_tutorial">❓ Interactieve tutorial opnieuw bekijken</string>
+    <string name="trace_size">Grootte: %1$d×%1$d</string>
+    <string name="trace_grid_solved">Puzzel %1$d opgelost!</string>
+    <string name="trace_score">Score: %1$d</string>
+    <string name="trace_next_grid">Volgende puzzel…</string>
+    <string name="trace_sprint_done">Sprint voltooid!</string>
+    <plurals name="trace_all_grids">
+        <item quantity="one">%1$d puzzel gekraakt 🎉</item>
+        <item quantity="other">Alle %1$d puzzels gekraakt 🎉</item>
+    </plurals>
+    <string name="trace_no_lives">Geen levens meer…</string>
+    <plurals name="trace_partial">
+        <item quantity="one">Geeft niks — %1$d/%2$d puzzel opgelost!</item>
+        <item quantity="other">Geeft niks — %1$d/%2$d puzzels opgelost!</item>
+    </plurals>
+    <string name="trace_points">punten</string>
+    <string name="trace_share_text">who-called TRACE · %1$d ptn · %2$d/%3$d puzzels 🛡️\nJaag ook op spammers 👉 %4$s</string>
+    <string name="trace_new_grid">Nieuwe puzzel</string>
+    <string name="trace_quit_body">Je verliest je voortgang in de huidige uitdaging.</string>
+    <string name="trace_rule_color">1 per kleur</string>
+    <string name="trace_rule_line">1 / rij &amp; kolom</string>
+    <string name="trace_rule_adjacent">Nooit naast elkaar</string>
+    <string name="trace_tap_label">Tik:</string>
+    <string name="trace_safe">veilig</string>
+    <string name="trace_fraudster">oplichter</string>
+    <string name="trace_loading">Uitdaging voorbereiden…</string>
+    <string name="trace_error_title">Kan de uitdaging niet laden</string>
+    <string name="trace_error_body">Controleer je verbinding en probeer het opnieuw.</string>
+
+    <!-- TRACE villains (cosmetic fraudster per grid) -->
+    <string name="trace_villain_imp">Duiveltje</string>
+    <string name="trace_villain_demon">Demon</string>
+    <string name="trace_villain_supervillain">Superschurk</string>
+    <string name="trace_villain_ninja">Ninja</string>
+    <string name="trace_villain_robot">Spamrobot</string>
+    <string name="trace_villain_alien">Alien</string>
+    <string name="trace_villain_scammer">Zwendelaar</string>
+    <string name="trace_villain_impostor">Bedrieger</string>
+
+    <!-- TRACE interactive tutorial -->
+    <string name="trace_tuto_title">TUTORIAL — %1$s Zo speel je</string>
+    <string name="trace_tuto_step0">3 regels, meer niet:\n1 oplichter per kleur -- 1 per rij\nen kolom -- nooit naast elkaar</string>
+    <string name="trace_tuto_step1">Het roze gebied heeft maar één vak:\nde oplichter zit daar dus zeker.\nDubbeltik om hem te plaatsen.</string>
+    <string name="trace_tuto_step2">In deze vakken kan nooit een\noplichter zitten. Zet een X\nop de 3 verlichte vakken.</string>
+    <string name="trace_tuto_step3">1 oplichter per rij, 1 per kolom:\nieder zijn eigen plek. Zet een X\nop de 3 verlichte vakken.</string>
+    <string name="trace_tuto_step4">Nooit naast elkaar, ook niet\ndiagonaal. Zet een X op\nde verlichte vakken.</string>
+    <string name="trace_tuto_step5">Rij 2: maar één vrij vak.\nDe oplichter zit daar dus zeker.\nDubbeltik om hem te plaatsen.</string>
+    <string name="trace_tuto_step6">En als je je vergist?\nDubbeltik op het rood\nomrande vak.</string>
+    <string name="trace_tuto_step7">Een 3e tik wist.\nTik nog eens op het vak.</string>
+    <string name="trace_tuto_step8_a">Nog maar 2 oplichters.\nRij 3: maar één vrij vak.\nDubbeltik erop.</string>
+    <string name="trace_tuto_step8_b">De laatste: rij 4!\nDubbeltik erop.</string>
+    <string name="trace_tuto_tap_again_place">Nog één tik om hem te plaatsen!</string>
+    <string name="trace_tuto_tap_again">Nog één tik!</string>
+    <string name="trace_tuto_tap_again_ellipsis">Nog één tik...</string>
+    <string name="trace_tuto_done1">Goed. 1 oplichter per kleur.</string>
+    <string name="trace_tuto_done2">Zo. Elke X schrapt een vak.\nMinder vakken = makkelijker\nom de volgende te vinden.</string>
+    <string name="trace_tuto_done3">1 oplichter per rij, 1 per kolom.\nDe X\'en zijn je geheugen: verboden.</string>
+    <string name="trace_tuto_done4">Alles wat een oplichter raakt,\nis veilig: dat krijgt een X.</string>
+    <string name="trace_tuto_done5">Goed gedaan. De X\'en verkleinen het veld\ntot er nog maar één mogelijk\nvak over is. Dat is het hele principe.</string>
+    <string name="trace_tuto_done6">Verkeerd geplaatst: hij raakte een oplichter.\n-1 leven, -200 ptn.</string>
+    <string name="trace_tuto_done7">Gewist. De cyclus:\nleeg, X, oplichter, leeg.</string>
+    <string name="trace_tuto_done8">Klaar. Elke kleur, elke rij,\nelke kolom heeft ZIJN oplichter.\nJij bent aan de beurt!</string>
+    <string name="trace_tuto_tap_glowing_any">Tik op een verlicht vak</string>
+    <string name="trace_tuto_tap_glowing">Tik op het verlichte vak</string>
+    <string name="trace_tuto_erased">Gewist</string>
+    <string name="trace_tuto_got_it">Begrepen ▸</string>
+    <string name="trace_tuto_skip">Overslaan</string>
+    <string name="trace_tuto_lets_go">Daar gaan we ▸</string>
+    <string name="trace_tuto_next">Volgende ▸</string>
+    <string name="nav_games">Spellen</string>
+    <string name="nav_settings">Instellingen</string>
+    <string name="home_country_dialog_title">Bewaakt land</string>
+    <string name="home_sync_connecting">Verbinden met server…</string>
+    <string name="home_sms_title">Sms-schild</string>
+    <string name="setup_skip">Overslaan</string>
+</resources>

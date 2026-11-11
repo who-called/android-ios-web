@@ -1,5 +1,7 @@
 package com.whocalled.android.util
 
+import androidx.annotation.StringRes
+import com.whocalled.android.R
 import com.whocalled.android.data.CallLogEntity
 import com.whocalled.android.data.MyReportEntity
 import java.util.Calendar
@@ -36,17 +38,17 @@ enum class CallDirection {
 
 /** A titled section of the calls screen ("Aujourd'hui", "Hier", …). */
 data class CallHistorySection(
-    val title: String,
+    @param:StringRes val titleRes: Int,
     val items: List<CallEvent>,
 )
 
 /** Time buckets, coarsened the further back we go (Phone-app style). */
-private enum class Bucket(val title: String) {
-    TODAY("Aujourd’hui"),
-    YESTERDAY("Hier"),
-    THIS_WEEK("Cette semaine"),
-    THIS_MONTH("Ce mois-ci"),
-    OLDER("Plus ancien"),
+private enum class Bucket(@param:StringRes val titleRes: Int) {
+    TODAY(R.string.history_section_today),
+    YESTERDAY(R.string.history_section_yesterday),
+    THIS_WEEK(R.string.history_section_this_week),
+    THIS_MONTH(R.string.history_section_this_month),
+    OLDER(R.string.history_section_older),
 }
 
 private const val RECENT_CALL_MAX_AGE_MS = 24 * 60 * 60 * 1_000L
@@ -194,5 +196,5 @@ fun groupCallHistory(
     }
 
     return Bucket.entries
-        .mapNotNull { b -> sections[b]?.let { CallHistorySection(b.title, it) } }
+        .mapNotNull { b -> sections[b]?.let { CallHistorySection(b.titleRes, it) } }
 }

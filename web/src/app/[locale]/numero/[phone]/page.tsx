@@ -5,17 +5,18 @@ import { fetchIndexable, fetchSeoNumbers, lookupNumber, type LookupResult, type 
 import { countryFromCode } from "@/lib/countries";
 import { config } from "@/lib/config";
 import { getDict } from "@/i18n/dictionaries";
-import { alternatesFor, toDictLocale, urlLocales } from "@/i18n/locales";
+import { alternatesFor, toDictLocale, publishedLocales } from "@/i18n/locales";
 import { isPersonalMobileFR, robotsFor } from "@/lib/seo";
 import { ShieldIcon, CheckCircleIcon, BlockIcon, BellIcon, ListIcon } from "@/components/Icons";
 import { NumberVote } from "@/components/NumberVote";
 import { NumberContactActions } from "@/components/NumberContactActions";
 
-// Pre-render the quality pages at build; others render on-demand (and noindex).
+// Pre-render the quality pages at build (published locales only — drafts render
+// on demand); others render on-demand (and noindex).
 export async function generateStaticParams() {
   const numbers = await fetchSeoNumbers(2000);
   const params: { locale: string; phone: string }[] = [];
-  for (const l of urlLocales) {
+  for (const l of publishedLocales) {
     for (const n of numbers) params.push({ locale: l, phone: n.phone });
   }
   return params;
@@ -68,7 +69,7 @@ export default async function NumberPage({
   const e164 = parsed?.number ?? `+${phone}`;
   const display = intlFormat;
 
-  const dateLocale = locale === "fr-FR" ? "fr-FR" : "en-US";
+  const dateLocale = locale; // URL locales are valid BCP-47 tags (fr-FR, pt-BR…)
   const fmtDate = (iso: string | null | undefined) => {
     if (!iso) return t.never;
     try {
