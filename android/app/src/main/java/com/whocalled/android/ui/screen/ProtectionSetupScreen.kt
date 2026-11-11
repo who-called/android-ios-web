@@ -64,6 +64,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import androidx.annotation.StringRes
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import com.whocalled.android.R
 import com.whocalled.android.util.UiLocale
@@ -95,6 +96,7 @@ fun ProtectionSetupScreen(
 ) {
     val view = LocalView.current
     val context = LocalContext.current
+    val resources = LocalResources.current
     val darkTheme = isSystemInDarkTheme()
     DisposableEffect(darkTheme) {
         val window = (view.context as Activity).window
@@ -124,13 +126,13 @@ fun ProtectionSetupScreen(
 
     fun bravoFor(step: SetupStep): String = when (step) {
         SetupStep.SCREENING -> coveredNumbers?.takeIf { it > 0 }?.let {
-            context.getString(
+            resources.getString(
                 R.string.setup_done_screening_count,
                 NumberFormat.getInstance(UiLocale.of(context)).format(it),
             )
-        } ?: context.getString(R.string.setup_done_screening)
-        SetupStep.NOTIFICATIONS -> context.getString(R.string.setup_done_notifications)
-        SetupStep.OVERLAY -> context.getString(R.string.setup_done_overlay)
+        } ?: resources.getString(R.string.setup_done_screening)
+        SetupStep.NOTIFICATIONS -> resources.getString(R.string.setup_done_notifications)
+        SetupStep.OVERLAY -> resources.getString(R.string.setup_done_overlay)
     }
 
     // Always start at step 0 so notifications is never jumped over.

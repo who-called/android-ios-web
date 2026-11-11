@@ -69,6 +69,7 @@ fun CallsScreen(
     var filter by remember { mutableStateOf(CallsFilter.ALL) }
     val clipboard = LocalClipboardManager.current
     val context = LocalContext.current
+    val copiedMessage = stringResource(R.string.history_copied)
 
     val displayedSections = remember(sections, filter) {
         sections.mapNotNull { section ->
@@ -156,7 +157,7 @@ fun CallsScreen(
                         onClick = { onCallClick(event) },
                         onLongClick = {
                             clipboard.setText(AnnotatedString("+${event.phone}"))
-                            Toast.makeText(context, context.getString(R.string.history_copied), Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, copiedMessage, Toast.LENGTH_SHORT).show()
                         },
                     )
                 }
