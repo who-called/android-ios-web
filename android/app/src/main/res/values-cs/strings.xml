@@ -1,0 +1,665 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- WARN notification -->
+    <string name="warn_channel_name">Upozornění na podezřelé hovory</string>
+    <string name="warn_channel_desc">Upozorní, když má příchozí hovor vysoké spamové skóre.</string>
+    <string name="warn_title">⚠️ Podezřelý hovor — nezablokováno</string>
+    <string name="warn_subtext">Who Called · telefon zvoní</string>
+
+    <!-- SMS shield -->
+    <string name="sms_blocked_channel_name">Skryté nevyžádané SMS</string>
+    <string name="sms_blocked_channel_desc">Nenápadně upozorní, když je skryto oznámení nevyžádané SMS.</string>
+    <string name="sms_blocked_title">Nevyžádaná SMS skryta</string>
+    <string name="sms_blocked_body">Oznámení od %1$s skryto. Zpráva zůstává v tvé aplikaci pro SMS.</string>
+    <string name="sms_listener_label">SMS štít Who Called</string>
+
+    <!-- Blocked-call notification -->
+    <string name="call_blocked_channel_name">Zablokované hovory</string>
+    <string name="call_blocked_channel_desc">Nenápadně upozorní, když je zablokován nevyžádaný hovor.</string>
+    <string name="call_blocked_title">Hovor zablokován</string>
+    <string name="call_blocked_unknown">Skryté číslo</string>
+
+    <!-- Daily game reminder -->
+    <string name="reminder_channel_name">Připomínka hry</string>
+    <string name="reminder_channel_desc">Přátelská připomínka jednou denně, abys přišel zahrát výzvu. Lze vypnout v nastavení.</string>
+
+    <!-- Common -->
+    <string name="common_back">Zpět</string>
+    <string name="common_close">Zavřít</string>
+    <string name="common_cancel">Zrušit</string>
+    <string name="common_delete">Smazat</string>
+    <string name="common_edit">Upravit</string>
+    <string name="common_loading">Načítání…</string>
+    <string name="common_connecting">Připojování k serveru…</string>
+    <string name="common_retry">Zkusit znovu</string>
+    <string name="common_points">%1$d b.</string>
+    <string name="common_vote_spam">Nevyžádané</string>
+    <string name="common_vote_legit">Legitimní</string>
+    <string name="common_status_blocked">Zablokováno</string>
+    <string name="common_status_warned">Upozorněno</string>
+
+    <!-- Bottom navigation tabs (keep short) -->
+    <string name="tab_games">Hry</string>
+
+    <!-- Daily game reminder notification (pairs of title + body, picked at random) -->
+    <string name="reminder_1_title">🧩 Dnešní výzva TRACE na tebe čeká — 5 mřížek, 3 minuty.</string>
+    <string name="reminder_1_body">Stoupej v žebříčku svým tempem.</string>
+    <string name="reminder_2_title">🔥 Udrž svou sérii naživu</string>
+    <string name="reminder_2_body">Stačí jedna rychlá hra a jedeš dál.</string>
+    <string name="reminder_3_title">🏆 Možná někdo překonal tvoje skóre</string>
+    <string name="reminder_3_body">Je na tobě, abys vedení získal zpět — v přátelském duchu.</string>
+    <string name="reminder_4_title">🛡️ Dnešní chytrá pauza</string>
+    <string name="reminder_4_body">Co takhle antispamová výzva na vyčištění hlavy?</string>
+    <string name="reminder_5_title">✨ Nová výzva je tu</string>
+    <string name="reminder_5_body">Dnes mají všichni stejné mřížky — ukaž, co umíš!</string>
+
+    <!-- Playful blocked-call notification titles (opt-in). Built-in defaults: local language + English. -->
+    <string-array name="fun_blocked_default_titles">
+        <item>🥊 Spam K.O.!</item>
+        <item>🛡️ Dobrý pokus, spammere</item>
+        <item>🚫 Telemarketér odmítnut</item>
+        <item>📵 O jednoho otravu méně</item>
+        <item>☀️ Další prodejce solárních panelů zablokován</item>
+        <item>🥊 Spam knocked out!</item>
+        <item>🛡️ Nice try, spammer</item>
+        <item>🚫 Cold caller turned away</item>
+        <item>📵 One less nuisance</item>
+        <item>😎 Blocked — you\'re welcome</item>
+    </string-array>
+
+    <!-- Country scopes for the spam list -->
+    <string name="country_all">Všechny země</string>
+    <string name="country_fr">Francie</string>
+    <string name="country_be">Belgie</string>
+    <string name="country_ch">Švýcarsko</string>
+    <string name="country_lu">Lucembursko</string>
+    <string name="country_es">Španělsko</string>
+    <string name="country_it">Itálie</string>
+    <string name="country_de">Německo</string>
+    <string name="country_gb">Spojené království</string>
+    <string name="country_pt">Portugalsko</string>
+    <string name="country_us">Spojené státy</string>
+    <string name="country_ca">Kanada</string>
+    <string name="country_ma">Maroko</string>
+    <string name="country_dz">Alžírsko</string>
+    <string name="country_tn">Tunisko</string>
+
+    <!-- Report categories -->
+    <string name="category_telemarketing">Telemarketing</string>
+    <string name="category_scam">Podvod</string>
+    <string name="category_robocall">Automatický hovor</string>
+    <string name="category_silent">Tichý hovor</string>
+    <string name="category_debt">Vymáhání dluhů</string>
+    <string name="category_survey">Průzkum</string>
+    <string name="category_other">Jiné</string>
+    <string name="category_unknown">Neznámé</string>
+
+    <!-- Call history sections -->
+    <string name="history_section_today">Dnes</string>
+    <string name="history_section_yesterday">Včera</string>
+    <string name="history_section_this_week">Tento týden</string>
+    <string name="history_section_this_month">Tento měsíc</string>
+    <string name="history_section_older">Starší</string>
+
+    <!-- Relative time -->
+    <string name="time_just_now">právě teď</string>
+    <string name="time_minutes_ago">před %1$d min</string>
+    <string name="time_hours_ago">před %1$d h</string>
+    <string name="time_yesterday">včera</string>
+    <string name="time_days_ago">před %1$d d</string>
+
+    <!-- Errors and status messages (ViewModel / repository) -->
+    <string name="error_invalid_phone">Neplatné číslo.</string>
+    <string name="error_network">Bez připojení. Zkus to znovu.</string>
+    <string name="error_server">Chyba serveru (%1$d).</string>
+    <string name="error_unknown">Neznámá chyba.</string>
+    <string name="sync_up_to_date">Už je aktuální ✓ Žádná nová čísla.</string>
+    <plurals name="sync_done">
+        <item quantity="one">Aktualizace dokončena 📥 Aktualizováno %1$d číslo.</item>
+        <item quantity="few">Aktualizace dokončena 📥 Aktualizována %1$d čísla.</item>
+        <item quantity="many">Aktualizace dokončena 📥 Aktualizováno %1$d čísla.</item>
+        <item quantity="other">Aktualizace dokončena 📥 Aktualizováno %1$d čísel.</item>
+    </plurals>
+    <string name="sync_failed">Aktualizace se nezdařila. Zkontroluj připojení a zkus to znovu.</string>
+    <string name="report_feedback_repeat">Už to máme 😊 Není třeba to opakovat — jedno hlášení stačí!</string>
+    <string name="report_feedback_thanks">Díky! Hlášení uloženo 🛡️</string>
+    <string name="report_feedback_saved_locally">Uloženo v zařízení. Odeslání na server se nezdařilo: %1$s</string>
+    <string name="privacy_erased">Tvoje hlášení byla smazána.</string>
+    <string name="privacy_erase_failed">Smazání se nezdařilo. Zkus to znovu.</string>
+    <string name="api_test_unreachable">Nedostupné.</string>
+
+    <!-- Country picker (Home + Settings) -->
+    <string name="country_dialog_title">Sledovaná země</string>
+
+    <!-- Home screen -->
+    <string name="home_sync_button">Aktualizovat seznam</string>
+    <plurals name="home_sync_progress">
+        <item quantity="one">Staženo %1$s číslo…</item>
+        <item quantity="few">Stažena %1$s čísla…</item>
+        <item quantity="many">Staženo %1$s čísla…</item>
+        <item quantity="other">Staženo %1$s čísel…</item>
+    </plurals>
+    <string name="home_sms_on">Aktivní · nevyžádané SMS jsou skryté</string>
+    <string name="home_sms_off">Skryj oznámení nevyžádaných SMS</string>
+    <string name="home_covered_numbers">Pokrytá čísla</string>
+    <string name="home_auto_update">Automatická aktualizace · %1$s</string>
+    <string name="home_blocked_calls">Zablokované hovory</string>
+    <string name="home_none_yet">Zatím žádné</string>
+    <string name="home_update_today">aktuální dnes</string>
+    <string name="home_update_yesterday">aktualizováno včera</string>
+    <string name="home_update_days_ago">aktualizováno před %1$d d</string>
+    <string name="home_update_on">Akt. %1$s</string>
+    <string name="home_community_title">Komunitní štít</string>
+
+    <!-- Report screen -->
+    <string name="report_title">Nahlásit číslo</string>
+    <string name="report_subtitle">Anonymně — žádný účet, žádné osobní údaje.</string>
+    <string name="report_phone_label">Číslo (např. +33 6 12 34 56 78)</string>
+    <string name="report_call_type">Typ hovoru</string>
+    <string name="report_submit">Odeslat hlášení</string>
+    <string name="report_allow">Povolit</string>
+    <string name="report_empty_recent_title">Žádné nedávné hovory</string>
+
+    <!-- Number detail (call detail + number lookup) -->
+    <string name="detail_title">Detail čísla</string>
+    <string name="detail_filtered_on">Filtrováno</string>
+    <string name="detail_badge_community">Komunita</string>
+    <string name="detail_stats_top_reason">Nejčastěji: %1$s (%2$d %%)</string>
+    <string name="detail_stats_24h">24 h</string>
+    <string name="detail_stats_7d">7 d</string>
+    <string name="detail_stats_30d">30 d</string>
+    <string name="detail_stats_1y">1 rok</string>
+
+    <!-- My reports (Journal tab) -->
+    <string name="myreports_title">Moje hlášení</string>
+    <string name="myreports_intro">Rozmysli si to, nebo smaž hlášení odeslané omylem.</string>
+    <string name="myreports_delete_title">Smazat toto hlášení?</string>
+    <string name="myreports_delete_body">Hlášení čísla +%1$s bude odstraněno (v zařízení i z našich serverů). Tuto akci nelze vrátit.</string>
+    <string name="myreports_empty_title">Žádná hlášení</string>
+    <string name="myreports_empty_body">Tvoje hlášení se zobrazí tady. Nahlas nevyžádané číslo a ochraň komunitu.</string>
+    <string name="myreports_sync_sent">odesláno</string>
+    <string name="myreports_sync_failed">neodesláno</string>
+    <string name="myreports_sync_pending">čeká</string>
+    <string name="myreports_change_mind">Rozmyslet si to</string>
+
+    <!-- Filtered-call history -->
+    <string name="history_empty_title">Žádné filtrované hovory</string>
+    <string name="history_copied">Číslo zkopírováno</string>
+
+    <!-- SMS shield -->
+    <string name="sms_title">SMS štít</string>
+    <string name="sms_subtitle">Skryj nevyžádané SMS</string>
+    <string name="sms_access_required">Je potřeba přístup k oznámením</string>
+    <string name="sms_access_body">Abys mohl skrývat nevyžádané SMS, povol aplikaci Who Called přístup k oznámením. Obsah tvých zpráv nikdy nečteme: skryjeme jen oznámení od nevyžádaného odesílatele. SMS zůstává v tvé aplikaci pro zprávy.</string>
+    <string name="sms_access_button">Zapnout přístup k oznámením</string>
+    <string name="sms_hide_title">Skrývat oznámení nevyžádaných SMS</string>
+    <string name="sms_hide_desc">Zpráva zůstává v tvé aplikaci pro SMS, označená jako nepřečtená. Žádná zpráva se nečte ani nemaže.</string>
+    <string name="sms_notify_title">Upozornit mě na skrytou SMS</string>
+    <string name="sms_notify_desc">Zobrazí nenápadné oznámení, když je nevyžádaná SMS skryta.</string>
+    <string name="sms_how_title">Jak to funguje</string>
+    <string name="sms_how_body">Android neumožňuje blokovat SMS, aniž by se aplikace stala výchozí aplikací pro zprávy. Who Called zůstává filtrem: skrýváme jen oznámení od odesílatelů s vysokým spamovým skóre, podle stejného seznamu jako u hovorů.</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Nastavení</string>
+    <string name="settings_erase_dialog_title">Smazat moje data?</string>
+    <string name="settings_erase_dialog_body">Všechna hlášení odeslaná z tohoto zařízení budou trvale smazána z našich serverů. Tuto akci nelze vrátit.</string>
+    <string name="settings_section_filtering">Filtrování</string>
+    <string name="settings_block_title">Blokovat nevyžádané hovory</string>
+    <string name="settings_block_desc">Čísla s vysokým spamovým skóre jsou automaticky odmítnuta: telefon nezazvoní.</string>
+    <string name="settings_warn_title">Upozornit mě v případě pochybností</string>
+    <string name="settings_warn_desc">U čísel se středním skóre telefon zazvoní a upozorní tě výstraha. Jestli hovor vezmeš, je na tobě.</string>
+    <string name="settings_blocked_notif_title">Upozornit mě na zablokovaný hovor</string>
+    <string name="settings_blocked_notif_desc">Po každém zablokovaném nevyžádaném hovoru zobrazí nenápadné oznámení.</string>
+    <string name="settings_fun_title">Vtipná oznámení 😜</string>
+    <string name="settings_fun_desc">Zábavné zprávy, když je spam zablokován („Spam K.O.!“). Ve výchozím stavu vypnuto.</string>
+    <string name="settings_fun_messages_title">Zprávy 😜</string>
+    <string name="settings_fun_messages_desc">Tady jsou všechny zprávy, které se střídají, když je spam zablokován. Přidej vlastní, uprav je, nebo se vrať k výchozím.</string>
+    <string name="settings_fun_defaults">Výchozí zprávy</string>
+    <string name="settings_fun_yours">Tvoje zprávy ✍️</string>
+    <string name="settings_fun_none">Zatím žádné vlastní zprávy — napiš svou níže.</string>
+    <string name="settings_fun_edit">Upravit tuto zprávu</string>
+    <string name="settings_fun_delete">Smazat tuto zprávu</string>
+    <string name="settings_fun_placeholder">Např.: 🎣 Další phishing na háčku!</string>
+    <string name="settings_fun_counter">%1$d/%2$d · emoji vítány 😄</string>
+    <string name="settings_fun_add">Přidat</string>
+    <string name="settings_fun_reset">Obnovit (vrátit výchozí zprávy)</string>
+    <string name="settings_section_games">Hry</string>
+    <string name="settings_reminder_title">Denní připomínka hraní 🎮</string>
+    <string name="settings_reminder_desc">Přátelská připomínka mezi 18:30 a 20:30, nikdy ne, pokud už máš odehráno. Po %1$d ignorovaných večerech v řadě se pozastaví a po %2$d dnech to zkusí znovu.</string>
+    <string name="settings_country_desc">Stahovat jen čísla z této země (menší mezipaměť). Zjištěno automaticky, lze změnit.</string>
+    <string name="settings_threshold">Citlivost blokování: %1$d %%</string>
+    <string name="settings_threshold_desc">Od tohoto spamového skóre je číslo zablokováno. Pod ním jen spustí upozornění (pokud je výše uvedená možnost zapnutá). Čím nižší práh, tím víc se blokuje — s rizikem několika falešných poplachů.</string>
+    <string name="settings_section_info">Informace</string>
+    <string name="settings_link_privacy">Soukromí</string>
+    <string name="settings_link_legal">Právní informace</string>
+    <string name="settings_link_site">Oficiální web</string>
+    <string name="settings_link_rate">Ohodnotit aplikaci</string>
+    <string name="settings_link_source">Zdrojový kód (open source)</string>
+    <string name="settings_link_contact">Kontaktuj nás</string>
+    <string name="settings_contact_subject">Who Called — kontakt</string>
+    <string name="settings_section_data">Moje data</string>
+    <string name="settings_erase_title">Smazat moje hlášení</string>
+    <string name="settings_erase_desc">Trvale smaže všechna hlášení odeslaná z tohoto zařízení. V souladu s tvým právem na výmaz (GDPR).</string>
+    <string name="settings_erase_button">Smazat moje data</string>
+    <string name="settings_erasing">Mazání…</string>
+    <string name="settings_section_diagnostic">Diagnostika</string>
+    <string name="settings_api_title">Připojení k API</string>
+    <string name="settings_api_desc">Ověř, že se aplikace spojí se serverem Who Called.</string>
+    <string name="settings_api_testing">Probíhá test…</string>
+    <string name="settings_api_test">Otestovat připojení</string>
+    <string name="settings_api_ok">API OK ✓ (%1$d ms)</string>
+    <string name="settings_api_failed">API nedostupné ✗ — %1$s</string>
+    <string name="settings_free_title">Zdarma a open source</string>
+    <string name="settings_free_body" formatted="false">Who Called je 100 % zdarma a jeho kód je otevřený. 100 % anonymní — žádný účet, žádné osobní údaje. Čísla v mezinárodním formátu.</string>
+    <string name="settings_version_hint">Dvojitým klepnutím otestuješ API</string>
+    <string name="settings_version_testing">Test API…</string>
+
+    <!-- Settings: hidden notification debug card (long-press the version) -->
+    <string name="debug_title">Ladění oznámení</string>
+    <string name="debug_permission">Oprávnění k oznámením: %1$s</string>
+    <string name="debug_permission_granted">uděleno ✓</string>
+    <string name="debug_permission_denied">ZAMÍTNUTO ✗ — nic se nezobrazí</string>
+    <string name="debug_request">Požádat</string>
+    <string name="debug_system_settings">Nastavení systému</string>
+    <string name="debug_blocked_standard">Zablokovaný hovor (standardní)</string>
+    <string name="debug_blocked_fun">Zablokovaný hovor (vtipný)</string>
+    <string name="debug_sms">Nevyžádaná SMS skryta</string>
+    <string name="debug_reminder">Denní připomínka hry</string>
+    <string name="debug_hide_hint">Dlouhým stisknutím verze tento panel skryješ.</string>
+
+    <!-- Games: shared -->
+    <string name="game_leaderboard_button">🏆 Žebříček</string>
+    <string name="game_start">Začít ▸</string>
+    <string name="game_share">Sdílet</string>
+    <string name="game_replay">Hrát znovu</string>
+    <string name="game_quit">Ukončit</string>
+    <string name="game_quit_title">Ukončit hru?</string>
+    <string name="game_daily_rank">Dnešní žebříček · top %1$d%%</string>
+    <plurals name="game_players_best">
+        <item quantity="one">%1$d hráč · nejlepší %2$d</item>
+        <item quantity="few">%1$d hráči · nejlepší %2$d</item>
+        <item quantity="many">%1$d hráče · nejlepší %2$d</item>
+        <item quantity="other">%1$d hráčů · nejlepší %2$d</item>
+    </plurals>
+
+    <!-- Games hub -->
+    <string name="games_subtitle">Jedna výzva denně, tvůj žebříček</string>
+    <string name="games_defense_tagline">Arkáda — znič spamové hovory.</string>
+    <string name="games_trace_tagline">Hlavolam — odhal skrytého podvodníka.</string>
+    <string name="games_practice">🎯 Volný trénink TRACE — mimo žebříček</string>
+    <string name="games_footer" formatted="false">Nová výzva každý den · 3 hry do žebříčku denně · 100 % anonymní.</string>
+    <string name="games_record">Rekord: %1$d b.</string>
+    <string name="games_not_played">Zatím nehráno</string>
+    <string name="games_play_daily">Hrát dnešní výzvu ▸</string>
+    <plurals name="games_play_attempts">
+        <item quantity="one">Hrát (zbývá %1$d pokus do žebříčku)</item>
+        <item quantity="few">Hrát (zbývají %1$d pokusy do žebříčku)</item>
+        <item quantity="many">Hrát (zbývá %1$d pokusu do žebříčku)</item>
+        <item quantity="other">Hrát (zbývá %1$d pokusů do žebříčku)</item>
+    </plurals>
+    <string name="games_replay_practice">Hrát znovu (trénink)</string>
+
+    <!-- Daily streak screen -->
+    <string name="streak_title">Denní série</string>
+    <string name="streak_current">Aktuální série</string>
+    <string name="streak_best">Nejlepší série: %1$d</string>
+    <string name="streak_kept">Skvělé — dnes je série udržená! 🔥</string>
+    <string name="streak_keep_going">Zahraj si dnes a pokračuj v sérii ☀️</string>
+    <string name="streak_milestone_reached">Milník 7 dní dosažen! 🎁</string>
+    <string name="streak_next_milestone">Další milník: 7 dní 🎁</string>
+    <string name="streak_weekday_mon">PO</string>
+    <string name="streak_weekday_tue">ÚT</string>
+    <string name="streak_weekday_wed">ST</string>
+    <string name="streak_weekday_thu">ČT</string>
+    <string name="streak_weekday_fri">PÁ</string>
+    <string name="streak_weekday_sat">SO</string>
+    <string name="streak_weekday_sun">NE</string>
+
+    <!-- Leaderboard screen -->
+    <string name="leaderboard_title">Žebříček %1$s</string>
+    <string name="leaderboard_period_day">Dnes</string>
+    <string name="leaderboard_period_week">Týden</string>
+    <string name="leaderboard_period_all">Celkově</string>
+    <string name="leaderboard_day_today">Dnes</string>
+    <string name="leaderboard_day_yesterday">Včera</string>
+    <string name="leaderboard_days_ago">před %1$d d</string>
+    <plurals name="leaderboard_unit_grids">
+        <item quantity="one">%1$d mřížka</item>
+        <item quantity="few">%1$d mřížky</item>
+        <item quantity="many">%1$d mřížky</item>
+        <item quantity="other">%1$d mřížek</item>
+    </plurals>
+    <string name="leaderboard_unit_wave">vlna %1$d</string>
+    <plurals name="leaderboard_summary">
+        <item quantity="one">%1$d hráč · nejlepší %2$d · medián %3$d</item>
+        <item quantity="few">%1$d hráči · nejlepší %2$d · medián %3$d</item>
+        <item quantity="many">%1$d hráče · nejlepší %2$d · medián %3$d</item>
+        <item quantity="other">%1$d hráčů · nejlepší %2$d · medián %3$d</item>
+    </plurals>
+    <string name="leaderboard_summary_solo">1 hráč (ty) · nejlepší %1$d</string>
+    <string name="leaderboard_be_first">Buď první, kdo zapíše skóre! 🚀</string>
+    <string name="leaderboard_your_rank">Tvoje umístění</string>
+    <string name="leaderboard_you_top">Top %1$d%% · %2$d b. (%3$s)</string>
+    <string name="leaderboard_you_local">%1$d b. (%2$s)</string>
+    <string name="leaderboard_not_played">V tomto období jsi ještě nehrál — pusť se do hry!</string>
+    <string name="leaderboard_top">Top</string>
+    <string name="leaderboard_sync_pending">Tvoje skóre se v žebříčku objeví po synchronizaci.</string>
+    <string name="leaderboard_no_scores">Zatím žádné skóre. Jsi na tahu!</string>
+    <string name="leaderboard_history">Tvoje historie</string>
+    <string name="leaderboard_history_rank">#%1$d/%2$d · top %3$d%%</string>
+    <string name="leaderboard_history_empty">Zahraj si hru a začni svou historii.</string>
+
+    <!-- DEFENSE game -->
+    <string name="defense_hud_score">SKÓRE</string>
+    <string name="defense_hud_wave">VLNA</string>
+    <string name="defense_item_ready">PŘEDMĚT PŘIPRAVEN — klepni</string>
+    <string name="defense_intro">Podrž prst a střílej, táhni a miř.\nNič nevyžádané hovory — plní ti ukazatel PŘEDMĚTU (aktivuješ ho sám!).\nZelené hovory jsou přátelské; chytej 🎁 a získej předmět hned.</string>
+    <string name="defense_game_over">Štít padl</string>
+    <plurals name="defense_result">
+        <item quantity="one">Vlna %1$d · %2$d spam zablokován</item>
+        <item quantity="few">Vlna %1$d · %2$d spamy zablokovány</item>
+        <item quantity="many">Vlna %1$d · %2$d spamu zablokováno</item>
+        <item quantity="other">Vlna %1$d · %2$d spamů zablokováno</item>
+    </plurals>
+    <string name="defense_share_text">who-called DEFENSE · %1$d b. · Vlna %2$d 🛡️\nBlokuj spam i ty 👉 %3$s</string>
+    <string name="defense_quit_body">Přijdeš o postup v aktuální vlně.</string>
+    <string name="defense_incoming">PŘICHÁZÍ…</string>
+    <string name="defense_item_rapid">RYCHLÁ PALBA</string>
+    <string name="defense_item_spread">PALBA ×5</string>
+    <string name="defense_item_slow">ZPOMALENÍ</string>
+    <string name="defense_item_repair">OPRAVA</string>
+    <string name="defense_item_shield">ŠTÍT</string>
+    <string name="defense_pop_combo">COMBO ×%1$d</string>
+    <string name="defense_pop_boss_bonus">BOSS +%1$d</string>
+    <string name="defense_pop_surge">NÁPOR ×%1$d</string>
+    <string name="defense_pop_boss">⚠ BOSS</string>
+    <string name="defense_pop_bonus">BONUS 🎁</string>
+
+    <!-- TRACE game -->
+    <string name="trace_mode_daily">Denní výzva</string>
+    <string name="trace_mode_practice">Trénink</string>
+    <string name="trace_tutorial">Návod</string>
+    <string name="trace_toast_error">−1 život · −%1$d b.</string>
+    <string name="trace_toast_points">+%1$d b.!</string>
+    <string name="trace_hint">💡 Nápověda</string>
+    <string name="trace_hint_desc">Umístí podvodníka · −%1$d b.</string>
+    <string name="trace_no_hints">Žádné další nápovědy</string>
+    <string name="trace_rules_title">3 PRAVIDLA</string>
+    <string name="trace_controls">1 klepnutí = ✗ bezpečné · 2 klepnutí = podvodník · 3 klepnutí = smazat\nTažením prstu po mřížce nakreslíš řadu ✗</string>
+    <string name="trace_resume">Pokračovat ▸</string>
+    <string name="trace_intro_daily">Denní výzva · 5 mřížek · 3 životy</string>
+    <string name="trace_intro_practice">Volný trénink · mimo žebříček</string>
+    <string name="trace_replay_tutorial">❓ Znovu interaktivní návod</string>
+    <string name="trace_size">Velikost: %1$d×%1$d</string>
+    <string name="trace_grid_solved">Mřížka %1$d vyřešena!</string>
+    <string name="trace_score">Skóre: %1$d</string>
+    <string name="trace_next_grid">Další mřížka…</string>
+    <string name="trace_sprint_done">Sprint dokončen!</string>
+    <plurals name="trace_all_grids">
+        <item quantity="one">%1$d mřížka zneškodněna 🎉</item>
+        <item quantity="few">Všechny %1$d mřížky zneškodněny 🎉</item>
+        <item quantity="many">Všech %1$d mřížky zneškodněno 🎉</item>
+        <item quantity="other">Všech %1$d mřížek zneškodněno 🎉</item>
+    </plurals>
+    <string name="trace_no_lives">Došly životy…</string>
+    <plurals name="trace_partial">
+        <item quantity="one">Nevadí — vyřešena %1$d/%2$d mřížka!</item>
+        <item quantity="few">Nevadí — vyřešeny %1$d/%2$d mřížky!</item>
+        <item quantity="many">Nevadí — vyřešeno %1$d/%2$d mřížky!</item>
+        <item quantity="other">Nevadí — vyřešeno %1$d/%2$d mřížek!</item>
+    </plurals>
+    <string name="trace_points">body</string>
+    <string name="trace_share_text">who-called TRACE · %1$d b. · %2$d/%3$d mřížek 🛡️\nLov spammery i ty 👉 %4$s</string>
+    <string name="trace_new_grid">Nová mřížka</string>
+    <string name="trace_quit_body">Přijdeš o postup v aktuální výzvě.</string>
+    <string name="trace_rule_color">1 na barvu</string>
+    <string name="trace_rule_line">1 / řádek &amp; sloupec</string>
+    <string name="trace_rule_adjacent">Nikdy vedle sebe</string>
+    <string name="trace_tap_label">Klepnutí:</string>
+    <string name="trace_safe">bezpečné</string>
+    <string name="trace_fraudster">podvodník</string>
+    <string name="trace_loading">Připravuji výzvu…</string>
+    <string name="trace_error_title">Výzvu nelze načíst</string>
+    <string name="trace_error_body">Zkontroluj připojení a zkus to znovu.</string>
+
+    <!-- TRACE villains (cosmetic fraudster per grid) -->
+    <string name="trace_villain_imp">Čertík</string>
+    <string name="trace_villain_demon">Démon</string>
+    <string name="trace_villain_supervillain">Superpadouch</string>
+    <string name="trace_villain_ninja">Ninja</string>
+    <string name="trace_villain_robot">Spamobot</string>
+    <string name="trace_villain_alien">Mimozemšťan</string>
+    <string name="trace_villain_scammer">Šmejd</string>
+    <string name="trace_villain_impostor">Zloděj identity</string>
+
+    <!-- TRACE interactive tutorial -->
+    <string name="trace_tuto_title">NÁVOD — %1$s Jak hrát</string>
+    <string name="trace_tuto_step0">3 pravidla, nic víc:\n1 podvodník na barvu -- 1 na řádek\na sloupec -- nikdy vedle sebe</string>
+    <string name="trace_tuto_step1">Růžová zóna má jen jedno pole:\npodvodník musí být tam.\nDvojitým klepnutím ho umísti.</string>
+    <string name="trace_tuto_step2">Na těchto polích nikdy nemůže\nbýt podvodník. Dej X\nna 3 zvýrazněná pole.</string>
+    <string name="trace_tuto_step3">1 podvodník na řádek, 1 na sloupec:\nkaždý má své místo. Dej X\nna 3 zvýrazněná pole.</string>
+    <string name="trace_tuto_step4">Nikdy vedle sebe, ani\núhlopříčně. Dej X\nna zvýrazněná pole.</string>
+    <string name="trace_tuto_step5">Řádek 2: jen jedno volné pole.\nPodvodník musí být tam.\nDvojitým klepnutím ho umísti.</string>
+    <string name="trace_tuto_step6">A co když se spleteš?\nDvakrát klepni na pole\nv červeném rámečku.</string>
+    <string name="trace_tuto_step7">Třetí klepnutí maže.\nKlepni na pole znovu.</string>
+    <string name="trace_tuto_step8_a">Zbývají 2 podvodníci.\nŘádek 3: jen jedno volné pole.\nDvakrát na něj klepni.</string>
+    <string name="trace_tuto_step8_b">Poslední: řádek 4!\nDvakrát na něj klepni.</string>
+    <string name="trace_tuto_tap_again_place">Ještě jedno klepnutí a je umístěn!</string>
+    <string name="trace_tuto_tap_again">Ještě jedno klepnutí!</string>
+    <string name="trace_tuto_tap_again_ellipsis">Ještě jedno klepnutí...</string>
+    <string name="trace_tuto_done1">Dobře. 1 podvodník na barvu.</string>
+    <string name="trace_tuto_done2">Tak. Každé X vyřadí jedno pole.\nMéně polí = snazší\nnajít dalšího.</string>
+    <string name="trace_tuto_done3">1 podvodník na řádek, 1 na sloupec.\nX jsou tvoje paměť: zakázáno.</string>
+    <string name="trace_tuto_done4">Vše, co se dotýká podvodníka,\nje bezpečné: označ to X.</string>
+    <string name="trace_tuto_done5">Výborně. X zužují možnosti,\ndokud nezbude jediné\nmožné pole. V tom je celý princip.</string>
+    <string name="trace_tuto_done6">Špatně umístěn: dotýkal se podvodníka.\n-1 život, -200 b.</string>
+    <string name="trace_tuto_done7">Smazáno. Cyklus:\nprázdné, X, podvodník, prázdné.</string>
+    <string name="trace_tuto_done8">Hotovo. Každá barva, každý řádek,\nkaždý sloupec má SVÉHO podvodníka.\nTeď ty!</string>
+    <string name="trace_tuto_tap_glowing_any">Klepni na svítící pole</string>
+    <string name="trace_tuto_tap_glowing">Klepni na pole, které svítí</string>
+    <string name="trace_tuto_erased">Smazáno</string>
+    <string name="trace_tuto_got_it">Rozumím ▸</string>
+    <string name="trace_tuto_skip">Přeskočit</string>
+    <string name="trace_tuto_lets_go">Jdeme na to ▸</string>
+    <string name="trace_tuto_next">Další ▸</string>
+    <string name="nav_games">Hry</string>
+    <string name="nav_settings">Nastavení</string>
+    <string name="home_country_dialog_title">Sledovaná země</string>
+    <string name="home_sync_connecting">Připojování k serveru…</string>
+    <string name="home_sms_title">SMS štít</string>
+    <string name="setup_skip">Přeskočit</string>
+    <string name="warn_detail_channel_name">Detail podezřelého hovoru</string>
+    <string name="warn_detail_channel_desc">Nenápadné oznámení bez vyskakovacího okna, které po upozornění na obrazovce otevře detail.</string>
+    <string name="warn_detail_title">Podezřelý hovor</string>
+    <string name="warn_detail_line">%1$s · %2$d%% · Zobrazit detail</string>
+    <string name="warn_group_title">Podezřelé hovory</string>
+    <string name="overlay_title">Podezřelý hovor</string>
+    <string name="overlay_not_blocked">Nezablokováno — rozhodnutí je na tobě</string>
+    <string name="overlay_dismiss">Zavřít upozornění</string>
+    <string name="home_overlay_title">Upozornění viditelné během hovoru</string>
+    <string name="home_overlay_body">Povol zobrazení přes jiné aplikace a uvidíš riziko spamu, zatímco telefon zvoní — tlačítko Přijmout zůstane volné.</string>
+    <string name="home_overlay_cta">Povolit zobrazení</string>
+    <string name="nav_home">Domů</string>
+    <string name="nav_calls">Hovory</string>
+    <string name="nav_report">Nahlásit</string>
+    <string name="common_collapse">Sbalit</string>
+    <string name="common_expand">Rozbalit</string>
+    <string name="common_scroll_top">Zpět nahoru</string>
+    <string name="home_protected">Jsi pod ochranou</string>
+    <string name="home_protection_to_enable">Zapni ochranu</string>
+    <string name="home_sync_updating">Aktualizace…</string>
+    <string name="home_country_watched">Sledovaná čísla: %1$s %2$s</string>
+    <string name="home_country_detected">Zjištěno automaticky. Klepni na „Upravit“ a změň to.</string>
+    <string name="home_shield_partial">Částečná ochrana · %1$d/%2$d</string>
+    <string name="home_shield_off">Štít není zapnutý · %1$d/%2$d</string>
+    <string name="home_shield_enable_filter">Zapni filtr hovorů a blokuj nevyžádané hovory.</string>
+    <string name="home_shield_enable_notifs">Upozornění jsou vypnutá: zapni oznámení.</string>
+    <string name="home_enable_blocker">Zapnout blokování</string>
+    <string name="home_enable_alerts">Zapnout upozornění</string>
+    <string name="home_recent_blocked_title">Nevyžádaný hovor zablokován</string>
+    <string name="home_recent_blocked_msg">Who Called zavěsil dřív, než telefon zazvonil.</string>
+    <string name="home_recent_warned_title">Zjištěn podezřelý hovor</string>
+    <string name="home_recent_warned_msg">Telefon zazvonil s upozorněním.</string>
+    <string name="home_recent_reported_title">Číslo nahlášeno jako nevyžádané</string>
+    <string name="home_recent_reported_msg">Toto číslo už máš označené jako nevyžádané.</string>
+    <string name="home_recent_legit_title">Číslo označeno jako legitimní</string>
+    <string name="home_recent_legit_msg">Toto číslo máš označené jako legitimní.</string>
+    <string name="home_recent_unknown_title">Volalo ti neznámé číslo</string>
+    <string name="home_recent_unknown_msg">Než zavoláš zpět, číslo si ověř.</string>
+    <string name="home_recent_see_number">Zobrazit číslo</string>
+    <plurals name="home_recent_others">
+        <item quantity="one">a %1$d další hovor za posledních 24 h</item>
+        <item quantity="few">a %1$d další hovory za posledních 24 h</item>
+        <item quantity="many">a %1$d dalšího hovoru za posledních 24 h</item>
+        <item quantity="other">a %1$d dalších hovorů za posledních 24 h</item>
+    </plurals>
+    <string name="home_quiet">Žádný nový hovor k ověření — všude klid.</string>
+    <string name="home_blocker_active">Blokování je aktivní a aktuální</string>
+    <string name="home_country_breakdown">%1$s %2$s: %3$s čísel%4$s</string>
+    <string name="home_arcep_prefixes"> · %1$s předvoleb ARCEP</string>
+    <string name="home_blocked_detail">Odmítnuto bez zvonění · zobrazit detail</string>
+    <string name="home_suspect_calls">Podezřelé hovory</string>
+    <string name="home_suspect_detail">Zvonilo to, přišlo upozornění · zobrazit detail</string>
+    <string name="home_games_row">Hry — denní výzvy a žebříčky%1$s</string>
+    <string name="home_community_line">Společně %1$s hlášení · +%2$s tento týden</string>
+    <string name="report_feedback_flip">Názor aktualizován ✓</string>
+    <string name="report_feedback_refine">Díky, upřesnění uloženo ✓</string>
+    <string name="sync_error_rate_limited">Příliš mnoho aktualizací z této sítě. Počkej pár minut a zkus to znovu.</string>
+    <string name="sync_error_server">Server aktualizaci odmítl (chyba %1$d). Zkus to později.</string>
+    <string name="sync_error_generic">Aktualizace se nezdařila. Zkus to za chvíli znovu.</string>
+    <string name="report_error_invalid_phone">Neplatné číslo — zkontroluj formát.</string>
+    <string name="report_error_daily_limit">Denní limit hlášení vyčerpán. Tvůj názor zůstává uložený v zařízení a odešle se automaticky.</string>
+    <string name="myreports_resend_now">Odeslat teď</string>
+    <string name="settings_overlay_title">Banner na obrazovce hovoru</string>
+    <string name="settings_overlay_desc">Zobrazí upozornění přes příchozí hovor. Hovory dál přijímá aplikace Telefon. Bez toho oznámení zmizí za obrazovkou hovoru.</string>
+    <string name="settings_reminder_paused_title">Připomínky pozastaveny</string>
+    <string name="settings_reminder_paused_until">Několik připomínek zůstalo bez odezvy — automaticky se obnoví %1$s.</string>
+    <string name="settings_reminder_paused_soon">Několik připomínek zůstalo bez odezvy — automaticky se obnoví za pár dní.</string>
+    <string name="settings_reminder_resume">Obnovit</string>
+    <string name="settings_link_arcep">Zdroj předvoleb ARCEP (arcep.fr)</string>
+    <string name="settings_independent_title">Nezávislá aplikace</string>
+    <string name="settings_independent_body">Who Called není oficiální aplikace: není spojena s úřadem ARCEP ani s žádnou vládní institucí a nezastupuje žádný veřejný orgán. Použité telemarketingové předvolby pocházejí z národního číslovacího plánu zveřejněného úřadem ARCEP (odkaz „Zdroj předvoleb ARCEP“ výše).</string>
+    <string name="debug_overlay_granted">Zobrazení přes jiné aplikace: uděleno ✓</string>
+    <string name="debug_overlay_denied">Zobrazení přes jiné aplikace: zamítnuto — banner hovoru se nezobrazí</string>
+    <string name="debug_overlay_allow">Povolit zobrazení přes jiné aplikace</string>
+    <string name="debug_simulate_hint">Skrytý test — simuluje podezřelý hovor (oznámení + banner 45 s):</string>
+    <string name="debug_simulate">Simulovat podezřelý hovor</string>
+    <string name="debug_other_tests">Další testy:</string>
+    <string name="debug_overlay_only">Jen overlay banner</string>
+    <string name="calls_filter_all">Vše</string>
+    <string name="calls_filter_review">K ověření</string>
+    <string name="calls_filter_filtered">Filtrované</string>
+    <string name="calls_title">Nedávné hovory</string>
+    <string name="calls_subtitle">Hovory zachycené filtrem · uložené v tvém telefonu</string>
+    <string name="calls_empty_review_title">Žádné číslo k ověření</string>
+    <string name="calls_empty_body_on">Tady se objeví další hovory zachycené filtrem.</string>
+    <string name="calls_empty_body_off">Zapni filtr hovorů a uvidíš, kdo ti volá.</string>
+    <string name="calls_copy_hint">Dlouhým stisknutím číslo zkopíruješ.</string>
+    <string name="calls_status_unknown">Nehodnoceno</string>
+    <string name="calls_direction_incoming">Příchozí</string>
+    <plurals name="calls_attempts">
+        <item quantity="one">%1$d hovor</item>
+        <item quantity="few">%1$d hovory</item>
+        <item quantity="many">%1$d hovoru</item>
+        <item quantity="other">%1$d hovorů</item>
+    </plurals>
+    <string name="report_see_my_reports">Zobrazit moje hlášení</string>
+    <string name="report_pick_recent">Vybrat z nedávných hovorů</string>
+    <string name="gauge_risk_high">Vysoké</string>
+    <string name="gauge_risk_medium">Střední</string>
+    <string name="gauge_risk_low">Nízké</string>
+    <string name="gauge_risk_caption">Riziko</string>
+    <string name="setup_done_screening_count">✓ Filtr zapnut · %1$s čísel připraveno</string>
+    <string name="setup_done_screening">✓ Filtr hovorů zapnut</string>
+    <string name="setup_done_notifications">✓ Upozornění zapnuta</string>
+    <string name="setup_done_overlay">✓ Banner na obrazovce hovoru</string>
+    <string name="setup_step">Krok %1$d/%2$d</string>
+    <string name="setup_continue">Pokračovat</string>
+    <string name="setup_continue_without">Pokračovat bez blokování</string>
+    <string name="setup_later">Později</string>
+    <string name="setup_footer">Lze změnit v Nastavení. Hry a vyhledávání fungují i bez oprávnění.</string>
+    <string name="setup_complete_title">Jsi pod ochranou</string>
+    <string name="setup_complete_count">%1$s čísel připraveno k filtrování</string>
+    <string name="setup_complete_ready">Tvůj štít Who Called je připraven</string>
+    <string name="setup_already_screening">Ochrana je už zapnutá</string>
+    <string name="setup_already_notifications">Upozornění jsou už zapnutá</string>
+    <string name="setup_already_overlay">Banner je už povolen</string>
+    <string name="setup_already_body">Toto oprávnění už je uděleno. Pokračuj dalším krokem.</string>
+    <string name="setup_screening_title">Zapni svůj štít</string>
+    <string name="setup_screening_body">Who Called nemůže nic blokovat, dokud není zapnutý systémový filtr hovorů. Pár vteřin · kdykoli lze zrušit.</string>
+    <string name="setup_screening_cta">Zapnout ochranu</string>
+    <string name="setup_notifications_title">Měj přehled</string>
+    <string name="setup_notifications_body">Bez oznámení zůstává ochrana tichá: žádné upozornění na podezřelý hovor ani potvrzení, když je číslo zablokováno.</string>
+    <string name="setup_notifications_cta">Zapnout upozornění</string>
+    <string name="setup_overlay_body">Aplikace Telefon oznámení překryje. Povol zobrazení přes jiné aplikace a spamové skóre zůstane na obrazovce, zatímco telefon zvoní — hovor se tím neblokuje a Who Called se nestane aplikací pro volání.</string>
+    <string name="detail_confirm_title_spam">Nevyžádané číslo</string>
+    <string name="detail_confirm_title_suspect">Podezřelé číslo</string>
+    <string name="detail_confirm_call_body">Toto číslo je rizikové. Opravdu chceš otevřít číselník?</string>
+    <string name="detail_confirm_sms_body">Toto číslo je rizikové. Opravdu chceš napsat SMS?</string>
+    <string name="detail_confirm_continue">Pokračovat</string>
+    <string name="detail_received_today">Příchozí hovor dnes v %1$s</string>
+    <string name="detail_received_on_date">Příchozí hovor %1$s v %2$s</string>
+    <string name="detail_warn_score_explanation">Skóre %1$d %%. Hlášení existují, ale na automatické blokování jich není dost. Telefon zazvonil: přijmout, nebo odmítnout bylo na tobě.</string>
+    <string name="detail_warn_score_explanation_category">Skóre %1$d %% · %2$s. Hlášení existují, ale na automatické blokování jich není dost. Telefon zazvonil: přijmout, nebo odmítnout bylo na tobě.</string>
+    <string name="detail_status_suspect">Podezřelé</string>
+    <string name="detail_status_rather_legit">Spíše legitimní</string>
+    <string name="detail_status_little_data">Málo dat</string>
+    <string name="detail_stats_loading">Statistiky…</string>
+    <string name="detail_action_call">Zavolat</string>
+    <string name="detail_action_sms">SMS</string>
+    <string name="detail_action_block">Blokovat</string>
+    <string name="detail_action_copy">Kopírovat</string>
+    <string name="detail_rule_always_allowed">V tomto zařízení vždy povoleno.</string>
+    <string name="detail_rule_blocked">V tomto zařízení zablokováno.</string>
+    <string name="detail_your_opinion">Tvůj názor</string>
+    <string name="detail_why_optional">Proč? (nepovinné)</string>
+    <string name="detail_arcep_range">Oficiální rozsah ARCEP</string>
+    <string name="detail_arcep_range_pattern">Oficiální rozsah ARCEP · %1$s</string>
+    <string name="detail_arcep_official_source">Oficiální zdroj: číslovací plán (arcep.fr)</string>
+    <string name="detail_arcep_not_affiliated">Who Called je nezávislá aplikace, není spojena s ARCEP.</string>
+    <string name="detail_why_evaluation">Proč toto hodnocení</string>
+    <string name="detail_your_calls">Tvoje hovory s tímto číslem</string>
+    <string name="detail_your_calls_subtitle">%1$d za 30 dní · %2$d za 7 dní</string>
+    <string name="detail_received_on">Přijato</string>
+    <string name="detail_badge_mixed">ARCEP + komunita</string>
+    <string name="detail_badge_arcep">ARCEP</string>
+    <string name="detail_badge_none">Žádná data</string>
+    <plurals name="detail_spam_count">
+        <item quantity="one">Nevyžádané: %1$d</item>
+        <item quantity="few">Nevyžádané: %1$d</item>
+        <item quantity="many">Nevyžádané: %1$d</item>
+        <item quantity="other">Nevyžádané: %1$d</item>
+    </plurals>
+    <plurals name="detail_legit_count">
+        <item quantity="one">Legitimní: %1$d</item>
+        <item quantity="few">Legitimní: %1$d</item>
+        <item quantity="many">Legitimní: %1$d</item>
+        <item quantity="other">Legitimní: %1$d</item>
+    </plurals>
+    <string name="detail_raw_counts_note">Zobrazená čísla jsou hrubé počty názorů; verdikt zohledňuje i jejich stáří a pověst přispěvatelů.</string>
+    <string name="detail_reviews_activity">Aktivita názorů</string>
+    <string name="detail_headline_mixed">ARCEP a názory komunity</string>
+    <string name="detail_headline_community">Názory komunity</string>
+    <string name="detail_headline_none">Žádná data od komunity</string>
+    <string name="detail_explanation_mixed">Toto číslo spadá do rozsahu ARCEP a má i názory komunity. Verdikt zohledňuje obojí.</string>
+    <string name="detail_explanation_arcep">Toto číslo odpovídá předvolbě z oficiálního seznamu telemarketingových čísel (ARCEP / operátoři). Tento zdroj je nezávislý na názorech komunity.</string>
+    <string name="detail_explanation_arcep_pattern">Toto číslo odpovídá předvolbě z oficiálního seznamu telemarketingových čísel (ARCEP / operátoři): %1$s. Tento zdroj je nezávislý na názorech komunity.</string>
+    <string name="detail_explanation_community">Verdikt kombinuje nedávné názory, jejich počet a pověst přispěvatelů.</string>
+    <string name="detail_explanation_none">To, že chybí názory, neznamená, že je číslo důvěryhodné. Než zavoláš zpět, dej si pozor.</string>
+    <string name="detail_verdict_block_high">Názory se jasně shodují na nevyžádaném hovoru.</string>
+    <string name="detail_verdict_block">Hodnoceno jako nevyžádané, zatím s malým odstupem.</string>
+    <string name="detail_verdict_warn">Negativní názory existují, ale verdikt je třeba potvrdit.</string>
+    <string name="detail_verdict_allow_high">Názory se shodují na legitimním čísle.</string>
+    <string name="detail_verdict_allow">Spíše legitimní, zatím s málo názory.</string>
+    <string name="detail_verdict_unknown">Na hodnocení tohoto čísla není dost podkladů.</string>
+    <string name="detail_confidence_official">oficiální zdroj</string>
+    <string name="detail_confidence_high">vysoká spolehlivost</string>
+    <string name="detail_confidence_medium">střední spolehlivost</string>
+    <string name="detail_confidence_low">nízká spolehlivost</string>
+    <string name="detail_confidence_none">spolehlivost nehodnocena</string>
+    <string name="detail_confidence_official_body">Stav vychází z oficiálního rozsahu, ne z výpočtu podle komunity.</string>
+    <string name="detail_confidence_high_body">Vážený počet názorů stačí na spolehlivé hodnocení (%1$d %%).</string>
+    <string name="detail_confidence_medium_body">Několik názorů existuje, ale hodil by se větší odstup (%1$d %%).</string>
+    <string name="detail_confidence_low_body">Příliš málo vážených názorů na jistý závěr (%1$d %%).</string>
+    <string name="detail_confidence_none_body">Zatím žádné použitelné vážené názory.</string>
+</resources>

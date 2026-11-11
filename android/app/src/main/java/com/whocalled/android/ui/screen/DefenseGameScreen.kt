@@ -53,6 +53,10 @@ import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
+import com.whocalled.android.R
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -68,10 +72,29 @@ import kotlin.math.sin
 private fun col(l: Long) = Color(l.toInt())
 private fun col(i: Int) = Color(i)
 
+/** Localised item names for the engine's floating pops. */
+private fun itemLabelRes(item: String): Int = when (item) {
+    "rapid" -> R.string.defense_item_rapid
+    "spread" -> R.string.defense_item_spread
+    "slow" -> R.string.defense_item_slow
+    "repair" -> R.string.defense_item_repair
+    else -> R.string.defense_item_shield
+}
+
+private fun defenseLabels(context: android.content.Context) = DefenseEngine.Labels(
+    item = { context.getString(itemLabelRes(it)) },
+    combo = { context.getString(R.string.defense_pop_combo, it) },
+    bossBonus = { context.getString(R.string.defense_pop_boss_bonus, it) },
+    surge = { context.getString(R.string.defense_pop_surge, it) },
+    boss = context.getString(R.string.defense_pop_boss),
+    bonus = context.getString(R.string.defense_pop_bonus),
+)
+
 @Composable
 fun DefenseGameScreen(viewModel: MainViewModel, onBack: () -> Unit, onLeaderboard: () -> Unit = {}) {
     val context = LocalContext.current
-    val engine = remember { DefenseEngine() }
+    val resources = LocalResources.current
+    val engine = remember { DefenseEngine(defenseLabels(context)) }
     val rank by viewModel.gameRank.collectAsState()
 
     // The engine runs in a fixed 390-wide logical space (matching the design); we
@@ -117,6 +140,7 @@ fun DefenseGameScreen(viewModel: MainViewModel, onBack: () -> Unit, onLeaderboar
 
     val phonePaint = remember { Paint().apply { isAntiAlias = true; textAlign = Paint.Align.CENTER } }
     val textPaint = remember { Paint().apply { isAntiAlias = true; textAlign = Paint.Align.CENTER; typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD) } }
+    val incomingLabel = stringResource(R.string.defense_incoming)
 
     // System back during an active run asks for confirmation; otherwise it exits.
     BackHandler(enabled = runningUi && !overUi && !showQuitConfirm) { showQuitConfirm = true }
@@ -145,7 +169,7 @@ fun DefenseGameScreen(viewModel: MainViewModel, onBack: () -> Unit, onLeaderboar
         ) {
             @Suppress("UNUSED_EXPRESSION") tick // subscribe to frames
             if (engine.w <= 0f) return@Canvas
-            scale(vscale, vscale, pivot = Offset.Zero) { drawGame(engine, phonePaint, textPaint) }
+            scale(vscale, vscale, pivot = Offset.Zero) { drawGame(engine, phonePaint, textPaint, incomingLabel) }
         }
 
         // HUD ----------------------------------------------------------
@@ -153,11 +177,11 @@ fun DefenseGameScreen(viewModel: MainViewModel, onBack: () -> Unit, onLeaderboar
             Modifier.fillMaxWidth().padding(12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            IconButton(onClick = { if (runningUi && !overUi) showQuitConfirm = true else onBack() }) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Retour", tint = col(DefenseEngine.INK)) }
+            IconButton(onClick = { if (runningUi && !overUi) showQuitConfirm = true else onBack() }) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(R.string.common_back), tint = col(DefenseEngine.INK)) }
             Spacer(Modifier.weight(1f))
-            HudChip("SCORE", scoreUi.toString())
+            HudChip(stringResource(R.string.defense_hud_score), scoreUi.toString())
             Spacer(Modifier.size(8.dp))
-            HudChip("WAVE", waveUi.toString())
+            HudChip(stringResource(R.string.defense_hud_wave), waveUi.toString())
             Spacer(Modifier.size(8.dp))
             HudChip("🛡", "${(shieldUi * 100).toInt()}%", if (shieldUi < 0.34f) col(DefenseEngine.SPAM) else col(DefenseEngine.CY))
         }
@@ -178,7 +202,7 @@ fun DefenseGameScreen(viewModel: MainViewModel, onBack: () -> Unit, onLeaderboar
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             if (ready) {
-                Text("OBJET PRÊT — touche", color = col(DefenseEngine.AMBER), fontWeight = FontWeight.Bold, style = androidx.compose.material3.MaterialTheme.typography.labelMedium)
+                Text(stringResource(R.string.defense_item_ready), color = col(DefenseEngine.AMBER), fontWeight = FontWeight.Bold, style = androidx.compose.material3.MaterialTheme.typography.labelMedium)
                 Spacer(Modifier.size(4.dp))
             }
             Box(
@@ -211,41 +235,41 @@ fun DefenseGameScreen(viewModel: MainViewModel, onBack: () -> Unit, onLeaderboar
                 Text("DEFENSE", style = androidx.compose.material3.MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold, color = col(DefenseEngine.INK))
                 Spacer(Modifier.height(10.dp))
                 Text(
-                    "Maintiens appuyé pour tirer, glisse pour viser.\nDétruis les indésirables — ils remplissent ta jauge d'OBJET (à activer toi-même !).\nLes appels verts sont bienveillants ; attrape les 🎁 pour un objet immédiat.",
+                    stringResource(R.string.defense_intro),
                     color = col(DefenseEngine.INK).copy(alpha = 0.75f),
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(horizontal = 28.dp),
                 )
                 Spacer(Modifier.height(22.dp))
-                Button(onClick = { engine.start() }) { Text("Commencer ▸") }
+                Button(onClick = { engine.start() }) { Text(stringResource(R.string.game_start)) }
                 Spacer(Modifier.height(10.dp))
-                OutlinedButton(onClick = onLeaderboard) { Text("🏆 Classement") }
+                OutlinedButton(onClick = onLeaderboard) { Text(stringResource(R.string.game_leaderboard_button)) }
             }
         }
         // Game-over overlay.
         if (overUi) {
             Overlay {
-                Text("Bouclier tombé", style = androidx.compose.material3.MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = col(DefenseEngine.INK))
+                Text(stringResource(R.string.defense_game_over), style = androidx.compose.material3.MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = col(DefenseEngine.INK))
                 Spacer(Modifier.height(6.dp))
                 Text("$scoreUi", style = androidx.compose.material3.MaterialTheme.typography.displaySmall, fontWeight = FontWeight.Bold, color = col(DefenseEngine.CY))
-                Text("Vague $waveUi · ${engine.blocked} spams bloqués", color = col(DefenseEngine.INK).copy(alpha = 0.7f))
+                Text(pluralStringResource(R.plurals.defense_result, engine.blocked, waveUi, engine.blocked), color = col(DefenseEngine.INK).copy(alpha = 0.7f))
                 rank?.let { r ->
                     Spacer(Modifier.height(12.dp))
-                    Text("Classement du jour · top ${r.topPercent}%", color = col(DefenseEngine.INK), fontWeight = FontWeight.Bold)
-                    Text("${r.players} joueur${if (r.players > 1) "s" else ""} · meilleur ${r.bestScore}", color = col(DefenseEngine.INK).copy(alpha = 0.7f), style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
+                    Text(stringResource(R.string.game_daily_rank, r.topPercent), color = col(DefenseEngine.INK), fontWeight = FontWeight.Bold)
+                    Text(pluralStringResource(R.plurals.game_players_best, r.players, r.players, r.bestScore), color = col(DefenseEngine.INK).copy(alpha = 0.7f), style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                 }
                 Spacer(Modifier.height(20.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     OutlinedButton(onClick = {
-                        val text = "who-called DEFENSE · $scoreUi pts · Vague $waveUi 🛡️\nBloque les spams toi aussi 👉 ${BuildConfig.SITE_URL}"
-                        context.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text), "Partager"))
-                    }) { Text("Partager") }
-                    Button(onClick = { engine.start() }) { Text("Rejouer") }
+                        val text = resources.getString(R.string.defense_share_text, scoreUi, waveUi, BuildConfig.SITE_URL)
+                        context.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text), resources.getString(R.string.game_share)))
+                    }) { Text(stringResource(R.string.game_share)) }
+                    Button(onClick = { engine.start() }) { Text(stringResource(R.string.game_replay)) }
                 }
                 Spacer(Modifier.height(8.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    OutlinedButton(onClick = onLeaderboard) { Text("🏆 Classement") }
-                    OutlinedButton(onClick = onBack) { Text("Retour") }
+                    OutlinedButton(onClick = onLeaderboard) { Text(stringResource(R.string.game_leaderboard_button)) }
+                    OutlinedButton(onClick = onBack) { Text(stringResource(R.string.common_back)) }
                 }
             }
         }
@@ -254,10 +278,10 @@ fun DefenseGameScreen(viewModel: MainViewModel, onBack: () -> Unit, onLeaderboar
         if (showQuitConfirm) {
             AlertDialog(
                 onDismissRequest = { showQuitConfirm = false },
-                confirmButton = { TextButton(onClick = onBack) { Text("Quitter") } },
-                dismissButton = { TextButton(onClick = { showQuitConfirm = false }) { Text("Annuler") } },
-                title = { Text("Quitter la partie ?") },
-                text = { Text("Tu perdras ta progression de la vague en cours.") },
+                confirmButton = { TextButton(onClick = onBack) { Text(stringResource(R.string.game_quit)) } },
+                dismissButton = { TextButton(onClick = { showQuitConfirm = false }) { Text(stringResource(R.string.common_cancel)) } },
+                title = { Text(stringResource(R.string.game_quit_title)) },
+                text = { Text(stringResource(R.string.defense_quit_body)) },
             )
         }
     }
@@ -297,7 +321,7 @@ private fun shieldPath(cx: Float, cy: Float, size: Float): Path {
     }
 }
 
-private fun DrawScope.drawGame(e: DefenseEngine, phonePaint: Paint, textPaint: Paint) {
+private fun DrawScope.drawGame(e: DefenseEngine, phonePaint: Paint, textPaint: Paint, incomingLabel: String) {
     val sx = if (e.shake > 0) (Math.random().toFloat() - 0.5f) * e.shake else 0f
     val sy = if (e.shake > 0) (Math.random().toFloat() - 0.5f) * e.shake else 0f
     translate(sx, sy) {
@@ -321,7 +345,7 @@ private fun DrawScope.drawGame(e: DefenseEngine, phonePaint: Paint, textPaint: P
             drawCircle(col(DefenseEngine.AMBER).copy(alpha = a), rp * 0.6f, Offset(e.w / 2, e.h * 0.42f), style = androidx.compose.ui.graphics.drawscope.Stroke(2f))
             drawContext.canvas.nativeCanvas.apply {
                 textPaint.color = DefenseEngine.AMBER.toInt(); textPaint.alpha = (a * 255).toInt(); textPaint.textSize = 12f
-                drawText("📞  INCOMING…", e.w / 2, e.h * 0.16f, textPaint)
+                drawText("📞  $incomingLabel", e.w / 2, e.h * 0.16f, textPaint)
                 textPaint.textSize = 15f; drawText(e.fakeDigits, e.w / 2, e.h * 0.16f + 20f, textPaint); textPaint.alpha = 255
             }
         }

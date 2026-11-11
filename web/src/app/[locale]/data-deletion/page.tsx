@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getDataDeletion } from "@/i18n/legal";
 import { alternatesFor, toDictLocale } from "@/i18n/locales";
+import { getDict } from "@/i18n/dictionaries";
 
 export async function generateMetadata({
   params,
@@ -21,7 +22,7 @@ export default async function DataDeletionPage({ params }: { params: Promise<{ l
   const { locale } = await params;
   const lang = toDictLocale(locale);
   const doc = getDataDeletion(lang);
-  const updatedLabel = lang === "en" ? "Last updated" : "Dernière mise à jour";
+  const updatedLabel = getDict(lang).common.lastUpdated;
 
   return (
     <article className="mx-auto max-w-3xl px-4 py-12">

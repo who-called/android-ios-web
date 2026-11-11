@@ -36,6 +36,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import com.whocalled.android.R
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.whocalled.android.data.ReportCategory
@@ -91,8 +94,8 @@ fun ReportScreen(
     ) {
         item {
             GradientHeader(
-                title = "Signaler un numéro",
-                subtitle = "Anonyme — aucun compte, aucune donnée personnelle.",
+                title = stringResource(R.string.report_title),
+                subtitle = stringResource(R.string.report_subtitle),
             )
         }
 
@@ -102,7 +105,7 @@ fun ReportScreen(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
             ) {
                 Icon(Icons.AutoMirrored.Rounded.ListAlt, contentDescription = null, modifier = Modifier.padding(end = 8.dp))
-                Text("Voir mes signalements")
+                Text(stringResource(R.string.report_see_my_reports))
             }
         }
 
@@ -112,7 +115,7 @@ fun ReportScreen(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
             ) {
                 Icon(Icons.Rounded.History, contentDescription = null, modifier = Modifier.padding(end = 8.dp))
-                Text("Choisir dans mes appels récents")
+                Text(stringResource(R.string.report_pick_recent))
             }
         }
 
@@ -120,7 +123,7 @@ fun ReportScreen(
             OutlinedTextField(
                 value = phone,
                 onValueChange = { phone = it },
-                label = { Text("Numéro (ex. +33 6 12 34 56 78)") },
+                label = { Text(stringResource(R.string.report_phone_label)) },
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                 singleLine = true,
             )
@@ -132,12 +135,12 @@ fun ReportScreen(
                     selected = isSpam,
                     onClick = { isSpam = true },
                     shape = SegmentedButtonDefaults.itemShape(0, 2),
-                ) { Text("Indésirable") }
+                ) { Text(stringResource(R.string.common_vote_spam)) }
                 SegmentedButton(
                     selected = !isSpam,
                     onClick = { isSpam = false },
                     shape = SegmentedButtonDefaults.itemShape(1, 2),
-                ) { Text("Légitime") }
+                ) { Text(stringResource(R.string.common_vote_legit)) }
             }
         }
 
@@ -145,13 +148,13 @@ fun ReportScreen(
         if (isSpam) {
             item {
                 Column(Modifier.padding(horizontal = 16.dp)) {
-                    Text("Type d’appel", style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.SemiBold)
+                    Text(stringResource(R.string.report_call_type), style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.SemiBold)
                     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         ReportCategory.entries.forEach { c ->
                             FilterChip(
                                 selected = category == c,
                                 onClick = { category = c },
-                                label = { Text(c.label) },
+                                label = { Text(stringResource(c.labelRes)) },
                             )
                         }
                     }
@@ -170,7 +173,7 @@ fun ReportScreen(
                 if (report is LoadState.Loading) {
                     CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
                 } else {
-                    Text("Envoyer le signalement")
+                    Text(stringResource(R.string.report_submit))
                 }
             }
         }

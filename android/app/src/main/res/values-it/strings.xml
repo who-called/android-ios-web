@@ -1,0 +1,653 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Italiano. Source language is French (values/). Keep keys in sync. -->
+<resources>
+    <!-- WARN notification -->
+    <string name="warn_channel_name">Avvisi di chiamate sospette</string>
+    <string name="warn_channel_desc">Ti avvisa quando una chiamata in arrivo ha un punteggio di spam elevato.</string>
+    <string name="warn_title">⚠️ Chiamata sospetta — non bloccata</string>
+    <string name="warn_subtext">Who Called · il telefono sta squillando</string>
+
+    <!-- SMS shield -->
+    <string name="sms_blocked_channel_name">SMS indesiderati nascosti</string>
+    <string name="sms_blocked_channel_desc">Ti avvisa discretamente quando la notifica di un SMS indesiderato viene nascosta.</string>
+    <string name="sms_blocked_title">SMS indesiderato nascosto</string>
+    <string name="sms_blocked_body">Notifica nascosta per %1$s. Il messaggio resta nella tua app SMS.</string>
+    <string name="sms_listener_label">Scudo SMS di Who Called</string>
+
+    <!-- Blocked-call notification -->
+    <string name="call_blocked_channel_name">Chiamate bloccate</string>
+    <string name="call_blocked_channel_desc">Ti avvisa discretamente quando una chiamata indesiderata viene bloccata.</string>
+    <string name="call_blocked_title">Chiamata bloccata</string>
+    <string name="call_blocked_unknown">Numero privato</string>
+
+    <!-- Daily game reminder -->
+    <string name="reminder_channel_name">Promemoria di gioco</string>
+    <string name="reminder_channel_desc">Un promemoria gentile, una volta al giorno, per venire a giocare la sfida. Disattivabile nelle impostazioni.</string>
+
+    <!-- Common -->
+    <string name="common_back">Indietro</string>
+    <string name="common_close">Chiudi</string>
+    <string name="common_cancel">Annulla</string>
+    <string name="common_delete">Elimina</string>
+    <string name="common_edit">Modifica</string>
+    <string name="common_loading">Caricamento…</string>
+    <string name="common_connecting">Connessione al server…</string>
+    <string name="common_retry">Riprova</string>
+    <string name="common_points">%1$d pt</string>
+    <string name="common_vote_spam">Indesiderato</string>
+    <string name="common_vote_legit">Legittimo</string>
+    <string name="common_status_blocked">Bloccato</string>
+    <string name="common_status_warned">Segnalato</string>
+
+    <!-- Bottom navigation tabs (keep short) -->
+    <string name="tab_games">Giochi</string>
+
+    <!-- Daily game reminder notification (pairs of title + body, picked at random) -->
+    <string name="reminder_1_title">🧩 La sfida TRACE del giorno ti aspetta: 5 griglie, 3 minuti.</string>
+    <string name="reminder_1_body">Scala la classifica, con calma.</string>
+    <string name="reminder_2_title">🔥 Tieni viva la tua serie</string>
+    <string name="reminder_2_body">Basta una partita veloce per continuare così.</string>
+    <string name="reminder_3_title">🏆 Forse qualcuno ha battuto il tuo punteggio</string>
+    <string name="reminder_3_body">Tocca a te riprenderti il primo posto, con spirito sportivo.</string>
+    <string name="reminder_4_title">🛡️ La pausa intelligente del giorno</string>
+    <string name="reminder_4_body">Una sfida anti-spam per staccare un po\'?</string>
+    <string name="reminder_5_title">✨ Nuova sfida disponibile</string>
+    <string name="reminder_5_body">Stesse griglie per tutti oggi: mostra quello che sai fare!</string>
+
+    <!-- Playful blocked-call notification titles (opt-in). Built-in defaults: local language + English. -->
+    <string-array name="fun_blocked_default_titles">
+        <item>🥊 Spam K.O.!</item>
+        <item>🛡️ Bel tentativo, spammer</item>
+        <item>🚫 Venditore respinto</item>
+        <item>📵 Un seccatore in meno</item>
+        <item>☀️ Un altro venditore di pannelli solari bloccato</item>
+        <item>🥊 Spam knocked out!</item>
+        <item>🛡️ Nice try, spammer</item>
+        <item>🚫 Cold caller turned away</item>
+        <item>📵 One less nuisance</item>
+        <item>😎 Blocked — you\'re welcome</item>
+    </string-array>
+
+    <!-- Country scopes for the spam list -->
+    <string name="country_all">Tutti i paesi</string>
+    <string name="country_fr">Francia</string>
+    <string name="country_be">Belgio</string>
+    <string name="country_ch">Svizzera</string>
+    <string name="country_lu">Lussemburgo</string>
+    <string name="country_es">Spagna</string>
+    <string name="country_it">Italia</string>
+    <string name="country_de">Germania</string>
+    <string name="country_gb">Regno Unito</string>
+    <string name="country_pt">Portogallo</string>
+    <string name="country_us">Stati Uniti</string>
+    <string name="country_ca">Canada</string>
+    <string name="country_ma">Marocco</string>
+    <string name="country_dz">Algeria</string>
+    <string name="country_tn">Tunisia</string>
+
+    <!-- Report categories -->
+    <string name="category_telemarketing">Telemarketing</string>
+    <string name="category_scam">Truffa</string>
+    <string name="category_robocall">Chiamata automatica</string>
+    <string name="category_silent">Chiamata muta</string>
+    <string name="category_debt">Recupero crediti</string>
+    <string name="category_survey">Sondaggio</string>
+    <string name="category_other">Altro</string>
+    <string name="category_unknown">Sconosciuto</string>
+
+    <!-- Call history sections -->
+    <string name="history_section_today">Oggi</string>
+    <string name="history_section_yesterday">Ieri</string>
+    <string name="history_section_this_week">Questa settimana</string>
+    <string name="history_section_this_month">Questo mese</string>
+    <string name="history_section_older">Più vecchi</string>
+
+    <!-- Relative time -->
+    <string name="time_just_now">proprio ora</string>
+    <string name="time_minutes_ago">%1$d min fa</string>
+    <string name="time_hours_ago">%1$d h fa</string>
+    <string name="time_yesterday">ieri</string>
+    <string name="time_days_ago">%1$d g fa</string>
+
+    <!-- Errors and status messages (ViewModel / repository) -->
+    <string name="error_invalid_phone">Numero non valido.</string>
+    <string name="error_network">Nessuna connessione. Riprova.</string>
+    <string name="error_server">Errore del server (%1$d).</string>
+    <string name="error_unknown">Errore sconosciuto.</string>
+    <string name="sync_up_to_date">Già aggiornato ✓ Nessun nuovo numero.</string>
+    <plurals name="sync_done">
+        <item quantity="one">Aggiornamento completato 📥 %1$d numero aggiornato.</item>
+        <item quantity="many">Aggiornamento completato 📥 %1$d di numeri aggiornati.</item>
+        <item quantity="other">Aggiornamento completato 📥 %1$d numeri aggiornati.</item>
+    </plurals>
+    <string name="sync_failed">Aggiornamento non riuscito. Controlla la connessione e riprova.</string>
+    <string name="report_feedback_repeat">Ricevuto 😊 Non serve insistere: una segnalazione basta!</string>
+    <string name="report_feedback_thanks">Grazie! Segnalazione registrata 🛡️</string>
+    <string name="report_feedback_saved_locally">Salvato sul dispositivo. Invio al server non riuscito: %1$s</string>
+    <string name="privacy_erased">Le tue segnalazioni sono state eliminate.</string>
+    <string name="privacy_erase_failed">Eliminazione non riuscita. Riprova.</string>
+    <string name="api_test_unreachable">Irraggiungibile.</string>
+
+    <!-- Country picker (Home + Settings) -->
+    <string name="country_dialog_title">Paese monitorato</string>
+
+    <!-- Home screen -->
+    <string name="home_sync_button">Aggiorna l\'elenco</string>
+    <plurals name="home_sync_progress">
+        <item quantity="one">%1$s numero scaricato…</item>
+        <item quantity="many">%1$s di numeri scaricati…</item>
+        <item quantity="other">%1$s numeri scaricati…</item>
+    </plurals>
+    <string name="home_sms_on">Attivo · gli SMS indesiderati sono nascosti</string>
+    <string name="home_sms_off">Nascondi le notifiche degli SMS indesiderati</string>
+    <string name="home_covered_numbers">Numeri coperti</string>
+    <string name="home_auto_update">Aggiornamento automatico · %1$s</string>
+    <string name="home_blocked_calls">Chiamate bloccate</string>
+    <string name="home_none_yet">Nessuna per ora</string>
+    <string name="home_update_today">aggiornato oggi</string>
+    <string name="home_update_yesterday">aggiornato ieri</string>
+    <string name="home_update_days_ago">aggiornato %1$d g fa</string>
+    <string name="home_update_on">aggiornato il %1$s</string>
+    <string name="home_community_title">Scudo della community</string>
+
+    <!-- Report screen -->
+    <string name="report_title">Segnala un numero</string>
+    <string name="report_subtitle">Anonimo: nessun account, nessun dato personale.</string>
+    <string name="report_phone_label">Numero (es. +33 6 12 34 56 78)</string>
+    <string name="report_call_type">Tipo di chiamata</string>
+    <string name="report_submit">Invia segnalazione</string>
+    <string name="report_allow">Consenti</string>
+    <string name="report_empty_recent_title">Nessuna chiamata recente</string>
+
+    <!-- Number detail (call detail + number lookup) -->
+    <string name="detail_title">Dettagli del numero</string>
+    <string name="detail_filtered_on">Filtrata il</string>
+    <string name="detail_badge_community">Community</string>
+    <string name="detail_stats_top_reason">Più spesso: %1$s (%2$d%%)</string>
+    <string name="detail_stats_24h">24 h</string>
+    <string name="detail_stats_7d">7 g</string>
+    <string name="detail_stats_30d">30 g</string>
+    <string name="detail_stats_1y">1 anno</string>
+
+    <!-- My reports (Journal tab) -->
+    <string name="myreports_title">Le mie segnalazioni</string>
+    <string name="myreports_intro">Cambia idea o elimina una segnalazione fatta per errore.</string>
+    <string name="myreports_delete_title">Eliminare questa segnalazione?</string>
+    <string name="myreports_delete_body">La segnalazione di +%1$s sarà rimossa (dal dispositivo e dai nostri server). L\'azione è irreversibile.</string>
+    <string name="myreports_empty_title">Nessuna segnalazione</string>
+    <string name="myreports_empty_body">Le tue segnalazioni appariranno qui. Segnala un numero indesiderato per proteggere la community.</string>
+    <string name="myreports_sync_sent">inviata</string>
+    <string name="myreports_sync_failed">non inviata</string>
+    <string name="myreports_sync_pending">in attesa</string>
+    <string name="myreports_change_mind">Cambia idea</string>
+
+    <!-- Filtered-call history -->
+    <string name="history_empty_title">Nessuna chiamata filtrata</string>
+    <string name="history_copied">Numero copiato</string>
+
+    <!-- SMS shield -->
+    <string name="sms_title">Scudo SMS</string>
+    <string name="sms_subtitle">Nascondi gli SMS indesiderati</string>
+    <string name="sms_access_required">Accesso alle notifiche necessario</string>
+    <string name="sms_access_body">Per nascondere gli SMS indesiderati, consenti a Who Called di accedere alle notifiche. Non leggiamo mai il contenuto dei tuoi messaggi: nascondiamo solo la notifica di un mittente indesiderato. L\'SMS resta nella tua app di messaggi.</string>
+    <string name="sms_access_button">Attiva l\'accesso alle notifiche</string>
+    <string name="sms_hide_title">Nascondi le notifiche degli SMS indesiderati</string>
+    <string name="sms_hide_desc">Il messaggio resta nella tua app SMS, segnato come non letto. Nessun messaggio viene letto o eliminato.</string>
+    <string name="sms_notify_title">Avvisami di un SMS nascosto</string>
+    <string name="sms_notify_desc">Mostra una notifica discreta quando un SMS indesiderato viene nascosto.</string>
+    <string name="sms_how_title">Come funziona</string>
+    <string name="sms_how_body">Android non permette di bloccare un SMS senza diventare la tua app di messaggi predefinita. Who Called resta un filtro: nascondiamo solo la notifica dei mittenti con un punteggio di spam alto, usando lo stesso elenco delle chiamate.</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Impostazioni</string>
+    <string name="settings_erase_dialog_title">Eliminare i miei dati?</string>
+    <string name="settings_erase_dialog_body">Tutte le segnalazioni inviate da questo dispositivo saranno eliminate definitivamente dai nostri server. L\'azione è irreversibile.</string>
+    <string name="settings_section_filtering">Filtro</string>
+    <string name="settings_block_title">Blocca le chiamate indesiderate</string>
+    <string name="settings_block_desc">I numeri con un punteggio di spam alto vengono rifiutati automaticamente: il telefono non squilla.</string>
+    <string name="settings_warn_title">Avvisami in caso di dubbio</string>
+    <string name="settings_warn_desc">Per i numeri con un punteggio medio, il telefono squilla e un avviso ti informa. Decidi tu se rispondere.</string>
+    <string name="settings_blocked_notif_title">Avvisami di una chiamata bloccata</string>
+    <string name="settings_blocked_notif_desc">Mostra una notifica discreta dopo ogni chiamata indesiderata bloccata.</string>
+    <string name="settings_fun_title">Notifiche divertenti 😜</string>
+    <string name="settings_fun_desc">Messaggi divertenti quando uno spam viene bloccato («Spam K.O.!»). Disattivato per impostazione predefinita.</string>
+    <string name="settings_fun_messages_title">I messaggi 😜</string>
+    <string name="settings_fun_messages_desc">Ecco tutti i messaggi che si alternano quando uno spam viene bloccato. Aggiungi i tuoi, modificali o torna ai messaggi predefiniti.</string>
+    <string name="settings_fun_defaults">Messaggi predefiniti</string>
+    <string name="settings_fun_yours">I tuoi messaggi ✍️</string>
+    <string name="settings_fun_none">Ancora nessun messaggio personale: scrivi il tuo qui sotto.</string>
+    <string name="settings_fun_edit">Modifica questo messaggio</string>
+    <string name="settings_fun_delete">Elimina questo messaggio</string>
+    <string name="settings_fun_placeholder">Es.: 🎣 Un altro phishing finito all\'amo!</string>
+    <string name="settings_fun_counter">%1$d/%2$d · emoji benvenute 😄</string>
+    <string name="settings_fun_add">Aggiungi</string>
+    <string name="settings_fun_reset">Ripristina (torna ai messaggi predefiniti)</string>
+    <string name="settings_section_games">Giochi</string>
+    <string name="settings_reminder_title">Promemoria giornaliero per giocare 🎮</string>
+    <string name="settings_reminder_desc">Un promemoria gentile tra le 18:30 e le 20:30, mai se hai già giocato. Se lo ignori per %1$d sere di fila, va in pausa per %2$d giorni e poi riprova.</string>
+    <string name="settings_country_desc">Scarica solo i numeri di questo paese (cache più leggera). Rilevato automaticamente, modificabile.</string>
+    <string name="settings_threshold">Sensibilità del blocco: %1$d%%</string>
+    <string name="settings_threshold_desc">Da questo punteggio di spam in su, il numero viene bloccato. Al di sotto, genera solo un avviso (se l\'opzione sopra è attiva). Più la soglia è bassa, più si blocca, con il rischio di qualche falso positivo.</string>
+    <string name="settings_section_info">Informazioni</string>
+    <string name="settings_link_privacy">Privacy</string>
+    <string name="settings_link_legal">Note legali</string>
+    <string name="settings_link_site">Sito ufficiale</string>
+    <string name="settings_link_rate">Valuta l\'app</string>
+    <string name="settings_link_source">Codice sorgente (open source)</string>
+    <string name="settings_link_contact">Contattaci</string>
+    <string name="settings_contact_subject">Who Called — contatto</string>
+    <string name="settings_section_data">I miei dati</string>
+    <string name="settings_erase_title">Elimina le mie segnalazioni</string>
+    <string name="settings_erase_desc">Cancella definitivamente tutte le segnalazioni inviate da questo dispositivo. Conforme al tuo diritto alla cancellazione (GDPR).</string>
+    <string name="settings_erase_button">Elimina i miei dati</string>
+    <string name="settings_erasing">Eliminazione…</string>
+    <string name="settings_section_diagnostic">Diagnostica</string>
+    <string name="settings_api_title">Connessione all\'API</string>
+    <string name="settings_api_desc">Verifica che l\'app raggiunga il server di Who Called.</string>
+    <string name="settings_api_testing">Test in corso…</string>
+    <string name="settings_api_test">Prova la connessione</string>
+    <string name="settings_api_ok">API OK ✓ (%1$d ms)</string>
+    <string name="settings_api_failed">API irraggiungibile ✗ — %1$s</string>
+    <string name="settings_free_title">Gratuito e open source</string>
+    <string name="settings_free_body" formatted="false">Who Called è gratuito al 100% e il suo codice è aperto. Anonimo al 100%: nessun account, nessun dato personale. Numeri in formato internazionale.</string>
+    <string name="settings_version_hint">Doppio tocco per provare l\'API</string>
+    <string name="settings_version_testing">Test dell\'API…</string>
+
+    <!-- Settings: hidden notification debug card (long-press the version) -->
+    <string name="debug_title">Debug notifiche</string>
+    <string name="debug_permission">Autorizzazione notifiche: %1$s</string>
+    <string name="debug_permission_granted">concessa ✓</string>
+    <string name="debug_permission_denied">NEGATA ✗: non verrà mostrato nulla</string>
+    <string name="debug_request">Richiedi</string>
+    <string name="debug_system_settings">Impostazioni di sistema</string>
+    <string name="debug_blocked_standard">Chiamata bloccata (standard)</string>
+    <string name="debug_blocked_fun">Chiamata bloccata (divertente)</string>
+    <string name="debug_sms">SMS indesiderato nascosto</string>
+    <string name="debug_reminder">Promemoria gioco giornaliero</string>
+    <string name="debug_hide_hint">Tieni premuta la versione per nascondere questo pannello.</string>
+
+    <!-- Games: shared -->
+    <string name="game_leaderboard_button">🏆 Classifica</string>
+    <string name="game_start">Inizia ▸</string>
+    <string name="game_share">Condividi</string>
+    <string name="game_replay">Rigioca</string>
+    <string name="game_quit">Esci</string>
+    <string name="game_quit_title">Uscire dalla partita?</string>
+    <string name="game_daily_rank">Classifica del giorno · top %1$d%%</string>
+    <plurals name="game_players_best">
+        <item quantity="one">%1$d giocatore · migliore %2$d</item>
+        <item quantity="many">%1$d di giocatori · migliore %2$d</item>
+        <item quantity="other">%1$d giocatori · migliore %2$d</item>
+    </plurals>
+
+    <!-- Games hub -->
+    <string name="games_subtitle">Una sfida al giorno, la tua classifica</string>
+    <string name="games_defense_tagline">Arcade: distruggi le chiamate spam.</string>
+    <string name="games_trace_tagline">Puzzle: smaschera il truffatore nascosto.</string>
+    <string name="games_practice">🎯 Allenamento libero TRACE: non in classifica</string>
+    <string name="games_footer" formatted="false">Nuova sfida ogni giorno · 3 partite in classifica / giorno · anonimo al 100%.</string>
+    <string name="games_record">Record: %1$d pt</string>
+    <string name="games_not_played">Non ancora giocato</string>
+    <string name="games_play_daily">Gioca la sfida del giorno ▸</string>
+    <plurals name="games_play_attempts">
+        <item quantity="one">Gioca (%1$d tentativo in classifica rimasto)</item>
+        <item quantity="many">Gioca (%1$d di tentativi in classifica rimasti)</item>
+        <item quantity="other">Gioca (%1$d tentativi in classifica rimasti)</item>
+    </plurals>
+    <string name="games_replay_practice">Rigioca (allenamento)</string>
+
+    <!-- Daily streak screen -->
+    <string name="streak_title">Serie giornaliera</string>
+    <string name="streak_current">Serie attuale</string>
+    <string name="streak_best">Serie migliore: %1$d</string>
+    <string name="streak_kept">Ben fatto: serie mantenuta oggi! 🔥</string>
+    <string name="streak_keep_going">Gioca oggi per continuare la tua serie ☀️</string>
+    <string name="streak_milestone_reached">Traguardo dei 7 giorni raggiunto! 🎁</string>
+    <string name="streak_next_milestone">Prossimo traguardo: 7 giorni 🎁</string>
+    <string name="streak_weekday_mon">LUN</string>
+    <string name="streak_weekday_tue">MAR</string>
+    <string name="streak_weekday_wed">MER</string>
+    <string name="streak_weekday_thu">GIO</string>
+    <string name="streak_weekday_fri">VEN</string>
+    <string name="streak_weekday_sat">SAB</string>
+    <string name="streak_weekday_sun">DOM</string>
+
+    <!-- Leaderboard screen -->
+    <string name="leaderboard_title">Classifica %1$s</string>
+    <string name="leaderboard_period_day">Oggi</string>
+    <string name="leaderboard_period_week">Settimana</string>
+    <string name="leaderboard_period_all">Sempre</string>
+    <string name="leaderboard_day_today">Oggi</string>
+    <string name="leaderboard_day_yesterday">Ieri</string>
+    <string name="leaderboard_days_ago">%1$d g fa</string>
+    <plurals name="leaderboard_unit_grids">
+        <item quantity="one">%1$d griglia</item>
+        <item quantity="many">%1$d di griglie</item>
+        <item quantity="other">%1$d griglie</item>
+    </plurals>
+    <string name="leaderboard_unit_wave">ondata %1$d</string>
+    <plurals name="leaderboard_summary">
+        <item quantity="one">%1$d giocatore · migliore %2$d · mediana %3$d</item>
+        <item quantity="many">%1$d di giocatori · migliore %2$d · mediana %3$d</item>
+        <item quantity="other">%1$d giocatori · migliore %2$d · mediana %3$d</item>
+    </plurals>
+    <string name="leaderboard_summary_solo">1 giocatore (tu) · migliore %1$d</string>
+    <string name="leaderboard_be_first">Sii il primo a fare un punteggio! 🚀</string>
+    <string name="leaderboard_your_rank">La tua posizione</string>
+    <string name="leaderboard_you_top">Top %1$d%% · %2$d pt (%3$s)</string>
+    <string name="leaderboard_you_local">%1$d pt (%2$s)</string>
+    <string name="leaderboard_not_played">Non hai ancora giocato in questo periodo: inizia una partita!</string>
+    <string name="leaderboard_top">Top</string>
+    <string name="leaderboard_sync_pending">Il tuo punteggio apparirà in classifica dopo la sincronizzazione.</string>
+    <string name="leaderboard_no_scores">Ancora nessun punteggio. Tocca a te!</string>
+    <string name="leaderboard_history">La tua cronologia</string>
+    <string name="leaderboard_history_rank">#%1$d/%2$d · top %3$d%%</string>
+    <string name="leaderboard_history_empty">Gioca una partita per iniziare la tua cronologia.</string>
+
+    <!-- DEFENSE game -->
+    <string name="defense_hud_score">PUNTI</string>
+    <string name="defense_hud_wave">ONDATA</string>
+    <string name="defense_item_ready">OGGETTO PRONTO — tocca</string>
+    <string name="defense_intro">Tieni premuto per sparare, scorri per mirare.\nDistruggi le chiamate indesiderate: riempiono il tuo indicatore OGGETTO (lo attivi tu!).\nLe chiamate verdi sono amiche; prendi i 🎁 per un oggetto immediato.</string>
+    <string name="defense_game_over">Scudo abbattuto</string>
+    <plurals name="defense_result">
+        <item quantity="one">Ondata %1$d · %2$d spam bloccato</item>
+        <item quantity="many">Ondata %1$d · %2$d di spam bloccati</item>
+        <item quantity="other">Ondata %1$d · %2$d spam bloccati</item>
+    </plurals>
+    <string name="defense_share_text">who-called DEFENSE · %1$d pt · Ondata %2$d 🛡️\nBlocca anche tu lo spam 👉 %3$s</string>
+    <string name="defense_quit_body">Perderai i progressi dell\'ondata in corso.</string>
+    <string name="defense_incoming">IN ARRIVO…</string>
+    <string name="defense_item_rapid">FUOCO RAPIDO</string>
+    <string name="defense_item_spread">COLPO ×5</string>
+    <string name="defense_item_slow">RALLENTATORE</string>
+    <string name="defense_item_repair">RIPARAZIONE</string>
+    <string name="defense_item_shield">SCUDO</string>
+    <string name="defense_pop_combo">COMBO ×%1$d</string>
+    <string name="defense_pop_boss_bonus">BOSS +%1$d</string>
+    <string name="defense_pop_surge">ASSALTO ×%1$d</string>
+    <string name="defense_pop_boss">⚠ BOSS</string>
+    <string name="defense_pop_bonus">BONUS 🎁</string>
+
+    <!-- TRACE game -->
+    <string name="trace_mode_daily">Sfida del giorno</string>
+    <string name="trace_mode_practice">Allenamento</string>
+    <string name="trace_tutorial">Tutorial</string>
+    <string name="trace_toast_error">−1 vita · −%1$d pt</string>
+    <string name="trace_toast_points">+%1$d pt!</string>
+    <string name="trace_hint">💡 Indizio</string>
+    <string name="trace_hint_desc">Piazza un truffatore · −%1$d pt</string>
+    <string name="trace_no_hints">Indizi esauriti</string>
+    <string name="trace_rules_title">LE 3 REGOLE</string>
+    <string name="trace_controls">1 tocco = ✗ sicura · 2 tocchi = truffatore · 3 tocchi = cancella\nTrascina il dito sulla griglia per mettere più ✗</string>
+    <string name="trace_resume">Riprendi ▸</string>
+    <string name="trace_intro_daily">Sfida del giorno · 5 griglie · 3 vite</string>
+    <string name="trace_intro_practice">Allenamento libero · non in classifica</string>
+    <string name="trace_replay_tutorial">❓ Rivedi il tutorial interattivo</string>
+    <string name="trace_size">Dimensione: %1$d×%1$d</string>
+    <string name="trace_grid_solved">Griglia %1$d risolta!</string>
+    <string name="trace_score">Punteggio: %1$d</string>
+    <string name="trace_next_grid">Griglia successiva…</string>
+    <string name="trace_sprint_done">Sprint completato!</string>
+    <plurals name="trace_all_grids">
+        <item quantity="one">%1$d griglia neutralizzata 🎉</item>
+        <item quantity="many">Tutte le %1$d di griglie neutralizzate 🎉</item>
+        <item quantity="other">Tutte le %1$d griglie neutralizzate 🎉</item>
+    </plurals>
+    <string name="trace_no_lives">Vite esaurite…</string>
+    <plurals name="trace_partial">
+        <item quantity="one">Non importa: %1$d/%2$d griglia risolta!</item>
+        <item quantity="many">Non importa: %1$d/%2$d di griglie risolte!</item>
+        <item quantity="other">Non importa: %1$d/%2$d griglie risolte!</item>
+    </plurals>
+    <string name="trace_points">punti</string>
+    <string name="trace_share_text">who-called TRACE · %1$d pt · %2$d/%3$d griglie 🛡️\nDai la caccia agli spammer anche tu 👉 %4$s</string>
+    <string name="trace_new_grid">Nuova griglia</string>
+    <string name="trace_quit_body">Perderai i progressi della sfida in corso.</string>
+    <string name="trace_rule_color">1 per colore</string>
+    <string name="trace_rule_line">1 / riga e colonna</string>
+    <string name="trace_rule_adjacent">Mai vicini</string>
+    <string name="trace_tap_label">Tocca:</string>
+    <string name="trace_safe">sicura</string>
+    <string name="trace_fraudster">truffatore</string>
+    <string name="trace_loading">Preparazione della sfida…</string>
+    <string name="trace_error_title">Impossibile caricare la sfida</string>
+    <string name="trace_error_body">Controlla la connessione e riprova.</string>
+
+    <!-- TRACE villains (cosmetic fraudster per grid) -->
+    <string name="trace_villain_imp">Diavoletto</string>
+    <string name="trace_villain_demon">Demone</string>
+    <string name="trace_villain_supervillain">Supercattivo</string>
+    <string name="trace_villain_ninja">Ninja</string>
+    <string name="trace_villain_robot">Robot spam</string>
+    <string name="trace_villain_alien">Alieno</string>
+    <string name="trace_villain_scammer">Truffatore</string>
+    <string name="trace_villain_impostor">Impostore</string>
+
+    <!-- TRACE interactive tutorial -->
+    <string name="trace_tuto_title">TUTORIAL — %1$s Come si gioca</string>
+    <string name="trace_tuto_step0">3 regole, tutto qui:\n1 truffatore per colore -- 1 per riga\ne colonna -- mai vicini</string>
+    <string name="trace_tuto_step1">La zona rosa ha una sola casella:\nil truffatore è per forza lì.\nTocca due volte per piazzarlo.</string>
+    <string name="trace_tuto_step2">Queste caselle non potranno mai\navere un truffatore. Metti una X\nsulle 3 caselle illuminate.</string>
+    <string name="trace_tuto_step3">1 truffatore per riga, 1 per colonna:\nognuno al suo posto. Metti una X sulle\n3 caselle illuminate.</string>
+    <string name="trace_tuto_step4">Mai vicini, nemmeno\nin diagonale. Metti una X sulle\ncaselle illuminate.</string>
+    <string name="trace_tuto_step5">Riga 2: una sola casella libera.\nIl truffatore è per forza lì.\nTocca due volte per piazzarlo.</string>
+    <string name="trace_tuto_step6">E se sbagli?\nTocca due volte la casella\ncerchiata di rosso.</string>
+    <string name="trace_tuto_step7">Un 3° tocco cancella.\nTocca di nuovo la casella.</string>
+    <string name="trace_tuto_step8_a">Restano solo 2 truffatori.\nRiga 3: una sola casella libera.\nToccala due volte.</string>
+    <string name="trace_tuto_step8_b">L\'ultimo: riga 4!\nToccala due volte.</string>
+    <string name="trace_tuto_tap_again_place">Un altro tocco per piazzarlo!</string>
+    <string name="trace_tuto_tap_again">Un altro tocco!</string>
+    <string name="trace_tuto_tap_again_ellipsis">Un altro tocco...</string>
+    <string name="trace_tuto_done1">Bene. 1 truffatore per colore.</string>
+    <string name="trace_tuto_done2">Ecco. Ogni X esclude una casella.\nMeno caselle = più facile\ntrovare il prossimo.</string>
+    <string name="trace_tuto_done3">1 truffatore per riga, 1 per colonna.\nLe X sono la tua memoria: vietato.</string>
+    <string name="trace_tuto_done4">Tutto ciò che tocca un truffatore\nè sicuro: segnalo con X.</string>
+    <string name="trace_tuto_done5">Ben fatto. Le X restringono il campo\nfinché non resta una sola\ncasella possibile. Tutto qui.</string>
+    <string name="trace_tuto_done6">Posizione sbagliata: toccava un truffatore.\n-1 vita, -200 pt.</string>
+    <string name="trace_tuto_done7">Cancellato. Il ciclo:\nvuota, X, truffatore, vuota.</string>
+    <string name="trace_tuto_done8">Fatto. Ogni colore, ogni riga,\nogni colonna ha il SUO truffatore.\nTocca a te!</string>
+    <string name="trace_tuto_tap_glowing_any">Tocca una casella illuminata</string>
+    <string name="trace_tuto_tap_glowing">Tocca la casella illuminata</string>
+    <string name="trace_tuto_erased">Cancellato</string>
+    <string name="trace_tuto_got_it">Capito ▸</string>
+    <string name="trace_tuto_skip">Salta</string>
+    <string name="trace_tuto_lets_go">Si parte ▸</string>
+    <string name="trace_tuto_next">Avanti ▸</string>
+    <string name="nav_games">Giochi</string>
+    <string name="nav_settings">Impostazioni</string>
+    <string name="home_country_dialog_title">Paese monitorato</string>
+    <string name="home_sync_connecting">Connessione al server…</string>
+    <string name="home_sms_title">Scudo SMS</string>
+    <string name="setup_skip">Salta</string>
+    <string name="warn_detail_channel_name">Dettagli di una chiamata sospetta</string>
+    <string name="warn_detail_channel_desc">Notifica discreta, senza banner, per aprire i dettagli dopo un avviso sullo schermo.</string>
+    <string name="warn_detail_title">Chiamata sospetta</string>
+    <string name="warn_detail_line">%1$s · %2$d%% · Vedi i dettagli</string>
+    <string name="warn_group_title">Chiamate sospette</string>
+    <string name="overlay_title">Chiamata sospetta</string>
+    <string name="overlay_not_blocked">Non bloccata — decidi tu</string>
+    <string name="overlay_dismiss">Chiudi l\'avviso</string>
+    <string name="home_overlay_title">Avviso visibile durante la chiamata</string>
+    <string name="home_overlay_body">Consenti la visualizzazione sopra altre app per vedere il rischio spam mentre squilla, senza coprire Rispondi.</string>
+    <string name="home_overlay_cta">Consenti la visualizzazione</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_calls">Chiamate</string>
+    <string name="nav_report">Segnala</string>
+    <string name="common_collapse">Comprimi</string>
+    <string name="common_expand">Espandi</string>
+    <string name="common_scroll_top">Torna su</string>
+    <string name="home_protected">Sei protetto</string>
+    <string name="home_protection_to_enable">Protezione da attivare</string>
+    <string name="home_sync_updating">Aggiornamento…</string>
+    <string name="home_country_watched">Numeri monitorati: %1$s %2$s</string>
+    <string name="home_country_detected">Rilevato automaticamente. Tocca «Modifica» per cambiarlo.</string>
+    <string name="home_shield_partial">Protezione parziale · %1$d/%2$d</string>
+    <string name="home_shield_off">Scudo non attivo · %1$d/%2$d</string>
+    <string name="home_shield_enable_filter">Attiva il filtro chiamate per bloccare quelle indesiderate.</string>
+    <string name="home_shield_enable_notifs">Gli avvisi sono disattivati: attiva le notifiche.</string>
+    <string name="home_enable_blocker">Attiva il blocco</string>
+    <string name="home_enable_alerts">Attiva gli avvisi</string>
+    <string name="home_recent_blocked_title">Chiamata indesiderata bloccata</string>
+    <string name="home_recent_blocked_msg">Who Called ha riattaccato prima che squillasse.</string>
+    <string name="home_recent_warned_title">Chiamata sospetta rilevata</string>
+    <string name="home_recent_warned_msg">La chiamata ha squillato con un avviso.</string>
+    <string name="home_recent_reported_title">Numero segnalato come indesiderato</string>
+    <string name="home_recent_reported_msg">Avevi già indicato questo numero come indesiderato.</string>
+    <string name="home_recent_legit_title">Numero indicato come legittimo</string>
+    <string name="home_recent_legit_msg">Avevi indicato che questo numero è legittimo.</string>
+    <string name="home_recent_unknown_title">Ti ha chiamato un numero sconosciuto</string>
+    <string name="home_recent_unknown_msg">Verifica questo numero prima di richiamare.</string>
+    <string name="home_recent_see_number">Vedi il numero</string>
+    <plurals name="home_recent_others">
+        <item quantity="one">e %1$d altra chiamata nelle ultime 24 h</item>
+        <item quantity="many">e %1$d di altre chiamate nelle ultime 24 h</item>
+        <item quantity="other">e altre %1$d chiamate nelle ultime 24 h</item>
+    </plurals>
+    <string name="home_quiet">Nessuna nuova chiamata da verificare — tutto tranquillo.</string>
+    <string name="home_blocker_active">Blocco attivo e aggiornato</string>
+    <string name="home_country_breakdown">%1$s %2$s: %3$s numeri%4$s</string>
+    <string name="home_arcep_prefixes"> · %1$s prefissi ARCEP</string>
+    <string name="home_blocked_detail">Rifiutate senza squillare · vedi i dettagli</string>
+    <string name="home_suspect_calls">Chiamate sospette</string>
+    <string name="home_suspect_detail">Hanno squillato, sei stato avvisato · vedi i dettagli</string>
+    <string name="home_games_row">Giochi — sfide del giorno &amp; classifiche%1$s</string>
+    <string name="home_community_line">%1$s segnalazioni insieme · +%2$s questa settimana</string>
+    <string name="report_feedback_flip">Opinione aggiornata ✓</string>
+    <string name="report_feedback_refine">Grazie, dettaglio registrato ✓</string>
+    <string name="sync_error_rate_limited">Troppi aggiornamenti da questa rete. Attendi qualche minuto e riprova.</string>
+    <string name="sync_error_server">Il server ha rifiutato l\'aggiornamento (errore %1$d). Riprova più tardi.</string>
+    <string name="sync_error_generic">Aggiornamento non riuscito. Riprova tra un istante.</string>
+    <string name="report_error_invalid_phone">Numero non valido — controlla il formato.</string>
+    <string name="report_error_daily_limit">Limite giornaliero di segnalazioni raggiunto. La tua opinione resta sul dispositivo e sarà reinviata automaticamente.</string>
+    <string name="myreports_resend_now">Reinvia ora</string>
+    <string name="settings_overlay_title">Banner sulla schermata di chiamata</string>
+    <string name="settings_overlay_desc">Mostra l\'avviso sopra la chiamata in arrivo. A rispondere resta l\'app Telefono. Senza questa opzione, la notifica sparisce dietro la schermata di chiamata.</string>
+    <string name="settings_reminder_paused_title">Promemoria in pausa</string>
+    <string name="settings_reminder_paused_until">Diversi promemoria sono rimasti senza risposta — ripresa automatica il %1$s.</string>
+    <string name="settings_reminder_paused_soon">Diversi promemoria sono rimasti senza risposta — ripresa automatica tra qualche giorno.</string>
+    <string name="settings_reminder_resume">Riprendi</string>
+    <string name="settings_link_arcep">Fonte dei prefissi ARCEP (arcep.fr)</string>
+    <string name="settings_independent_title">App indipendente</string>
+    <string name="settings_independent_body">Who Called non è un\'app ufficiale: non è affiliata all\'ARCEP né ad alcun ente governativo e non rappresenta alcun organismo pubblico. I prefissi di telemarketing utilizzati provengono dal piano nazionale di numerazione pubblicato dall\'ARCEP (link «Fonte dei prefissi ARCEP» qui sopra).</string>
+    <string name="debug_overlay_granted">Visualizzazione sopra altre app: concessa ✓</string>
+    <string name="debug_overlay_denied">Visualizzazione sopra altre app: negata — il banner di chiamata non verrà mostrato</string>
+    <string name="debug_overlay_allow">Consenti la visualizzazione sopra altre app</string>
+    <string name="debug_simulate_hint">Test nascosto — simula una chiamata sospetta (notifica + banner 45 s):</string>
+    <string name="debug_simulate">Simula una chiamata sospetta</string>
+    <string name="debug_other_tests">Altri test:</string>
+    <string name="debug_overlay_only">Solo banner overlay</string>
+    <string name="calls_filter_all">Tutte</string>
+    <string name="calls_filter_review">Da verificare</string>
+    <string name="calls_filter_filtered">Filtrate</string>
+    <string name="calls_title">Chiamate recenti</string>
+    <string name="calls_subtitle">Chiamate viste dal filtro · salvate sul tuo telefono</string>
+    <string name="calls_empty_review_title">Nessun numero da verificare</string>
+    <string name="calls_empty_body_on">Le prossime chiamate viste dal filtro appariranno qui.</string>
+    <string name="calls_empty_body_off">Attiva il filtro chiamate per vedere chi ti chiama.</string>
+    <string name="calls_copy_hint">Tieni premuto un numero per copiarlo.</string>
+    <string name="calls_status_unknown">Non valutato</string>
+    <string name="calls_direction_incoming">In arrivo</string>
+    <plurals name="calls_attempts">
+        <item quantity="one">%1$d chiamata</item>
+        <item quantity="many">%1$d di chiamate</item>
+        <item quantity="other">%1$d chiamate</item>
+    </plurals>
+    <string name="report_see_my_reports">Vedi le mie segnalazioni</string>
+    <string name="report_pick_recent">Scegli tra le mie chiamate recenti</string>
+    <string name="gauge_risk_high">Alto</string>
+    <string name="gauge_risk_medium">Moderato</string>
+    <string name="gauge_risk_low">Basso</string>
+    <string name="gauge_risk_caption">Rischio</string>
+    <string name="setup_done_screening_count">✓ Filtro attivato · %1$s numeri pronti</string>
+    <string name="setup_done_screening">✓ Filtro chiamate attivato</string>
+    <string name="setup_done_notifications">✓ Avvisi attivati</string>
+    <string name="setup_done_overlay">✓ Banner sulla schermata di chiamata</string>
+    <string name="setup_step">Passo %1$d/%2$d</string>
+    <string name="setup_continue">Continua</string>
+    <string name="setup_continue_without">Continua senza bloccare</string>
+    <string name="setup_later">Più tardi</string>
+    <string name="setup_footer">Modificabile nelle Impostazioni. Senza autorizzazione, giochi e ricerca restano disponibili.</string>
+    <string name="setup_complete_title">Sei protetto</string>
+    <string name="setup_complete_count">%1$s numeri pronti da filtrare</string>
+    <string name="setup_complete_ready">Il tuo scudo Who Called è pronto</string>
+    <string name="setup_already_screening">Protezione già attivata</string>
+    <string name="setup_already_notifications">Avvisi già attivati</string>
+    <string name="setup_already_overlay">Banner già autorizzato</string>
+    <string name="setup_already_body">Questa autorizzazione è già stata concessa. Continua con il passo successivo.</string>
+    <string name="setup_screening_title">Attiva il tuo scudo</string>
+    <string name="setup_screening_body">Who Called non può bloccare nulla finché il filtro chiamate di sistema non è attivo. Pochi secondi · revocabile in qualsiasi momento.</string>
+    <string name="setup_screening_cta">Attiva la protezione</string>
+    <string name="setup_notifications_title">Resta informato</string>
+    <string name="setup_notifications_body">Senza notifiche, la protezione resta silenziosa: nessun avviso per una chiamata sospetta, né conferma quando un numero viene bloccato.</string>
+    <string name="setup_notifications_cta">Attiva gli avvisi</string>
+    <string name="setup_overlay_body">L\'app Telefono copre la notifica. Consenti la visualizzazione sopra altre app per tenere il punteggio di spam sullo schermo mentre squilla — senza bloccare la chiamata né diventare la tua app Telefono.</string>
+    <string name="detail_confirm_title_spam">Numero indesiderato</string>
+    <string name="detail_confirm_title_suspect">Numero sospetto</string>
+    <string name="detail_confirm_call_body">Questo numero presenta un rischio. Vuoi davvero aprire il tastierino?</string>
+    <string name="detail_confirm_sms_body">Questo numero presenta un rischio. Vuoi davvero preparare un SMS?</string>
+    <string name="detail_confirm_continue">Continua</string>
+    <string name="detail_received_today">Chiamata ricevuta oggi alle %1$s</string>
+    <string name="detail_received_on_date">Chiamata ricevuta il %1$s alle %2$s</string>
+    <string name="detail_warn_score_explanation">Punteggio %1$d%%. Ci sono segnalazioni, ma non abbastanza per bloccare automaticamente. La chiamata ha squillato: stava a te rispondere o rifiutare.</string>
+    <string name="detail_warn_score_explanation_category">Punteggio %1$d%% · %2$s. Ci sono segnalazioni, ma non abbastanza per bloccare automaticamente. La chiamata ha squillato: stava a te rispondere o rifiutare.</string>
+    <string name="detail_status_suspect">Sospetto</string>
+    <string name="detail_status_rather_legit">Probabilmente legittimo</string>
+    <string name="detail_status_little_data">Pochi dati</string>
+    <string name="detail_stats_loading">Statistiche…</string>
+    <string name="detail_action_call">Chiama</string>
+    <string name="detail_action_sms">SMS</string>
+    <string name="detail_action_block">Blocca</string>
+    <string name="detail_action_copy">Copia</string>
+    <string name="detail_rule_always_allowed">Sempre consentito su questo dispositivo.</string>
+    <string name="detail_rule_blocked">Bloccato su questo dispositivo.</string>
+    <string name="detail_your_opinion">La tua opinione</string>
+    <string name="detail_why_optional">Perché? (facoltativo)</string>
+    <string name="detail_arcep_range">Intervallo ufficiale ARCEP</string>
+    <string name="detail_arcep_range_pattern">Intervallo ufficiale ARCEP · %1$s</string>
+    <string name="detail_arcep_official_source">Fonte ufficiale: piano di numerazione (arcep.fr)</string>
+    <string name="detail_arcep_not_affiliated">Who Called è indipendente e non è affiliata all\'ARCEP.</string>
+    <string name="detail_why_evaluation">Perché questa valutazione</string>
+    <string name="detail_your_calls">Le tue chiamate con questo numero</string>
+    <string name="detail_your_calls_subtitle">%1$d in 30 giorni · %2$d in 7 giorni</string>
+    <string name="detail_received_on">Ricevuta il</string>
+    <string name="detail_badge_mixed">ARCEP + community</string>
+    <string name="detail_badge_arcep">ARCEP</string>
+    <string name="detail_badge_none">Nessun dato</string>
+    <plurals name="detail_spam_count">
+        <item quantity="one">%1$d indesiderato</item>
+        <item quantity="many">%1$d di indesiderati</item>
+        <item quantity="other">%1$d indesiderati</item>
+    </plurals>
+    <plurals name="detail_legit_count">
+        <item quantity="one">%1$d legittimo</item>
+        <item quantity="many">%1$d di legittimi</item>
+        <item quantity="other">%1$d legittimi</item>
+    </plurals>
+    <string name="detail_raw_counts_note">I numeri mostrati sono le opinioni grezze; il verdetto tiene conto anche di quanto sono recenti e della reputazione di chi contribuisce.</string>
+    <string name="detail_reviews_activity">Attività delle opinioni</string>
+    <string name="detail_headline_mixed">ARCEP e opinioni della community</string>
+    <string name="detail_headline_community">Opinioni della community</string>
+    <string name="detail_headline_none">Nessun dato dalla community</string>
+    <string name="detail_explanation_mixed">Questo numero rientra in un intervallo ARCEP e ha anche opinioni della community. Il verdetto tiene conto di entrambi.</string>
+    <string name="detail_explanation_arcep">Questo numero corrisponde a un prefisso della lista ufficiale dei numeri di telemarketing (ARCEP / operatori). Questa fonte è distinta dalle opinioni della community.</string>
+    <string name="detail_explanation_arcep_pattern">Questo numero corrisponde a un prefisso della lista ufficiale dei numeri di telemarketing (ARCEP / operatori): %1$s. Questa fonte è distinta dalle opinioni della community.</string>
+    <string name="detail_explanation_community">Il verdetto combina le opinioni recenti, il loro volume e la reputazione di chi contribuisce.</string>
+    <string name="detail_explanation_none">L\'assenza di opinioni non significa che questo numero sia affidabile. Fai attenzione prima di richiamare.</string>
+    <string name="detail_verdict_block_high">Le opinioni convergono nettamente su una chiamata indesiderata.</string>
+    <string name="detail_verdict_block">Valutato come indesiderato, ma con dati ancora recenti.</string>
+    <string name="detail_verdict_warn">Ci sono opinioni negative, ma il verdetto è ancora da confermare.</string>
+    <string name="detail_verdict_allow_high">Le opinioni convergono su un numero legittimo.</string>
+    <string name="detail_verdict_allow">Tendenza piuttosto legittima, ma con ancora poche opinioni.</string>
+    <string name="detail_verdict_unknown">Elementi insufficienti per valutare questo numero.</string>
+    <string name="detail_confidence_official">fonte ufficiale</string>
+    <string name="detail_confidence_high">affidabilità alta</string>
+    <string name="detail_confidence_medium">affidabilità media</string>
+    <string name="detail_confidence_low">affidabilità bassa</string>
+    <string name="detail_confidence_none">affidabilità non valutata</string>
+    <string name="detail_confidence_official_body">Lo stato deriva da un intervallo ufficiale, non da un calcolo della community.</string>
+    <string name="detail_confidence_high_body">Il volume ponderato di opinioni è sufficiente per una valutazione solida (%1$d%%).</string>
+    <string name="detail_confidence_medium_body">Ci sono diverse opinioni, ma servono più dati nel tempo (%1$d%%).</string>
+    <string name="detail_confidence_low_body">Troppo poche opinioni ponderate per concludere con sicurezza (%1$d%%).</string>
+    <string name="detail_confidence_none_body">Per ora nessuna opinione ponderata utilizzabile.</string>
+</resources>

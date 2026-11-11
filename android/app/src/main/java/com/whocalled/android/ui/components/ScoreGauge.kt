@@ -23,6 +23,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import com.whocalled.android.R
 import com.whocalled.android.ui.theme.WCColor
 
 /**
@@ -50,9 +52,9 @@ fun ScoreGauge(
         else -> WCColor.Blue
     }
     val riskLabel = when (status) {
-        "block" -> "Élevé"
-        "warn" -> "Modéré"
-        "allow" -> "Faible"
+        "block" -> stringResource(R.string.gauge_risk_high)
+        "warn" -> stringResource(R.string.gauge_risk_medium)
+        "allow" -> stringResource(R.string.gauge_risk_low)
         else -> "—"
     }
 
@@ -111,7 +113,7 @@ fun ScoreGauge(
             )
             if (showCaption) {
                 Text(
-                    "Risque",
+                    stringResource(R.string.gauge_risk_caption),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = captionSize,

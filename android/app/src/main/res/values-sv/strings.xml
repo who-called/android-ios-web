@@ -1,0 +1,640 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Svenska. Source language is French (values/). Keep keys in sync. -->
+<resources>
+    <!-- WARN notification -->
+    <string name="warn_channel_name">Varningar för misstänkta samtal</string>
+    <string name="warn_channel_desc">Meddelar när ett inkommande samtal har hög spampoäng.</string>
+    <string name="warn_title">⚠️ Misstänkt samtal — inte blockerat</string>
+    <string name="warn_subtext">Who Called · telefonen ringer</string>
+
+    <!-- SMS shield -->
+    <string name="sms_blocked_channel_name">Dolda oönskade sms</string>
+    <string name="sms_blocked_channel_desc">Meddelar diskret när aviseringen för ett oönskat sms har dolts.</string>
+    <string name="sms_blocked_title">Oönskat sms dolt</string>
+    <string name="sms_blocked_body">Avisering dold för %1$s. Meddelandet finns kvar i din sms-app.</string>
+    <string name="sms_listener_label">Who Called sms-sköld</string>
+
+    <!-- Blocked-call notification -->
+    <string name="call_blocked_channel_name">Blockerade samtal</string>
+    <string name="call_blocked_channel_desc">Meddelar diskret när ett oönskat samtal blockeras.</string>
+    <string name="call_blocked_title">Samtal blockerat</string>
+    <string name="call_blocked_unknown">Dolt nummer</string>
+
+    <!-- Daily game reminder -->
+    <string name="reminder_channel_name">Spelpåminnelse</string>
+    <string name="reminder_channel_desc">En vänlig påminnelse, en gång om dagen, om att spela dagens utmaning. Kan stängas av i inställningarna.</string>
+
+    <!-- Common -->
+    <string name="common_back">Tillbaka</string>
+    <string name="common_close">Stäng</string>
+    <string name="common_cancel">Avbryt</string>
+    <string name="common_delete">Radera</string>
+    <string name="common_edit">Ändra</string>
+    <string name="common_loading">Läser in…</string>
+    <string name="common_connecting">Ansluter till servern…</string>
+    <string name="common_retry">Försök igen</string>
+    <string name="common_points">%1$d p</string>
+    <string name="common_vote_spam">Oönskat</string>
+    <string name="common_vote_legit">Legitimt</string>
+    <string name="common_status_blocked">Blockerat</string>
+    <string name="common_status_warned">Varnat</string>
+
+    <!-- Bottom navigation tabs (keep short) -->
+    <string name="tab_games">Spel</string>
+
+    <!-- Daily game reminder notification (pairs of title + body, picked at random) -->
+    <string name="reminder_1_title">🧩 Dagens TRACE-utmaning väntar — 5 rutnät, 3 minuter.</string>
+    <string name="reminder_1_body">Klättra på topplistan, i din egen takt.</string>
+    <string name="reminder_2_title">🔥 Håll din svit vid liv</string>
+    <string name="reminder_2_body">En snabb omgång räcker för att hålla farten uppe.</string>
+    <string name="reminder_3_title">🏆 Någon kanske har slagit ditt resultat</string>
+    <string name="reminder_3_body">Din tur att ta tillbaka ledningen, i god anda.</string>
+    <string name="reminder_4_title">🛡️ Dagens smarta paus</string>
+    <string name="reminder_4_body">En anti-spam-utmaning för att koppla av?</string>
+    <string name="reminder_5_title">✨ Ny utmaning tillgänglig</string>
+    <string name="reminder_5_body">Samma rutnät för alla i dag — visa vad du kan!</string>
+
+    <!-- Playful blocked-call notification titles (opt-in). Built-in defaults: local language + English. -->
+    <string-array name="fun_blocked_default_titles">
+        <item>🥊 Spam knockad!</item>
+        <item>🛡️ Bra försök, spammare</item>
+        <item>🚫 Telefonförsäljare avvisad</item>
+        <item>📵 En störande mindre</item>
+        <item>☀️ Ännu en solpanelsförsäljare blockerad</item>
+        <item>🥊 Spam knocked out!</item>
+        <item>🛡️ Nice try, spammer</item>
+        <item>🚫 Cold caller turned away</item>
+        <item>📵 One less nuisance</item>
+        <item>😎 Blocked — you\'re welcome</item>
+    </string-array>
+
+    <!-- Country scopes for the spam list -->
+    <string name="country_all">Alla länder</string>
+    <string name="country_fr">Frankrike</string>
+    <string name="country_be">Belgien</string>
+    <string name="country_ch">Schweiz</string>
+    <string name="country_lu">Luxemburg</string>
+    <string name="country_es">Spanien</string>
+    <string name="country_it">Italien</string>
+    <string name="country_de">Tyskland</string>
+    <string name="country_gb">Storbritannien</string>
+    <string name="country_pt">Portugal</string>
+    <string name="country_us">USA</string>
+    <string name="country_ca">Kanada</string>
+    <string name="country_ma">Marocko</string>
+    <string name="country_dz">Algeriet</string>
+    <string name="country_tn">Tunisien</string>
+
+    <!-- Report categories -->
+    <string name="category_telemarketing">Telefonförsäljning</string>
+    <string name="category_scam">Bedrägeri</string>
+    <string name="category_robocall">Automatiskt samtal</string>
+    <string name="category_silent">Tyst samtal</string>
+    <string name="category_debt">Inkasso</string>
+    <string name="category_survey">Undersökning</string>
+    <string name="category_other">Annat</string>
+    <string name="category_unknown">Okänt</string>
+
+    <!-- Call history sections -->
+    <string name="history_section_today">I dag</string>
+    <string name="history_section_yesterday">I går</string>
+    <string name="history_section_this_week">Den här veckan</string>
+    <string name="history_section_this_month">Den här månaden</string>
+    <string name="history_section_older">Äldre</string>
+
+    <!-- Relative time -->
+    <string name="time_just_now">just nu</string>
+    <string name="time_minutes_ago">för %1$d min sedan</string>
+    <string name="time_hours_ago">för %1$d h sedan</string>
+    <string name="time_yesterday">i går</string>
+    <string name="time_days_ago">för %1$d d sedan</string>
+
+    <!-- Errors and status messages (ViewModel / repository) -->
+    <string name="error_invalid_phone">Ogiltigt nummer.</string>
+    <string name="error_network">Ingen anslutning. Försök igen.</string>
+    <string name="error_server">Serverfel (%1$d).</string>
+    <string name="error_unknown">Okänt fel.</string>
+    <string name="sync_up_to_date">Redan uppdaterad ✓ Inga nya nummer.</string>
+    <plurals name="sync_done">
+        <item quantity="one">Uppdatering klar 📥 %1$d nummer uppdaterat.</item>
+        <item quantity="other">Uppdatering klar 📥 %1$d nummer uppdaterade.</item>
+    </plurals>
+    <string name="sync_failed">Det gick inte att uppdatera. Kontrollera anslutningen och försök igen.</string>
+    <string name="report_feedback_repeat">Uppfattat 😊 Ingen idé att tjata — en rapport räcker!</string>
+    <string name="report_feedback_thanks">Tack! Rapporten är sparad 🛡️</string>
+    <string name="report_feedback_saved_locally">Sparad lokalt. Det gick inte att skicka till servern: %1$s</string>
+    <string name="privacy_erased">Dina rapporter har raderats.</string>
+    <string name="privacy_erase_failed">Det gick inte att radera. Försök igen.</string>
+    <string name="api_test_unreachable">Går inte att nå.</string>
+
+    <!-- Country picker (Home + Settings) -->
+    <string name="country_dialog_title">Bevakat land</string>
+
+    <!-- Home screen -->
+    <string name="home_sync_button">Uppdatera listan</string>
+    <plurals name="home_sync_progress">
+        <item quantity="one">%1$s nummer hämtat…</item>
+        <item quantity="other">%1$s nummer hämtade…</item>
+    </plurals>
+    <string name="home_sms_on">Aktiv · oönskade sms döljs</string>
+    <string name="home_sms_off">Dölj aviseringar för oönskade sms</string>
+    <string name="home_covered_numbers">Täckta nummer</string>
+    <string name="home_auto_update">Automatisk uppdatering · %1$s</string>
+    <string name="home_blocked_calls">Blockerade samtal</string>
+    <string name="home_none_yet">Inga än</string>
+    <string name="home_update_today">uppdaterad i dag</string>
+    <string name="home_update_yesterday">uppdaterad i går</string>
+    <string name="home_update_days_ago">uppdaterad för %1$d d sedan</string>
+    <string name="home_update_on">Uppdaterad %1$s</string>
+    <string name="home_community_title">Communityns sköld</string>
+
+    <!-- Report screen -->
+    <string name="report_title">Rapportera ett nummer</string>
+    <string name="report_subtitle">Anonymt — inget konto, inga personuppgifter.</string>
+    <string name="report_phone_label">Nummer (t.ex. +33 6 12 34 56 78)</string>
+    <string name="report_call_type">Typ av samtal</string>
+    <string name="report_submit">Skicka rapport</string>
+    <string name="report_allow">Tillåt</string>
+    <string name="report_empty_recent_title">Inga senaste samtal</string>
+
+    <!-- Number detail (call detail + number lookup) -->
+    <string name="detail_title">Nummerdetaljer</string>
+    <string name="detail_filtered_on">Filtrerat den</string>
+    <string name="detail_badge_community">Community</string>
+    <string name="detail_stats_top_reason">Oftast: %1$s (%2$d %%)</string>
+    <string name="detail_stats_24h">24 h</string>
+    <string name="detail_stats_7d">7 d</string>
+    <string name="detail_stats_30d">30 d</string>
+    <string name="detail_stats_1y">1 år</string>
+
+    <!-- My reports (Journal tab) -->
+    <string name="myreports_title">Mina rapporter</string>
+    <string name="myreports_intro">Ändra dig eller radera en rapport som gjorts av misstag.</string>
+    <string name="myreports_delete_title">Radera rapporten?</string>
+    <string name="myreports_delete_body">Rapporten för +%1$s tas bort (lokalt och från våra servrar). Det går inte att ångra.</string>
+    <string name="myreports_empty_title">Inga rapporter</string>
+    <string name="myreports_empty_body">Dina rapporter visas här. Rapportera ett oönskat nummer för att skydda communityn.</string>
+    <string name="myreports_sync_sent">skickad</string>
+    <string name="myreports_sync_failed">inte skickad</string>
+    <string name="myreports_sync_pending">väntar</string>
+    <string name="myreports_change_mind">Ändra dig</string>
+
+    <!-- Filtered-call history -->
+    <string name="history_empty_title">Inga filtrerade samtal</string>
+    <string name="history_copied">Numret har kopierats</string>
+
+    <!-- SMS shield -->
+    <string name="sms_title">Sms-sköld</string>
+    <string name="sms_subtitle">Dölj oönskade sms</string>
+    <string name="sms_access_required">Åtkomst till aviseringar krävs</string>
+    <string name="sms_access_body">För att dölja oönskade sms behöver Who Called åtkomst till aviseringar. Vi läser aldrig innehållet i dina meddelanden: vi döljer bara aviseringen från en oönskad avsändare. Sms:et finns kvar i din meddelandeapp.</string>
+    <string name="sms_access_button">Aktivera åtkomst till aviseringar</string>
+    <string name="sms_hide_title">Dölj aviseringar för oönskade sms</string>
+    <string name="sms_hide_desc">Meddelandet finns kvar i din sms-app, markerat som oläst. Inga meddelanden läses eller raderas.</string>
+    <string name="sms_notify_title">Meddela mig om ett dolt sms</string>
+    <string name="sms_notify_desc">Visar en diskret avisering när ett oönskat sms döljs.</string>
+    <string name="sms_how_title">Så fungerar det</string>
+    <string name="sms_how_body">Android tillåter inte att sms blockeras utan att appen blir din standardapp för meddelanden. Who Called förblir ett filter: vi döljer bara aviseringen från avsändare med hög spampoäng, utifrån samma lista som för samtal.</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Inställningar</string>
+    <string name="settings_erase_dialog_title">Radera mina data?</string>
+    <string name="settings_erase_dialog_body">Alla rapporter som skickats från den här enheten raderas permanent från våra servrar. Det går inte att ångra.</string>
+    <string name="settings_section_filtering">Filtrering</string>
+    <string name="settings_block_title">Blockera oönskade samtal</string>
+    <string name="settings_block_desc">Nummer med hög spampoäng avvisas automatiskt: telefonen ringer inte.</string>
+    <string name="settings_warn_title">Varna mig vid tveksamhet</string>
+    <string name="settings_warn_desc">För nummer med medelhög poäng ringer telefonen och en varning uppmärksammar dig. Du bestämmer om du vill svara.</string>
+    <string name="settings_blocked_notif_title">Meddela mig om ett blockerat samtal</string>
+    <string name="settings_blocked_notif_desc">Visar en diskret avisering efter varje blockerat oönskat samtal.</string>
+    <string name="settings_fun_title">Roliga aviseringar 😜</string>
+    <string name="settings_fun_desc">Roliga meddelanden när spam blockeras (”Spam knockad!”). Avstängt som standard.</string>
+    <string name="settings_fun_messages_title">Meddelandena 😜</string>
+    <string name="settings_fun_messages_desc">Här är alla meddelanden som roterar när spam blockeras. Lägg till egna, ändra dem eller återgå till standardmeddelandena.</string>
+    <string name="settings_fun_defaults">Standardmeddelanden</string>
+    <string name="settings_fun_yours">Dina meddelanden ✍️</string>
+    <string name="settings_fun_none">Inga egna meddelanden än — skriv ditt eget nedan.</string>
+    <string name="settings_fun_edit">Ändra meddelandet</string>
+    <string name="settings_fun_delete">Radera meddelandet</string>
+    <string name="settings_fun_placeholder">T.ex.: 🎣 Ännu en nätfiskare på kroken!</string>
+    <string name="settings_fun_counter">%1$d/%2$d · emojier välkomna 😄</string>
+    <string name="settings_fun_add">Lägg till</string>
+    <string name="settings_fun_reset">Återställ (gå tillbaka till standardmeddelandena)</string>
+    <string name="settings_section_games">Spel</string>
+    <string name="settings_reminder_title">Daglig påminnelse om att spela 🎮</string>
+    <string name="settings_reminder_desc">En vänlig påminnelse mellan 18.30 och 20.30, aldrig om du redan har spelat. Ignoreras den %1$d kvällar i rad pausas den i %2$d dagar och försöker sedan igen.</string>
+    <string name="settings_country_desc">Ladda bara ner nummer från det här landet (mindre cache). Identifieras automatiskt, kan ändras.</string>
+    <string name="settings_threshold">Blockeringskänslighet: %1$d %%</string>
+    <string name="settings_threshold_desc">Från och med den här spampoängen blockeras ett nummer. Under den utlöser det bara en varning (om alternativet ovan är aktiverat). Ju lägre tröskel, desto mer blockeras — med risk för några falska träffar.</string>
+    <string name="settings_section_info">Information</string>
+    <string name="settings_link_privacy">Integritet</string>
+    <string name="settings_link_legal">Juridisk information</string>
+    <string name="settings_link_site">Officiell webbplats</string>
+    <string name="settings_link_rate">Betygsätt appen</string>
+    <string name="settings_link_source">Källkod (öppen källkod)</string>
+    <string name="settings_link_contact">Kontakta oss</string>
+    <string name="settings_contact_subject">Who Called — kontakt</string>
+    <string name="settings_section_data">Mina data</string>
+    <string name="settings_erase_title">Radera mina rapporter</string>
+    <string name="settings_erase_desc">Raderar permanent alla rapporter som skickats från den här enheten. I enlighet med din rätt till radering (GDPR).</string>
+    <string name="settings_erase_button">Radera mina data</string>
+    <string name="settings_erasing">Raderar…</string>
+    <string name="settings_section_diagnostic">Diagnostik</string>
+    <string name="settings_api_title">Anslutning till API:t</string>
+    <string name="settings_api_desc">Kontrollera att appen når Who Called-servern.</string>
+    <string name="settings_api_testing">Testar…</string>
+    <string name="settings_api_test">Testa anslutningen</string>
+    <string name="settings_api_ok">API OK ✓ (%1$d ms)</string>
+    <string name="settings_api_failed">API:t går inte att nå ✗ — %1$s</string>
+    <string name="settings_free_title">Gratis och öppen källkod</string>
+    <string name="settings_free_body" formatted="false">Who Called är 100 % gratis och har öppen källkod. 100 % anonymt — inget konto, inga personuppgifter. Nummer i internationellt format.</string>
+    <string name="settings_version_hint">Dubbeltryck för att testa API:t</string>
+    <string name="settings_version_testing">Testar API:t…</string>
+
+    <!-- Settings: hidden notification debug card (long-press the version) -->
+    <string name="debug_title">Felsökning av aviseringar</string>
+    <string name="debug_permission">Behörighet för aviseringar: %1$s</string>
+    <string name="debug_permission_granted">beviljad ✓</string>
+    <string name="debug_permission_denied">NEKAD ✗ — inget kommer att visas</string>
+    <string name="debug_request">Begär</string>
+    <string name="debug_system_settings">Systeminställningar</string>
+    <string name="debug_blocked_standard">Blockerat samtal (standard)</string>
+    <string name="debug_blocked_fun">Blockerat samtal (rolig)</string>
+    <string name="debug_sms">Oönskat sms dolt</string>
+    <string name="debug_reminder">Daglig spelpåminnelse</string>
+    <string name="debug_hide_hint">Tryck länge på versionen för att dölja panelen.</string>
+
+    <!-- Games: shared -->
+    <string name="game_leaderboard_button">🏆 Topplista</string>
+    <string name="game_start">Starta ▸</string>
+    <string name="game_share">Dela</string>
+    <string name="game_replay">Spela igen</string>
+    <string name="game_quit">Avsluta</string>
+    <string name="game_quit_title">Avsluta omgången?</string>
+    <string name="game_daily_rank">Dagens placering · topp %1$d%%</string>
+    <plurals name="game_players_best">
+        <item quantity="one">%1$d spelare · bäst %2$d</item>
+        <item quantity="other">%1$d spelare · bäst %2$d</item>
+    </plurals>
+
+    <!-- Games hub -->
+    <string name="games_subtitle">En utmaning om dagen, din placering</string>
+    <string name="games_defense_tagline">Arkad — förstör spamsamtalen.</string>
+    <string name="games_trace_tagline">Pussel — avslöja den dolda bedragaren.</string>
+    <string name="games_practice">🎯 Fri träning TRACE — utanför topplistan</string>
+    <string name="games_footer" formatted="false">Ny utmaning varje dag · 3 rankade omgångar / dag · 100 % anonymt.</string>
+    <string name="games_record">Rekord: %1$d p</string>
+    <string name="games_not_played">Inte spelat än</string>
+    <string name="games_play_daily">Spela dagens utmaning ▸</string>
+    <plurals name="games_play_attempts">
+        <item quantity="one">Spela (%1$d rankat försök kvar)</item>
+        <item quantity="other">Spela (%1$d rankade försök kvar)</item>
+    </plurals>
+    <string name="games_replay_practice">Spela igen (träning)</string>
+
+    <!-- Daily streak screen -->
+    <string name="streak_title">Daglig svit</string>
+    <string name="streak_current">Nuvarande svit</string>
+    <string name="streak_best">Bästa svit: %1$d</string>
+    <string name="streak_kept">Snyggt — sviten hålls i dag! 🔥</string>
+    <string name="streak_keep_going">Spela i dag för att fortsätta din svit ☀️</string>
+    <string name="streak_milestone_reached">7-dagarsmilstolpen nådd! 🎁</string>
+    <string name="streak_next_milestone">Nästa milstolpe: 7 dagar 🎁</string>
+    <string name="streak_weekday_mon">MÅN</string>
+    <string name="streak_weekday_tue">TIS</string>
+    <string name="streak_weekday_wed">ONS</string>
+    <string name="streak_weekday_thu">TOR</string>
+    <string name="streak_weekday_fri">FRE</string>
+    <string name="streak_weekday_sat">LÖR</string>
+    <string name="streak_weekday_sun">SÖN</string>
+
+    <!-- Leaderboard screen -->
+    <string name="leaderboard_title">Topplista %1$s</string>
+    <string name="leaderboard_period_day">I dag</string>
+    <string name="leaderboard_period_week">Vecka</string>
+    <string name="leaderboard_period_all">All tid</string>
+    <string name="leaderboard_day_today">I dag</string>
+    <string name="leaderboard_day_yesterday">I går</string>
+    <string name="leaderboard_days_ago">för %1$d d sedan</string>
+    <plurals name="leaderboard_unit_grids">
+        <item quantity="one">%1$d rutnät</item>
+        <item quantity="other">%1$d rutnät</item>
+    </plurals>
+    <string name="leaderboard_unit_wave">våg %1$d</string>
+    <plurals name="leaderboard_summary">
+        <item quantity="one">%1$d spelare · bäst %2$d · median %3$d</item>
+        <item quantity="other">%1$d spelare · bäst %2$d · median %3$d</item>
+    </plurals>
+    <string name="leaderboard_summary_solo">1 spelare (du) · bäst %1$d</string>
+    <string name="leaderboard_be_first">Bli först med att sätta ett resultat! 🚀</string>
+    <string name="leaderboard_your_rank">Din placering</string>
+    <string name="leaderboard_you_top">Topp %1$d%% · %2$d p (%3$s)</string>
+    <string name="leaderboard_you_local">%1$d p (%2$s)</string>
+    <string name="leaderboard_not_played">Inte spelat under den här perioden än — starta en omgång!</string>
+    <string name="leaderboard_top">Topp</string>
+    <string name="leaderboard_sync_pending">Ditt resultat visas på topplistan så snart det har synkats.</string>
+    <string name="leaderboard_no_scores">Inga resultat än. Din tur att spela!</string>
+    <string name="leaderboard_history">Din historik</string>
+    <string name="leaderboard_history_rank">#%1$d/%2$d · topp %3$d%%</string>
+    <string name="leaderboard_history_empty">Spela en omgång för att starta din historik.</string>
+
+    <!-- DEFENSE game -->
+    <string name="defense_hud_score">POÄNG</string>
+    <string name="defense_hud_wave">VÅG</string>
+    <string name="defense_item_ready">FÖREMÅL REDO — tryck</string>
+    <string name="defense_intro">Håll intryckt för att skjuta, dra för att sikta.\nFörstör de oönskade — de fyller din FÖREMÅLS-mätare (aktivera den själv!).\nGröna samtal är vänliga; fånga 🎁 för ett föremål direkt.</string>
+    <string name="defense_game_over">Skölden har fallit</string>
+    <plurals name="defense_result">
+        <item quantity="one">Våg %1$d · %2$d spam blockerat</item>
+        <item quantity="other">Våg %1$d · %2$d spam blockerade</item>
+    </plurals>
+    <string name="defense_share_text">who-called DEFENSE · %1$d p · Våg %2$d 🛡️\nBlockera spam du också 👉 %3$s</string>
+    <string name="defense_quit_body">Du förlorar dina framsteg i den pågående vågen.</string>
+    <string name="defense_incoming">INKOMMANDE…</string>
+    <string name="defense_item_rapid">SNABBELD</string>
+    <string name="defense_item_spread">ELD ×5</string>
+    <string name="defense_item_slow">SLOW MOTION</string>
+    <string name="defense_item_repair">REPARATION</string>
+    <string name="defense_item_shield">SKÖLD</string>
+    <string name="defense_pop_combo">KOMBO ×%1$d</string>
+    <string name="defense_pop_boss_bonus">BOSS +%1$d</string>
+    <string name="defense_pop_surge">ANSTORMNING ×%1$d</string>
+    <string name="defense_pop_boss">⚠ BOSS</string>
+    <string name="defense_pop_bonus">BONUS 🎁</string>
+
+    <!-- TRACE game -->
+    <string name="trace_mode_daily">Dagens utmaning</string>
+    <string name="trace_mode_practice">Träning</string>
+    <string name="trace_tutorial">Handledning</string>
+    <string name="trace_toast_error">−1 liv · −%1$d p</string>
+    <string name="trace_toast_points">+%1$d p!</string>
+    <string name="trace_hint">💡 Ledtråd</string>
+    <string name="trace_hint_desc">Placerar en bedragare · −%1$d p</string>
+    <string name="trace_no_hints">Inga ledtrådar kvar</string>
+    <string name="trace_rules_title">DE 3 REGLERNA</string>
+    <string name="trace_controls">1 tryck = ✗ säker · 2 tryck = bedragare · 3 tryck = rensa\nDra fingret över rutnätet för att sätta flera ✗ i rad</string>
+    <string name="trace_resume">Fortsätt ▸</string>
+    <string name="trace_intro_daily">Dagens utmaning · 5 rutnät · 3 liv</string>
+    <string name="trace_intro_practice">Fri träning · utanför topplistan</string>
+    <string name="trace_replay_tutorial">❓ Se den interaktiva handledningen igen</string>
+    <string name="trace_size">Storlek: %1$d×%1$d</string>
+    <string name="trace_grid_solved">Rutnät %1$d löst!</string>
+    <string name="trace_score">Poäng: %1$d</string>
+    <string name="trace_next_grid">Nästa rutnät…</string>
+    <string name="trace_sprint_done">Spurten klar!</string>
+    <plurals name="trace_all_grids">
+        <item quantity="one">%1$d rutnät oskadliggjort 🎉</item>
+        <item quantity="other">Alla %1$d rutnät oskadliggjorda 🎉</item>
+    </plurals>
+    <string name="trace_no_lives">Inga liv kvar…</string>
+    <plurals name="trace_partial">
+        <item quantity="one">Ingen fara — %1$d/%2$d rutnät löst!</item>
+        <item quantity="other">Ingen fara — %1$d/%2$d rutnät lösta!</item>
+    </plurals>
+    <string name="trace_points">poäng</string>
+    <string name="trace_share_text">who-called TRACE · %1$d p · %2$d/%3$d rutnät 🛡️\nJaga spammare du också 👉 %4$s</string>
+    <string name="trace_new_grid">Nytt rutnät</string>
+    <string name="trace_quit_body">Du förlorar dina framsteg i den pågående utmaningen.</string>
+    <string name="trace_rule_color">1 per färg</string>
+    <string name="trace_rule_line">1 / rad &amp; kolumn</string>
+    <string name="trace_rule_adjacent">Aldrig bredvid varandra</string>
+    <string name="trace_tap_label">Tryck:</string>
+    <string name="trace_safe">säker</string>
+    <string name="trace_fraudster">bedragare</string>
+    <string name="trace_loading">Förbereder utmaningen…</string>
+    <string name="trace_error_title">Det gick inte att läsa in utmaningen</string>
+    <string name="trace_error_body">Kontrollera anslutningen och försök igen.</string>
+
+    <!-- TRACE villains (cosmetic fraudster per grid) -->
+    <string name="trace_villain_imp">Smådjävul</string>
+    <string name="trace_villain_demon">Demon</string>
+    <string name="trace_villain_supervillain">Superskurk</string>
+    <string name="trace_villain_ninja">Ninja</string>
+    <string name="trace_villain_robot">Spamrobot</string>
+    <string name="trace_villain_alien">Utomjording</string>
+    <string name="trace_villain_scammer">Bedragare</string>
+    <string name="trace_villain_impostor">Bluffare</string>
+
+    <!-- TRACE interactive tutorial -->
+    <string name="trace_tuto_title">HANDLEDNING — %1$s Så spelar du</string>
+    <string name="trace_tuto_step0">3 regler, det är allt:\n1 bedragare per färg -- 1 per rad\noch kolumn -- aldrig bredvid varandra</string>
+    <string name="trace_tuto_step1">Den rosa zonen har bara en ruta:\nbedragaren måste vara där.\nDubbeltryck för att placera den.</string>
+    <string name="trace_tuto_step2">De här rutorna kan aldrig\nha en bedragare. Sätt ett X\npå de 3 upplysta rutorna.</string>
+    <string name="trace_tuto_step3">1 bedragare per rad, 1 per kolumn:\nvar och en på sin plats. Sätt ett X\npå de 3 upplysta rutorna.</string>
+    <string name="trace_tuto_step4">Aldrig bredvid varandra, inte ens\ndiagonalt. Sätt ett X på\nde upplysta rutorna.</string>
+    <string name="trace_tuto_step5">Rad 2: bara en ledig ruta.\nBedragaren måste vara där.\nDubbeltryck för att placera den.</string>
+    <string name="trace_tuto_step6">Och om man gör fel?\nDubbeltryck på rutan med\nröd ram.</string>
+    <string name="trace_tuto_step7">Ett 3:e tryck rensar.\nTryck på rutan igen.</string>
+    <string name="trace_tuto_step8_a">Bara 2 bedragare kvar.\nRad 3: bara en ledig ruta.\nDubbeltryck på den.</string>
+    <string name="trace_tuto_step8_b">Den sista: rad 4!\nDubbeltryck på den.</string>
+    <string name="trace_tuto_tap_again_place">Ett tryck till för att placera den!</string>
+    <string name="trace_tuto_tap_again">Ett tryck till!</string>
+    <string name="trace_tuto_tap_again_ellipsis">Ett tryck till...</string>
+    <string name="trace_tuto_done1">Bra. 1 bedragare per färg.</string>
+    <string name="trace_tuto_done2">Så. Varje X utesluter en ruta.\nFärre rutor = lättare\natt hitta nästa.</string>
+    <string name="trace_tuto_done3">1 bedragare per rad, 1 per kolumn.\nDina X är ditt minne: förbjudet.</string>
+    <string name="trace_tuto_done4">Allt som rör en bedragare\när säkert: markera det med X.</string>
+    <string name="trace_tuto_done5">Snyggt. Dina X krymper fältet\ntills bara en möjlig ruta\nfinns kvar. Det är hela idén.</string>
+    <string name="trace_tuto_done6">Fel placerad: den rörde en bedragare.\n-1 liv, -200 p.</string>
+    <string name="trace_tuto_done7">Rensad. Cykeln:\ntom, X, bedragare, tom.</string>
+    <string name="trace_tuto_done8">Klart. Varje färg, varje rad,\nvarje kolumn har SIN bedragare.\nDin tur att spela!</string>
+    <string name="trace_tuto_tap_glowing_any">Tryck på en ruta som lyser</string>
+    <string name="trace_tuto_tap_glowing">Tryck på rutan som lyser</string>
+    <string name="trace_tuto_erased">Rensad</string>
+    <string name="trace_tuto_got_it">Uppfattat ▸</string>
+    <string name="trace_tuto_skip">Hoppa över</string>
+    <string name="trace_tuto_lets_go">Nu kör vi ▸</string>
+    <string name="trace_tuto_next">Nästa ▸</string>
+    <string name="nav_games">Spel</string>
+    <string name="nav_settings">Inställningar</string>
+    <string name="home_country_dialog_title">Bevakat land</string>
+    <string name="home_sync_connecting">Ansluter till servern…</string>
+    <string name="home_sms_title">Sms-sköld</string>
+    <string name="setup_skip">Hoppa över</string>
+    <string name="warn_detail_channel_name">Detaljer om misstänkt samtal</string>
+    <string name="warn_detail_channel_desc">Diskret avisering, utan banner, för att öppna detaljerna efter en varning på skärmen.</string>
+    <string name="warn_detail_title">Misstänkt samtal</string>
+    <string name="warn_detail_line">%1$s · %2$d %% · Visa detaljer</string>
+    <string name="warn_group_title">Misstänkta samtal</string>
+    <string name="overlay_title">Misstänkt samtal</string>
+    <string name="overlay_not_blocked">Inte blockerat — du bestämmer</string>
+    <string name="overlay_dismiss">Stäng varningen</string>
+    <string name="home_overlay_title">Varning som syns under samtalet</string>
+    <string name="home_overlay_body">Tillåt visning över andra appar för att se spamrisken medan det ringer, utan att dölja Svara.</string>
+    <string name="home_overlay_cta">Tillåt visning</string>
+    <string name="nav_home">Hem</string>
+    <string name="nav_calls">Samtal</string>
+    <string name="nav_report">Rapportera</string>
+    <string name="common_collapse">Minimera</string>
+    <string name="common_expand">Expandera</string>
+    <string name="common_scroll_top">Till toppen</string>
+    <string name="home_protected">Du är skyddad</string>
+    <string name="home_protection_to_enable">Skyddet behöver aktiveras</string>
+    <string name="home_sync_updating">Uppdaterar…</string>
+    <string name="home_country_watched">Bevakade nummer: %1$s %2$s</string>
+    <string name="home_country_detected">Identifierat automatiskt. Tryck på ”Ändra” för att byta.</string>
+    <string name="home_shield_partial">Delvis skyddad · %1$d/%2$d</string>
+    <string name="home_shield_off">Skölden är inte aktiverad · %1$d/%2$d</string>
+    <string name="home_shield_enable_filter">Aktivera samtalsfiltret för att blockera oönskade samtal.</string>
+    <string name="home_shield_enable_notifs">Varningarna är avstängda: aktivera aviseringar.</string>
+    <string name="home_enable_blocker">Aktivera blockeringen</string>
+    <string name="home_enable_alerts">Aktivera varningar</string>
+    <string name="home_recent_blocked_title">Oönskat samtal blockerat</string>
+    <string name="home_recent_blocked_msg">Who Called lade på innan det hann ringa.</string>
+    <string name="home_recent_warned_title">Misstänkt samtal upptäckt</string>
+    <string name="home_recent_warned_msg">Samtalet ringde med en varning.</string>
+    <string name="home_recent_reported_title">Numret rapporterat som oönskat</string>
+    <string name="home_recent_reported_msg">Du hade redan markerat det här numret som oönskat.</string>
+    <string name="home_recent_legit_title">Numret markerat som legitimt</string>
+    <string name="home_recent_legit_msg">Du hade angett att det här numret är legitimt.</string>
+    <string name="home_recent_unknown_title">Ett okänt nummer har ringt dig</string>
+    <string name="home_recent_unknown_msg">Kontrollera numret innan du ringer tillbaka.</string>
+    <string name="home_recent_see_number">Visa numret</string>
+    <plurals name="home_recent_others">
+        <item quantity="one">och %1$d annat samtal det senaste dygnet</item>
+        <item quantity="other">och %1$d andra samtal det senaste dygnet</item>
+    </plurals>
+    <string name="home_quiet">Inga nya samtal att kontrollera — allt är lugnt.</string>
+    <string name="home_blocker_active">Blockeringen är aktiv och uppdaterad</string>
+    <string name="home_country_breakdown">%1$s %2$s: %3$s nummer%4$s</string>
+    <string name="home_arcep_prefixes"> · %1$s ARCEP-prefix</string>
+    <string name="home_blocked_detail">Avvisade utan att ringa · visa detaljer</string>
+    <string name="home_suspect_calls">Misstänkta samtal</string>
+    <string name="home_suspect_detail">Ringde, du blev varnad · visa detaljer</string>
+    <string name="home_games_row">Spel — dagens utmaningar &amp; topplistor%1$s</string>
+    <string name="home_community_line">%1$s rapporter tillsammans · +%2$s den här veckan</string>
+    <string name="report_feedback_flip">Omdömet har uppdaterats ✓</string>
+    <string name="report_feedback_refine">Tack, förtydligandet är sparat ✓</string>
+    <string name="sync_error_rate_limited">För många uppdateringar från det här nätverket. Vänta några minuter och försök igen.</string>
+    <string name="sync_error_server">Servern avvisade uppdateringen (fel %1$d). Försök igen senare.</string>
+    <string name="sync_error_generic">Det gick inte att uppdatera. Försök igen om en stund.</string>
+    <string name="report_error_invalid_phone">Ogiltigt nummer — kontrollera formatet.</string>
+    <string name="report_error_daily_limit">Dagsgränsen för rapporter är nådd. Ditt omdöme sparas på enheten och skickas automatiskt igen.</string>
+    <string name="myreports_resend_now">Skicka igen nu</string>
+    <string name="settings_overlay_title">Banner på samtalsskärmen</string>
+    <string name="settings_overlay_desc">Visar varningen ovanpå det inkommande samtalet. Det är fortfarande Telefon-appen som svarar. Utan detta försvinner aviseringen bakom samtalsskärmen.</string>
+    <string name="settings_reminder_paused_title">Påminnelser pausade</string>
+    <string name="settings_reminder_paused_until">Flera påminnelser har lämnats obesvarade — de återupptas automatiskt den %1$s.</string>
+    <string name="settings_reminder_paused_soon">Flera påminnelser har lämnats obesvarade — de återupptas automatiskt om några dagar.</string>
+    <string name="settings_reminder_resume">Återuppta</string>
+    <string name="settings_link_arcep">Källa för ARCEP-prefixen (arcep.fr)</string>
+    <string name="settings_independent_title">Oberoende app</string>
+    <string name="settings_independent_body">Who Called är ingen officiell app: den är inte knuten till ARCEP eller någon statlig instans och företräder ingen myndighet. Prefixen för telefonförsäljning som används kommer från den nationella nummerplan som ARCEP publicerar (länken ”Källa för ARCEP-prefixen” ovan).</string>
+    <string name="debug_overlay_granted">Visning över andra appar: beviljad ✓</string>
+    <string name="debug_overlay_denied">Visning över andra appar: nekad — samtalsbannern kommer inte att visas</string>
+    <string name="debug_overlay_allow">Tillåt visning över andra appar</string>
+    <string name="debug_simulate_hint">Dolt test — simulerar ett misstänkt samtal (avisering + banner 45 s):</string>
+    <string name="debug_simulate">Simulera ett misstänkt samtal</string>
+    <string name="debug_other_tests">Andra tester:</string>
+    <string name="debug_overlay_only">Endast overlay-banner</string>
+    <string name="calls_filter_all">Alla</string>
+    <string name="calls_filter_review">Att kontrollera</string>
+    <string name="calls_filter_filtered">Filtrerade</string>
+    <string name="calls_title">Senaste samtal</string>
+    <string name="calls_subtitle">Samtal som filtret har sett · sparas på din telefon</string>
+    <string name="calls_empty_review_title">Inga nummer att kontrollera</string>
+    <string name="calls_empty_body_on">Nästa samtal som filtret ser visas här.</string>
+    <string name="calls_empty_body_off">Aktivera samtalsfiltret för att se vem som ringer dig.</string>
+    <string name="calls_copy_hint">Tryck länge på ett nummer för att kopiera det.</string>
+    <string name="calls_status_unknown">Inte bedömt</string>
+    <string name="calls_direction_incoming">Inkommande</string>
+    <plurals name="calls_attempts">
+        <item quantity="one">%1$d samtal</item>
+        <item quantity="other">%1$d samtal</item>
+    </plurals>
+    <string name="report_see_my_reports">Visa mina rapporter</string>
+    <string name="report_pick_recent">Välj bland mina senaste samtal</string>
+    <string name="gauge_risk_high">Hög</string>
+    <string name="gauge_risk_medium">Måttlig</string>
+    <string name="gauge_risk_low">Låg</string>
+    <string name="gauge_risk_caption">Risk</string>
+    <string name="setup_done_screening_count">✓ Filtret aktiverat · %1$s nummer redo</string>
+    <string name="setup_done_screening">✓ Samtalsfiltret aktiverat</string>
+    <string name="setup_done_notifications">✓ Varningar aktiverade</string>
+    <string name="setup_done_overlay">✓ Banner på samtalsskärmen</string>
+    <string name="setup_step">Steg %1$d/%2$d</string>
+    <string name="setup_continue">Fortsätt</string>
+    <string name="setup_continue_without">Fortsätt utan att blockera</string>
+    <string name="setup_later">Senare</string>
+    <string name="setup_footer">Kan ändras i Inställningar. Utan behörighet går det fortfarande att spela och söka.</string>
+    <string name="setup_complete_title">Du är skyddad</string>
+    <string name="setup_complete_count">%1$s nummer redo att filtreras</string>
+    <string name="setup_complete_ready">Din Who Called-sköld är redo</string>
+    <string name="setup_already_screening">Skyddet är redan aktiverat</string>
+    <string name="setup_already_notifications">Varningarna är redan aktiverade</string>
+    <string name="setup_already_overlay">Bannern är redan tillåten</string>
+    <string name="setup_already_body">Den här behörigheten finns redan. Fortsätt till nästa steg.</string>
+    <string name="setup_screening_title">Aktivera din sköld</string>
+    <string name="setup_screening_body">Who Called kan inte blockera något förrän systemets samtalsfilter är aktiverat. Tar några sekunder · kan återkallas när som helst.</string>
+    <string name="setup_screening_cta">Aktivera skyddet</string>
+    <string name="setup_notifications_title">Håll dig informerad</string>
+    <string name="setup_notifications_body">Utan aviseringar är skyddet tyst: ingen varning vid ett misstänkt samtal och ingen bekräftelse när ett nummer blockeras.</string>
+    <string name="setup_notifications_cta">Aktivera varningar</string>
+    <string name="setup_overlay_body">Telefon-appen täcker aviseringen. Tillåt visning över andra appar så att spampoängen syns på skärmen medan det ringer — utan att blockera samtalet eller bli din telefonapp.</string>
+    <string name="detail_confirm_title_spam">Oönskat nummer</string>
+    <string name="detail_confirm_title_suspect">Misstänkt nummer</string>
+    <string name="detail_confirm_call_body">Det här numret innebär en risk. Vill du verkligen öppna telefonappen?</string>
+    <string name="detail_confirm_sms_body">Det här numret innebär en risk. Vill du verkligen skriva ett sms?</string>
+    <string name="detail_confirm_continue">Fortsätt</string>
+    <string name="detail_received_today">Samtal mottaget i dag kl. %1$s</string>
+    <string name="detail_received_on_date">Samtal mottaget %1$s kl. %2$s</string>
+    <string name="detail_warn_score_explanation">Poäng %1$d %%. Det finns rapporter, men inte tillräckligt många för att blockera automatiskt. Samtalet ringde: det var upp till dig att svara eller avvisa.</string>
+    <string name="detail_warn_score_explanation_category">Poäng %1$d %% · %2$s. Det finns rapporter, men inte tillräckligt många för att blockera automatiskt. Samtalet ringde: det var upp till dig att svara eller avvisa.</string>
+    <string name="detail_status_suspect">Misstänkt</string>
+    <string name="detail_status_rather_legit">Troligen legitimt</string>
+    <string name="detail_status_little_data">Lite data</string>
+    <string name="detail_stats_loading">Statistik…</string>
+    <string name="detail_action_call">Ring</string>
+    <string name="detail_action_sms">Sms</string>
+    <string name="detail_action_block">Blockera</string>
+    <string name="detail_action_copy">Kopiera</string>
+    <string name="detail_rule_always_allowed">Alltid tillåtet på den här enheten.</string>
+    <string name="detail_rule_blocked">Blockerat på den här enheten.</string>
+    <string name="detail_your_opinion">Ditt omdöme</string>
+    <string name="detail_why_optional">Varför? (valfritt)</string>
+    <string name="detail_arcep_range">Officiell ARCEP-nummerserie</string>
+    <string name="detail_arcep_range_pattern">Officiell ARCEP-nummerserie · %1$s</string>
+    <string name="detail_arcep_official_source">Officiell källa: nummerplanen (arcep.fr)</string>
+    <string name="detail_arcep_not_affiliated">Who Called är oberoende och inte knuten till ARCEP.</string>
+    <string name="detail_why_evaluation">Varför den här bedömningen</string>
+    <string name="detail_your_calls">Dina samtal med det här numret</string>
+    <string name="detail_your_calls_subtitle">%1$d på 30 dagar · %2$d på 7 dagar</string>
+    <string name="detail_received_on">Mottaget den</string>
+    <string name="detail_badge_mixed">ARCEP + community</string>
+    <string name="detail_badge_arcep">ARCEP</string>
+    <string name="detail_badge_none">Inga data</string>
+    <plurals name="detail_spam_count">
+        <item quantity="one">%1$d oönskat</item>
+        <item quantity="other">%1$d oönskade</item>
+    </plurals>
+    <plurals name="detail_legit_count">
+        <item quantity="one">%1$d legitimt</item>
+        <item quantity="other">%1$d legitima</item>
+    </plurals>
+    <string name="detail_raw_counts_note">Siffrorna som visas är oviktade omdömen; bedömningen väger också in hur nya de är och bidragsgivarnas rykte.</string>
+    <string name="detail_reviews_activity">Omdömesaktivitet</string>
+    <string name="detail_headline_mixed">ARCEP och communityns omdömen</string>
+    <string name="detail_headline_community">Communityns omdömen</string>
+    <string name="detail_headline_none">Inga communitydata</string>
+    <string name="detail_explanation_mixed">Numret ligger i en ARCEP-nummerserie och har dessutom omdömen från communityn. Bedömningen tar hänsyn till båda.</string>
+    <string name="detail_explanation_arcep">Numret matchar ett prefix i den officiella listan över telefonförsäljare (ARCEP / operatörer). Den källan är skild från communityns omdömen.</string>
+    <string name="detail_explanation_arcep_pattern">Numret matchar ett prefix i den officiella listan över telefonförsäljare (ARCEP / operatörer): %1$s. Den källan är skild från communityns omdömen.</string>
+    <string name="detail_explanation_community">Bedömningen väger samman nya omdömen, deras antal och bidragsgivarnas rykte.</string>
+    <string name="detail_explanation_none">Att omdömen saknas betyder inte att numret är pålitligt. Var försiktig innan du ringer tillbaka.</string>
+    <string name="detail_verdict_block_high">Det mesta pekar tydligt på ett oönskat samtal.</string>
+    <string name="detail_verdict_block">Bedömt som oönskat, men underlaget är ännu litet.</string>
+    <string name="detail_verdict_warn">Det finns negativa omdömen, men bedömningen är ännu inte bekräftad.</string>
+    <string name="detail_verdict_allow_high">Omdömena pekar tydligt på ett legitimt nummer.</string>
+    <string name="detail_verdict_allow">Verkar snarast legitimt, men omdömena är ännu få.</string>
+    <string name="detail_verdict_unknown">Inte tillräckligt underlag för att bedöma numret.</string>
+    <string name="detail_confidence_official">officiell källa</string>
+    <string name="detail_confidence_high">hög tillförlitlighet</string>
+    <string name="detail_confidence_medium">medelhög tillförlitlighet</string>
+    <string name="detail_confidence_low">låg tillförlitlighet</string>
+    <string name="detail_confidence_none">tillförlitlighet inte bedömd</string>
+    <string name="detail_confidence_official_body">Statusen kommer från en officiell nummerserie, inte från en beräkning av communityns omdömen.</string>
+    <string name="detail_confidence_high_body">Den viktade mängden omdömen räcker för en stabil bedömning (%1$d %%).</string>
+    <string name="detail_confidence_medium_body">Det finns flera omdömen, men mer underlag behövs (%1$d %%).</string>
+    <string name="detail_confidence_low_body">För få viktade omdömen för en säker slutsats (%1$d %%).</string>
+    <string name="detail_confidence_none_body">Inga användbara viktade omdömen ännu.</string>
+</resources>

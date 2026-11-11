@@ -75,6 +75,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
@@ -83,7 +84,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import com.whocalled.android.BuildConfig
+import com.whocalled.android.R
 import com.whocalled.android.data.Preferences
 import com.whocalled.android.game.GameDay
 import com.whocalled.android.game.TraceEngine
@@ -181,6 +185,18 @@ private fun playFx(view: View, good: Boolean) {
     TraceSound.play(good)
 }
 
+/** Localised name of a TRACE villain (key from [TraceEngine.VILLAINS]). */
+private fun villainNameRes(key: String): Int = when (key) {
+    "imp" -> R.string.trace_villain_imp
+    "demon" -> R.string.trace_villain_demon
+    "supervillain" -> R.string.trace_villain_supervillain
+    "ninja" -> R.string.trace_villain_ninja
+    "robot" -> R.string.trace_villain_robot
+    "alien" -> R.string.trace_villain_alien
+    "scammer" -> R.string.trace_villain_scammer
+    else -> R.string.trace_villain_impostor
+}
+
 /**
  * TRACE — daily deduction puzzle. Redesigned to fit on ONE screen (no scroll):
  * a compact status line, a thin sprint bar, the grid sized to the free space, and
@@ -195,6 +211,7 @@ fun TraceGameScreen(
     onLeaderboard: () -> Unit = {},
 ) {
     val context = LocalContext.current
+    val resources = LocalResources.current
     val view = LocalView.current
     val scope = rememberCoroutineScope()
     val engine = remember { TraceEngine() }
@@ -299,7 +316,7 @@ fun TraceGameScreen(
                 2 -> {
                     shakeCell = cell
                     playFx(view, good = false)
-                    showToast("−1 vie · −${kotlin.math.abs(engine.lastEventPoints)} pts", good = false)
+                    showToast(resources.getString(R.string.trace_toast_error, kotlin.math.abs(engine.lastEventPoints)), good = false)
                     scope.launch {
                         shake.snapTo(0f)
                         for (v in listOf(-6f, 6f, -5f, 5f, -3f, 3f, 0f)) shake.animateTo(v, tween(42))
@@ -308,7 +325,7 @@ fun TraceGameScreen(
                 1 -> {
                     popCell = cell
                     playFx(view, good = true)
-                    if (engine.lastEventPoints > 0) showToast("+${engine.lastEventPoints} pts !", good = true)
+                    if (engine.lastEventPoints > 0) showToast(resources.getString(R.string.trace_toast_points, engine.lastEventPoints), good = true)
                     scope.launch {
                         pop.snapTo(1f); pop.animateTo(1.22f, tween(110))
                         pop.animateTo(1f, spring(dampingRatio = 0.34f, stiffness = Spring.StiffnessMediumLow))
@@ -345,18 +362,18 @@ fun TraceGameScreen(
         Column(Modifier.fillMaxSize().padding(horizontal = 12.dp, vertical = 4.dp)) {
             // Top bar
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = { if (engine.started && !engine.runOver) showQuitConfirm = true else onBack() }) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, "Retour", tint = col(TraceEngine.INK)) }
+                IconButton(onClick = { if (engine.started && !engine.runOver) showQuitConfirm = true else onBack() }) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, stringResource(R.string.common_back), tint = col(TraceEngine.INK)) }
                 Text("TRACE", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 20.sp)
                 Spacer(Modifier.width(8.dp))
                 Text(
-                    if (ranked) "Défi du jour" else "Entraînement",
+                    stringResource(if (ranked) R.string.trace_mode_daily else R.string.trace_mode_practice),
                     color = col(TraceEngine.CY), fontWeight = FontWeight.SemiBold, fontSize = 11.sp,
                     modifier = Modifier.clip(RoundedCornerShape(999.dp)).background(col(TraceEngine.CY).copy(alpha = 0.16f)).padding(horizontal = 8.dp, vertical = 3.dp),
                 )
                 Spacer(Modifier.weight(1f))
                 // Replay the interactive tutorial at any time.
                 IconButton(onClick = { showTutorial = true }) {
-                    Icon(Icons.AutoMirrored.Rounded.HelpOutline, "Tutoriel", tint = col(TraceEngine.INK).copy(alpha = 0.85f))
+                    Icon(Icons.AutoMirrored.Rounded.HelpOutline, stringResource(R.string.trace_tutorial), tint = col(TraceEngine.INK).copy(alpha = 0.85f))
                 }
                 if (ranked) Text("🏆", fontSize = 18.sp, modifier = Modifier.clickable(onClick = onLeaderboard).padding(6.dp))
             }
@@ -372,7 +389,7 @@ fun TraceGameScreen(
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                         Text(engine.villain.first, fontSize = 18.sp)
                         Spacer(Modifier.width(5.dp))
-                        Text(engine.villain.second, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                        Text(stringResource(villainNameRes(engine.villain.second)), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp)
                         Spacer(Modifier.weight(1f))
                         Row {
                             repeat(TraceEngine.MAX_LIVES) { i ->
@@ -433,7 +450,7 @@ fun TraceGameScreen(
                                 disabledContainerColor = col(0x24FFFFFF), disabledContentColor = col(0x66FFFFFF),
                             ),
                         ) {
-                            Text("💡 Indice", fontWeight = FontWeight.Bold)
+                            Text(stringResource(R.string.trace_hint), fontWeight = FontWeight.Bold)
                             Spacer(Modifier.width(6.dp))
                             Box(Modifier.size(20.dp).clip(CircleShape).background(col(0xFF3A2E05)), contentAlignment = Alignment.Center) {
                                 Text("${engine.hints}", color = col(0xFFF4C430), fontWeight = FontWeight.Bold, fontSize = 12.sp)
@@ -441,7 +458,8 @@ fun TraceGameScreen(
                         }
                         Spacer(Modifier.width(12.dp))
                         Text(
-                            if (engine.hints > 0) "Place un fraudeur · −${TraceEngine.HINT_COST} pts" else "Plus d'indices",
+                            if (engine.hints > 0) stringResource(R.string.trace_hint_desc, TraceEngine.HINT_COST)
+                            else stringResource(R.string.trace_no_hints),
                             color = col(TraceEngine.INK).copy(alpha = 0.6f), fontSize = 11.sp,
                         )
                     }
@@ -463,19 +481,19 @@ fun TraceGameScreen(
             )
         } else if (showRules) {
             OverlayCard(onBackdropTap = { showRules = false }) {
-                Text("LES 3 RÈGLES", color = col(TraceEngine.CY), fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Text(stringResource(R.string.trace_rules_title), color = col(TraceEngine.CY), fontWeight = FontWeight.Bold, fontSize = 16.sp)
                 Spacer(Modifier.height(10.dp))
                 RuleStrip()
                 Spacer(Modifier.height(12.dp))
                 RuleLine(engine.villain.first)
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    "1 touche = ✗ sûre · 2 touches = fraudeur · 3 touches = effacer\nGlisse le doigt sur la grille pour poser des ✗ en série",
+                    stringResource(R.string.trace_controls),
                     color = col(TraceEngine.INK).copy(alpha = 0.65f), fontSize = 11.sp, textAlign = TextAlign.Center,
                 )
                 Spacer(Modifier.height(14.dp))
                 Button(onClick = { showRules = false }, colors = ButtonDefaults.buttonColors(containerColor = col(TraceEngine.CY))) {
-                    Text("Reprendre ▸", color = col(0xFF06233F), fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.trace_resume), color = col(0xFF06233F), fontWeight = FontWeight.Bold)
                 }
             }
         } else if (showIntro) {
@@ -483,24 +501,24 @@ fun TraceGameScreen(
                 Text("TRACE", color = Color.White, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.headlineMedium)
                 Spacer(Modifier.height(4.dp))
                 Text(
-                    if (ranked) "Défi du jour · 5 grilles · 3 vies" else "Entraînement libre · non classé",
+                    stringResource(if (ranked) R.string.trace_intro_daily else R.string.trace_intro_practice),
                     color = col(TraceEngine.INK).copy(alpha = 0.8f), fontSize = 13.sp,
                 )
                 Spacer(Modifier.height(14.dp))
-                Text("LES 3 RÈGLES", color = col(TraceEngine.CY), fontWeight = FontWeight.Bold, fontSize = 11.sp)
+                Text(stringResource(R.string.trace_rules_title), color = col(TraceEngine.CY), fontWeight = FontWeight.Bold, fontSize = 11.sp)
                 Spacer(Modifier.height(8.dp))
                 RuleStrip()
                 Spacer(Modifier.height(12.dp))
                 RuleLine(engine.villain.first)
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    "❓ Revoir le tuto interactif",
+                    stringResource(R.string.trace_replay_tutorial),
                     color = col(TraceEngine.CY), fontWeight = FontWeight.SemiBold, fontSize = 12.sp,
                     modifier = Modifier.clip(RoundedCornerShape(999.dp)).clickable { showTutorial = true }.padding(horizontal = 8.dp, vertical = 6.dp),
                 )
                 if (!ranked) {
                     Spacer(Modifier.height(14.dp))
-                    Text("Taille : ${practiceSize}×${practiceSize}", color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
+                    Text(stringResource(R.string.trace_size, practiceSize), color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
                     androidx.compose.material3.Slider(
                         value = practiceSize.toFloat(),
                         onValueChange = { practiceSize = it.toInt() },
@@ -511,61 +529,61 @@ fun TraceGameScreen(
                 }
                 Spacer(Modifier.height(18.dp))
                 Button(onClick = { viewModel.resetGameRank(); engine.start(); bump() }, colors = ButtonDefaults.buttonColors(containerColor = col(TraceEngine.CY))) {
-                    Text("Commencer ▸", color = col(0xFF06233F), fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.game_start), color = col(0xFF06233F), fontWeight = FontWeight.Bold)
                 }
                 if (ranked) {
                     Spacer(Modifier.height(8.dp))
-                    OutlinedButton(onClick = onLeaderboard) { Text("🏆 Classement", color = col(TraceEngine.INK)) }
+                    OutlinedButton(onClick = onLeaderboard) { Text(stringResource(R.string.game_leaderboard_button), color = col(TraceEngine.INK)) }
                 }
             }
         } else if (engine.started && engine.gridWon && !engine.runOver) {
             Overlay(dim = 0.55f) {
                 Text("✓", color = col(TraceEngine.OK), fontSize = 54.sp, fontWeight = FontWeight.Bold)
-                Text("Grille ${engine.gridIndex + 1} résolue !", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 20.sp)
-                Text("Score : ${engine.displayScore()}", color = col(TraceEngine.CY), fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.trace_grid_solved, engine.gridIndex + 1), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 20.sp)
+                Text(stringResource(R.string.trace_score, engine.displayScore()), color = col(TraceEngine.CY), fontWeight = FontWeight.SemiBold)
                 if (engine.gridIndex + 1 < engine.gridCount) {
                     Spacer(Modifier.height(6.dp))
-                    Text("Grille suivante…", color = col(TraceEngine.INK).copy(alpha = 0.7f), fontSize = 13.sp)
+                    Text(stringResource(R.string.trace_next_grid), color = col(TraceEngine.INK).copy(alpha = 0.7f), fontSize = 13.sp)
                 }
             }
         } else if (engine.runOver) {
             OverlayCard(onBackdropTap = onBack) {
                 if (engine.runWon) {
                     BouncyEmoji("🏆", 48.sp)
-                    Text("Sprint terminé !", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 24.sp)
-                    Text("Les ${engine.gridCount} grilles neutralisées 🎉", color = col(TraceEngine.INK).copy(alpha = 0.85f), textAlign = TextAlign.Center)
+                    Text(stringResource(R.string.trace_sprint_done), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 24.sp)
+                    Text(pluralStringResource(R.plurals.trace_all_grids, engine.gridCount, engine.gridCount), color = col(TraceEngine.INK).copy(alpha = 0.85f), textAlign = TextAlign.Center)
                 } else {
                     // Sympathetic fail — encouraging, not dramatic.
                     BouncyEmoji("😅", 48.sp)
-                    Text("Plus de vies…", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 22.sp)
-                    Text("Pas grave — ${engine.solvedCount}/${engine.gridCount} grilles résolues !", color = col(TraceEngine.INK).copy(alpha = 0.8f))
+                    Text(stringResource(R.string.trace_no_lives), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 22.sp)
+                    Text(pluralStringResource(R.plurals.trace_partial, engine.gridCount, engine.solvedCount, engine.gridCount), color = col(TraceEngine.INK).copy(alpha = 0.8f))
                 }
                 Spacer(Modifier.height(10.dp))
                 Text("${engine.finalScore()}", color = col(TraceEngine.CY), fontWeight = FontWeight.Bold, fontSize = 42.sp)
-                Text("points", color = col(TraceEngine.INK).copy(alpha = 0.65f), fontSize = 13.sp)
+                Text(stringResource(R.string.trace_points), color = col(TraceEngine.INK).copy(alpha = 0.65f), fontSize = 13.sp)
                 if (ranked) rank?.let { r ->
                     Spacer(Modifier.height(12.dp))
-                    Text("Classement du jour · top ${r.topPercent}%", color = Color.White, fontWeight = FontWeight.Bold)
-                    Text("${r.players} joueur${if (r.players > 1) "s" else ""} · meilleur ${r.bestScore}", color = col(TraceEngine.INK).copy(alpha = 0.7f), fontSize = 13.sp)
+                    Text(stringResource(R.string.game_daily_rank, r.topPercent), color = Color.White, fontWeight = FontWeight.Bold)
+                    Text(pluralStringResource(R.plurals.game_players_best, r.players, r.players, r.bestScore), color = col(TraceEngine.INK).copy(alpha = 0.7f), fontSize = 13.sp)
                 }
                 Spacer(Modifier.height(20.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     if (ranked) OutlinedButton(onClick = {
-                        val text = "who-called TRACE · ${engine.finalScore()} pts · ${engine.solvedCount}/${engine.gridCount} grilles 🛡️\nTraque les spammeurs toi aussi 👉 ${BuildConfig.SITE_URL}"
-                        context.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text), "Partager"))
-                    }) { Text("Partager") }
+                        val text = resources.getString(R.string.trace_share_text, engine.finalScore(), engine.solvedCount, engine.gridCount, BuildConfig.SITE_URL)
+                        context.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text), resources.getString(R.string.game_share)))
+                    }) { Text(stringResource(R.string.game_share)) }
                     Button(
                         onClick = {
                             if (ranked) { viewModel.resetGameRank(); engine.start(); bump() }
                             else { autoStartNext = true; viewModel.loadTraceTraining(practiceSize) }
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = col(TraceEngine.CY)),
-                    ) { Text(if (ranked) "Rejouer" else "Nouvelle grille", color = col(0xFF06233F), fontWeight = FontWeight.Bold) }
+                    ) { Text(stringResource(if (ranked) R.string.game_replay else R.string.trace_new_grid), color = col(0xFF06233F), fontWeight = FontWeight.Bold) }
                 }
                 Spacer(Modifier.height(8.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    if (ranked) OutlinedButton(onClick = onLeaderboard) { Text("🏆 Classement") }
-                    OutlinedButton(onClick = onBack) { Text("Retour") }
+                    if (ranked) OutlinedButton(onClick = onLeaderboard) { Text(stringResource(R.string.game_leaderboard_button)) }
+                    OutlinedButton(onClick = onBack) { Text(stringResource(R.string.common_back)) }
                 }
             }
         }
@@ -574,10 +592,10 @@ fun TraceGameScreen(
         if (showQuitConfirm) {
             AlertDialog(
                 onDismissRequest = { showQuitConfirm = false },
-                confirmButton = { TextButton(onClick = onBack) { Text("Quitter") } },
-                dismissButton = { TextButton(onClick = { showQuitConfirm = false }) { Text("Annuler") } },
-                title = { Text("Quitter la partie ?") },
-                text = { Text("Tu perdras ta progression du défi en cours.") },
+                confirmButton = { TextButton(onClick = onBack) { Text(stringResource(R.string.game_quit)) } },
+                dismissButton = { TextButton(onClick = { showQuitConfirm = false }) { Text(stringResource(R.string.common_cancel)) } },
+                title = { Text(stringResource(R.string.game_quit_title)) },
+                text = { Text(stringResource(R.string.trace_quit_body)) },
             )
         }
     }
@@ -664,17 +682,17 @@ private fun RuleStrip(modifier: Modifier = Modifier) {
         RuleCard(
             tints = listOf(listOf(pink, pink, teal), listOf(amber, pink, teal), listOf(amber, amber, teal)),
             marks = listOf(listOf(2, 0, 0), listOf(0, 0, 2), listOf(0, 2, 0)),
-            label = "1 par couleur",
+            label = stringResource(R.string.trace_rule_color),
         )
         RuleCard(
             tints = List(3) { List(3) { neu } },
             marks = listOf(listOf(1, 2, 1), listOf(0, 1, 0), listOf(0, 1, 0)),
-            label = "1 / ligne & colonne",
+            label = stringResource(R.string.trace_rule_line),
         )
         RuleCard(
             tints = List(3) { List(3) { neu } },
             marks = listOf(listOf(1, 1, 1), listOf(1, 2, 1), listOf(1, 1, 1)),
-            label = "Jamais côte à côte",
+            label = stringResource(R.string.trace_rule_adjacent),
         )
     }
 }
@@ -716,11 +734,11 @@ private fun androidx.compose.foundation.layout.RowScope.RuleCard(tints: List<Lis
 @Composable
 private fun RuleLine(villain: String) {
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-        Text("Touche :", color = col(TraceEngine.INK).copy(alpha = 0.8f), fontSize = 12.sp)
+        Text(stringResource(R.string.trace_tap_label), color = col(TraceEngine.INK).copy(alpha = 0.8f), fontSize = 12.sp)
         Box(Modifier.size(16.dp)) { Canvas(Modifier.fillMaxSize()) { drawCross(col(0xFFBFD4EE)) } }
-        Text("sûre  ·", color = col(TraceEngine.INK).copy(alpha = 0.8f), fontSize = 12.sp)
+        Text(stringResource(R.string.trace_safe) + "  ·", color = col(TraceEngine.INK).copy(alpha = 0.8f), fontSize = 12.sp)
         Text(villain, fontSize = 14.sp)
-        Text("fraudeur", color = col(TraceEngine.INK).copy(alpha = 0.8f), fontSize = 12.sp)
+        Text(stringResource(R.string.trace_fraudster), color = col(TraceEngine.INK).copy(alpha = 0.8f), fontSize = 12.sp)
     }
 }
 
@@ -793,6 +811,7 @@ private fun TraceTutorialOverlay(
     onDone: () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
+    val resources = LocalResources.current
     var step by remember { mutableIntStateOf(0) }
     // True after the expected action is done: the grid freezes and the player
     // advances THEMSELVES via « Suivant » — no auto-advance, nobody loses track.
@@ -862,36 +881,32 @@ private fun TraceTutorialOverlay(
 
     val firstTapHint = singleTarget?.let { demo[it.first][it.second] == 1 } == true
 
-    val instruction = if (awaitingNext) when (step) {
-        1 -> "Bien. 1 fraudeur par couleur."
-        2 -> "Voila. Chaque X elimine une case.\nMoins de cases = plus facile\nde trouver le prochain."
-        3 -> "1 fraudeur par ligne, 1 par colonne.\nLes X sont ta memoire : interdit."
-        4 -> "Tout ce qui touche un fraudeur\nest sur : on le coche X."
-        5 -> "Bien joue. Les X reduisent le champ\njusqu'a ce qu'il ne reste qu'une\ncase possible. C'est tout le principe."
-        6 -> "Mal place : il touchait un fraudeur.\n-1 vie, -200 pts."
-        7 -> "Efface. Le cycle :\nvide, X, fraudeur, vide."
-        else -> "Termine. Chaque couleur, chaque ligne,\nchaque colonne a SON fraudeur.\nA toi de jouer !"
+    val instructionRes: Int? = if (awaitingNext) when (step) {
+        1 -> R.string.trace_tuto_done1
+        2 -> R.string.trace_tuto_done2
+        3 -> R.string.trace_tuto_done3
+        4 -> R.string.trace_tuto_done4
+        5 -> R.string.trace_tuto_done5
+        6 -> R.string.trace_tuto_done6
+        7 -> R.string.trace_tuto_done7
+        else -> R.string.trace_tuto_done8
     } else when (step) {
-        0 -> "3 regles, c'est tout :\n1 fraudeur par couleur -- 1 par ligne\net colonne -- jamais cote a cote"
-        1 -> if (firstTapHint) "Encore une touche pour le placer !"
-            else "La zone rose n'a qu'une case :\nle fraudeur est forcement la.\nDouble-touche pour le placer."
-        2 -> "Ces cases ne pourront jamais\navoir de fraudeur. Pose un X\nsur les 3 cases eclairees."
-        3 -> "1 fraudeur par ligne, 1 par colonne :\nchacun sa place. Pose un X sur\nles 3 cases eclairees."
-        4 -> "Jamais cote a cote, meme\nen diagonale. Pose un X sur\nles cases eclairees."
-        5 -> if (firstTapHint) "Encore une touche !"
-            else "Ligne 2 : une seule case libre.\nLe fraudeur est forcement la.\nDouble-touche pour le placer."
-        6 -> if (firstTapHint) "Encore une touche..."
-            else "Et si on se trompe ?\nDouble-touche la case encadree\nde rouge."
-        7 -> "Une 3eme touche efface.\nRetouche la case."
+        0 -> R.string.trace_tuto_step0
+        1 -> if (firstTapHint) R.string.trace_tuto_tap_again_place else R.string.trace_tuto_step1
+        2 -> R.string.trace_tuto_step2
+        3 -> R.string.trace_tuto_step3
+        4 -> R.string.trace_tuto_step4
+        5 -> if (firstTapHint) R.string.trace_tuto_tap_again else R.string.trace_tuto_step5
+        6 -> if (firstTapHint) R.string.trace_tuto_tap_again_ellipsis else R.string.trace_tuto_step6
+        7 -> R.string.trace_tuto_step7
         8 -> if (demo[2][0] != 2) {
-                if (demo[2][0] == 1) "Encore une touche !"
-                else "Plus que 2 fraudeurs.\nLigne 3 : une seule case libre.\nDouble-touche-la."
+                if (demo[2][0] == 1) R.string.trace_tuto_tap_again else R.string.trace_tuto_step8_a
             } else {
-                if (demo[3][2] == 1) "Encore une touche !"
-                else "La derniere : ligne 4 !\nDouble-touche-la."
+                if (demo[3][2] == 1) R.string.trace_tuto_tap_again else R.string.trace_tuto_step8_b
             }
-        else -> ""
+        else -> null
     }
+    val instruction = instructionRes?.let { stringResource(it) } ?: ""
     var hintBubble by remember { mutableStateOf<String?>(null) }
 
     // Back navigation: restore the demo exactly as it was at the start of `s`.
@@ -918,7 +933,7 @@ private fun TraceTutorialOverlay(
         // Multi-target X-placement steps (2,3,4): tap highlighted cell → ✗.
         if (step in 2..4) {
             if (!multiTargets.contains(r to c)) {
-                hintBubble = "Touche une case qui brille"
+                hintBubble = resources.getString(R.string.trace_tuto_tap_glowing_any)
                 scope.launch { delay(1200); hintBubble = null }
                 return
             }
@@ -928,7 +943,7 @@ private fun TraceTutorialOverlay(
         }
         // Single-target steps: only the spotlight cell reacts.
         if (singleTarget == null || (r to c) != singleTarget) {
-            hintBubble = "Touche la case qui brille"
+            hintBubble = resources.getString(R.string.trace_tuto_tap_glowing)
             scope.launch { delay(1200); hintBubble = null }
             return
         }
@@ -937,7 +952,7 @@ private fun TraceTutorialOverlay(
                 0 -> demo[r][c] = 1
                 1 -> {
                     demo[r][c] = 2; onFx(true)
-                    showBubble("+${TraceEngine.PLACE_BONUS} pts !", true)
+                    showBubble(resources.getString(R.string.trace_toast_points, TraceEngine.PLACE_BONUS), true)
                     if (step == 8 && demo[3][2] == 2) scope.launch {
                         delay(200)
                         for ((sr, sc) in remainingX) { demo[sr][sc] = 1; delay(120) }
@@ -949,19 +964,19 @@ private fun TraceTutorialOverlay(
                 0 -> demo[r][c] = 1
                 1 -> {
                     demo[r][c] = 2; lives = 2; onFx(false)
-                    showBubble("−1 vie · −${TraceEngine.ERROR_COST} pts", false)
+                    showBubble(resources.getString(R.string.trace_toast_error, TraceEngine.ERROR_COST), false)
                     scope.launch {
                         shake.snapTo(0f)
                         for (v in listOf(-6f, 6f, -5f, 5f, -3f, 3f, 0f)) shake.animateTo(v, tween(42))
                     }; awaitingNext = true
                 }
             }
-            7 -> { demo[r][c] = 0; showBubble("Efface", true); awaitingNext = true }
+            7 -> { demo[r][c] = 0; showBubble(resources.getString(R.string.trace_tuto_erased), true); awaitingNext = true }
         }
     }
 
     OverlayCard(onBackdropTap = onDone) {
-        Text("TUTO — $villain Comment jouer", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 17.sp)
+        Text(stringResource(R.string.trace_tuto_title, villain), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 17.sp)
         Spacer(Modifier.height(6.dp))
         // Lives mirror the real HUD so the −1 vie step reads instantly.
         Row {
@@ -1066,11 +1081,11 @@ private fun TraceTutorialOverlay(
             // Step 0 = the 3 rules, no action — a single « Compris » to start.
             step == 0 -> {
                 Button(onClick = { step = 1 }, colors = ButtonDefaults.buttonColors(containerColor = col(TraceEngine.CY))) {
-                    Text("Compris ▸", color = col(0xFF06233F), fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.trace_tuto_got_it), color = col(0xFF06233F), fontWeight = FontWeight.Bold)
                 }
                 Spacer(Modifier.height(4.dp))
                 Text(
-                    "Passer",
+                    stringResource(R.string.trace_tuto_skip),
                     color = col(TraceEngine.INK).copy(alpha = 0.6f), fontSize = 12.sp,
                     modifier = Modifier.clip(RoundedCornerShape(999.dp)).clickable(onClick = onDone).padding(horizontal = 10.dp, vertical = 6.dp),
                 )
@@ -1078,24 +1093,24 @@ private fun TraceTutorialOverlay(
             // Final recap → straight to the game.
             awaitingNext && step >= 8 -> {
                 Button(onClick = onDone, colors = ButtonDefaults.buttonColors(containerColor = col(TraceEngine.CY))) {
-                    Text("C'est parti ▸", color = col(0xFF06233F), fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.trace_tuto_lets_go), color = col(0xFF06233F), fontWeight = FontWeight.Bold)
                 }
             }
             // Action done → the player reads the recap and advances THEMSELVES.
             awaitingNext -> {
                 Button(onClick = { next() }, colors = ButtonDefaults.buttonColors(containerColor = col(TraceEngine.CY))) {
-                    Text("Suivant ▸", color = col(0xFF06233F), fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.trace_tuto_next), color = col(0xFF06233F), fontWeight = FontWeight.Bold)
                 }
                 Spacer(Modifier.height(4.dp))
                 Text(
-                    "Passer",
+                    stringResource(R.string.trace_tuto_skip),
                     color = col(TraceEngine.INK).copy(alpha = 0.6f), fontSize = 12.sp,
                     modifier = Modifier.clip(RoundedCornerShape(999.dp)).clickable(onClick = onDone).padding(horizontal = 10.dp, vertical = 6.dp),
                 )
             }
             else -> {
                 Text(
-                    "Passer",
+                    stringResource(R.string.trace_tuto_skip),
                     color = col(TraceEngine.INK).copy(alpha = 0.6f), fontSize = 12.sp,
                     modifier = Modifier.clip(RoundedCornerShape(999.dp)).clickable(onClick = onDone).padding(horizontal = 10.dp, vertical = 6.dp),
                 )
@@ -1109,19 +1124,19 @@ private fun LoadingBlock() {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         CircularProgressIndicator(color = col(TraceEngine.CY))
         Spacer(Modifier.height(14.dp))
-        Text("Préparation du défi…", color = col(TraceEngine.INK).copy(alpha = 0.7f))
+        Text(stringResource(R.string.trace_loading), color = col(TraceEngine.INK).copy(alpha = 0.7f))
     }
 }
 
 @Composable
 private fun ErrorBlock(onRetry: () -> Unit) {
     Column(Modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-        Text("Impossible de charger le défi", color = Color.White, fontWeight = FontWeight.Bold)
+        Text(stringResource(R.string.trace_error_title), color = Color.White, fontWeight = FontWeight.Bold)
         Spacer(Modifier.height(6.dp))
-        Text("Vérifie ta connexion et réessaie.", color = col(TraceEngine.INK).copy(alpha = 0.7f), textAlign = TextAlign.Center)
+        Text(stringResource(R.string.trace_error_body), color = col(TraceEngine.INK).copy(alpha = 0.7f), textAlign = TextAlign.Center)
         Spacer(Modifier.height(16.dp))
         Button(onClick = onRetry, colors = ButtonDefaults.buttonColors(containerColor = col(TraceEngine.CY))) {
-            Text("Réessayer", color = col(0xFF06233F), fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.common_retry), color = col(0xFF06233F), fontWeight = FontWeight.Bold)
         }
     }
 }

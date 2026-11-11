@@ -69,6 +69,13 @@ android {
         )
     }
 
+    androidResources {
+        // Per-app language picker (Android 13+, system Settings → Apps → Language):
+        // the list is generated from the res/values-<lang> folders, base language
+        // declared in res/resources.properties (fr). Languages: see I18N.md.
+        generateLocaleConfig = true
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true

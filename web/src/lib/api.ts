@@ -91,6 +91,7 @@ export async function reportNumber(input: {
   deviceId: string;
   vote: "spam" | "legit";
   category?: string | null;
+  /** Dictionary locale of the UI the report came from (fr, en, es…). */
   locale?: string;
 }): Promise<void> {
   const res = await fetch(`${config.apiBaseUrl}/reports`, {

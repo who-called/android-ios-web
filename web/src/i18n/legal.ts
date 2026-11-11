@@ -367,15 +367,17 @@ const deletionEn: LegalDoc = {
   ],
 };
 
+// Legal texts exist in FR (authoritative) and EN. Every other locale gets the
+// English version until a reviewed translation is added here.
 export function getPrivacy(locale: Locale): LegalDoc {
-  return locale === "en" ? privacyEn : privacyFr;
+  return locale === "fr" ? privacyFr : privacyEn;
 }
 export function getPolicy(locale: Locale): LegalDoc {
-  return locale === "en" ? policyEn : policyFr;
+  return locale === "fr" ? policyFr : policyEn;
 }
 export function getSupport(locale: Locale): LegalDoc {
-  return locale === "en" ? supportEn : supportFr;
+  return locale === "fr" ? supportFr : supportEn;
 }
 export function getDataDeletion(locale: Locale): LegalDoc {
-  return locale === "en" ? deletionEn : deletionFr;
+  return locale === "fr" ? deletionFr : deletionEn;
 }

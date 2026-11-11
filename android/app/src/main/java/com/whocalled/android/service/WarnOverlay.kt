@@ -52,7 +52,7 @@ object WarnOverlay {
         if (!OverlayPermission.isGranted(context)) return false
         val app = context.applicationContext
         val categoryLabel = ReportCategory.fromApi(category)
-            ?.takeIf { it != ReportCategory.OTHER }?.label
+            ?.takeIf { it != ReportCategory.OTHER }?.let { context.getString(it.labelRes) }
         if (Looper.myLooper() == Looper.getMainLooper()) {
             return attach(app, phone, score, categoryLabel)
         }

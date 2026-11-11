@@ -2,6 +2,19 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<!-- Source language of the UI strings (SwiftUI Text literals are French). -->
+	<key>CFBundleDevelopmentRegion</key>
+	<string>fr</string>
+	<!-- Languages the app declares — keep in sync with Localizable.xcstrings. -->
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>fr</string>
+		<string>en</string>
+		<string>es</string>
+		<string>it</string>
+		<string>pt-BR</string>
+		<string>ru</string>
+	</array>
 	<key>CFBundleDisplayName</key>
 	<string>who-called</string>
 	<!-- Custom URL scheme used by the Share Extension to hand a number to the app. -->

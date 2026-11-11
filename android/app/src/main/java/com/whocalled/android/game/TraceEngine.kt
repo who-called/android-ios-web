@@ -67,10 +67,11 @@ class TraceEngine {
         // Region colours are generated algorithmically (see [regionColor]) so the
         // palette is always maximally distinct for the grid's region count — no
         // near-duplicate pinks like a fixed list would produce for some counts.
-        // Cosmetic fraudster per grid (emoji + name), tuned per grid index.
+        // Cosmetic fraudster per grid (emoji + name key), tuned per grid index.
+        // The key is mapped to a localised name by the UI (string resources).
         val VILLAINS = listOf(
-            "😈" to "Diablotin", "👿" to "Démon", "🦹" to "Super-vilain", "🥷" to "Ninja",
-            "🤖" to "Robot spam", "👾" to "Alien", "🃏" to "Arnaqueur", "🕵️" to "Usurpateur",
+            "😈" to "imp", "👿" to "demon", "🦹" to "supervillain", "🥷" to "ninja",
+            "🤖" to "robot", "👾" to "alien", "🃏" to "scammer", "🕵️" to "impostor",
         )
         // Brand palette (shared with DEFENSE for a consistent look).
         const val CY = 0xFF2BE0C6L

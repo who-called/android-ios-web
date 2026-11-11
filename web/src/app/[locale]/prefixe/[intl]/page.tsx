@@ -3,7 +3,7 @@ import Link from "next/link";
 import { fetchPrefix, fetchPrefixes } from "@/lib/api";
 import { config } from "@/lib/config";
 import { getDict } from "@/i18n/dictionaries";
-import { alternatesFor, toDictLocale, urlLocales } from "@/i18n/locales";
+import { alternatesFor, toDictLocale, publishedLocales } from "@/i18n/locales";
 import { robotsFor } from "@/lib/seo";
 
 export const revalidate = 3600;
@@ -12,7 +12,7 @@ export const dynamicParams = true;
 export async function generateStaticParams() {
   const prefixes = await fetchPrefixes();
   const params: { locale: string; intl: string }[] = [];
-  for (const l of urlLocales) for (const p of prefixes) params.push({ locale: l, intl: p.intl });
+  for (const l of publishedLocales) for (const p of prefixes) params.push({ locale: l, intl: p.intl });
   return params;
 }
 

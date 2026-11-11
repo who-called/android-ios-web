@@ -15,12 +15,16 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.TimeZone
 
-/** Typed errors surfaced to the UI for friendly messages. */
+/**
+ * Typed errors surfaced to the UI for friendly messages. The exception message is
+ * a developer-facing (log) text; the UI maps each type to a localised string
+ * resource (see MainViewModel.userMessage).
+ */
 sealed class RepoError(message: String) : Exception(message) {
-    object InvalidPhone : RepoError("Numéro invalide.")
-    object Network : RepoError("Pas de connexion. Réessayez.")
-    data class Server(val code: Int) : RepoError("Erreur serveur ($code).")
-    data class Unknown(val error: Throwable) : RepoError(error.message ?: "Erreur inconnue.")
+    object InvalidPhone : RepoError("Invalid phone number")
+    object Network : RepoError("Network unavailable")
+    data class Server(val code: Int) : RepoError("Server error ($code)")
+    data class Unknown(val error: Throwable) : RepoError(error.message ?: "Unknown error")
 }
 
 /**

@@ -1,0 +1,666 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Українська. Source language is French (values/). Keep keys in sync. -->
+<resources>
+    <!-- WARN notification -->
+    <string name="warn_channel_name">Попередження про підозрілі дзвінки</string>
+    <string name="warn_channel_desc">Сповіщає, коли вхідний дзвінок має високий індекс спаму.</string>
+    <string name="warn_title">⚠️ Підозрілий дзвінок — не заблоковано</string>
+    <string name="warn_subtext">Who Called · телефон дзвонить</string>
+
+    <!-- SMS shield -->
+    <string name="sms_blocked_channel_name">Приховані небажані SMS</string>
+    <string name="sms_blocked_channel_desc">Ненав\'язливо сповіщає, коли сповіщення про небажане SMS приховано.</string>
+    <string name="sms_blocked_title">Небажане SMS приховано</string>
+    <string name="sms_blocked_body">Сповіщення від %1$s приховано. Повідомлення залишається у вашому застосунку SMS.</string>
+    <string name="sms_listener_label">SMS-щит Who Called</string>
+
+    <!-- Blocked-call notification -->
+    <string name="call_blocked_channel_name">Заблоковані дзвінки</string>
+    <string name="call_blocked_channel_desc">Ненав\'язливо сповіщає, коли небажаний дзвінок заблоковано.</string>
+    <string name="call_blocked_title">Дзвінок заблоковано</string>
+    <string name="call_blocked_unknown">Прихований номер</string>
+
+    <!-- Daily game reminder -->
+    <string name="reminder_channel_name">Нагадування про гру</string>
+    <string name="reminder_channel_desc">Дружнє нагадування раз на день, щоб зіграти щоденне завдання. Можна вимкнути в налаштуваннях.</string>
+
+    <!-- Common -->
+    <string name="common_back">Назад</string>
+    <string name="common_close">Закрити</string>
+    <string name="common_cancel">Скасувати</string>
+    <string name="common_delete">Видалити</string>
+    <string name="common_edit">Змінити</string>
+    <string name="common_loading">Завантаження…</string>
+    <string name="common_connecting">Підключення до сервера…</string>
+    <string name="common_retry">Повторити</string>
+    <string name="common_points">%1$d бал.</string>
+    <string name="common_vote_spam">Небажаний</string>
+    <string name="common_vote_legit">Надійний</string>
+    <string name="common_status_blocked">Заблоковано</string>
+    <string name="common_status_warned">Попереджено</string>
+
+    <!-- Bottom navigation tabs (keep short) -->
+    <string name="tab_games">Ігри</string>
+
+    <!-- Daily game reminder notification (pairs of title + body, picked at random) -->
+    <string name="reminder_1_title">🧩 Завдання TRACE дня чекає на вас — 5 сіток, 3 хвилини.</string>
+    <string name="reminder_1_body">Піднімайтеся в рейтингу у своєму темпі.</string>
+    <string name="reminder_2_title">🔥 Не переривайте серію</string>
+    <string name="reminder_2_body">Однієї швидкої партії досить, щоб продовжити.</string>
+    <string name="reminder_3_title">🏆 Можливо, хтось побив ваш рекорд</string>
+    <string name="reminder_3_body">Ваша черга повернути лідерство — по-дружньому.</string>
+    <string name="reminder_4_title">🛡️ Розумна перерва дня</string>
+    <string name="reminder_4_body">Антиспам-завдання, щоб відволіктися?</string>
+    <string name="reminder_5_title">✨ Доступне нове завдання</string>
+    <string name="reminder_5_body">Сьогодні в усіх однакові сітки — покажіть, на що ви здатні!</string>
+
+    <!-- Playful blocked-call notification titles (opt-in). Built-in defaults: local language + English. -->
+    <string-array name="fun_blocked_default_titles">
+        <item>🥊 Спам у нокауті!</item>
+        <item>🛡️ Гарна спроба, спамере</item>
+        <item>🚫 Нав\'язливого продавця відшито</item>
+        <item>📵 На одного набриду менше</item>
+        <item>☀️ Ще одного продавця сонячних панелей заблоковано</item>
+        <item>🥊 Spam knocked out!</item>
+        <item>🛡️ Nice try, spammer</item>
+        <item>🚫 Cold caller turned away</item>
+        <item>📵 One less nuisance</item>
+        <item>😎 Blocked — you\'re welcome</item>
+    </string-array>
+
+    <!-- Country scopes for the spam list -->
+    <string name="country_all">Усі країни</string>
+    <string name="country_fr">Франція</string>
+    <string name="country_be">Бельгія</string>
+    <string name="country_ch">Швейцарія</string>
+    <string name="country_lu">Люксембург</string>
+    <string name="country_es">Іспанія</string>
+    <string name="country_it">Італія</string>
+    <string name="country_de">Німеччина</string>
+    <string name="country_gb">Велика Британія</string>
+    <string name="country_pt">Португалія</string>
+    <string name="country_us">США</string>
+    <string name="country_ca">Канада</string>
+    <string name="country_ma">Марокко</string>
+    <string name="country_dz">Алжир</string>
+    <string name="country_tn">Туніс</string>
+
+    <!-- Report categories -->
+    <string name="category_telemarketing">Телемаркетинг</string>
+    <string name="category_scam">Шахрайство</string>
+    <string name="category_robocall">Автоматичний дзвінок</string>
+    <string name="category_silent">Мовчазний дзвінок</string>
+    <string name="category_debt">Стягнення боргів</string>
+    <string name="category_survey">Опитування</string>
+    <string name="category_other">Інше</string>
+    <string name="category_unknown">Невідомо</string>
+
+    <!-- Call history sections -->
+    <string name="history_section_today">Сьогодні</string>
+    <string name="history_section_yesterday">Учора</string>
+    <string name="history_section_this_week">Цього тижня</string>
+    <string name="history_section_this_month">Цього місяця</string>
+    <string name="history_section_older">Раніше</string>
+
+    <!-- Relative time -->
+    <string name="time_just_now">щойно</string>
+    <string name="time_minutes_ago">%1$d хв тому</string>
+    <string name="time_hours_ago">%1$d год тому</string>
+    <string name="time_yesterday">учора</string>
+    <string name="time_days_ago">%1$d дн. тому</string>
+
+    <!-- Errors and status messages (ViewModel / repository) -->
+    <string name="error_invalid_phone">Неправильний номер.</string>
+    <string name="error_network">Немає з\'єднання. Спробуйте ще раз.</string>
+    <string name="error_server">Помилка сервера (%1$d).</string>
+    <string name="error_unknown">Невідома помилка.</string>
+    <string name="sync_up_to_date">Уже оновлено ✓ Нових номерів немає.</string>
+    <plurals name="sync_done">
+        <item quantity="one">Оновлення завершено 📥 Оновлено %1$d номер.</item>
+        <item quantity="few">Оновлення завершено 📥 Оновлено %1$d номери.</item>
+        <item quantity="many">Оновлення завершено 📥 Оновлено %1$d номерів.</item>
+        <item quantity="other">Оновлення завершено 📥 Оновлено %1$d номера.</item>
+    </plurals>
+    <string name="sync_failed">Не вдалося оновити. Перевірте з\'єднання та спробуйте ще раз.</string>
+    <string name="report_feedback_repeat">Уже враховано 😊 Повторювати не потрібно — однієї скарги достатньо!</string>
+    <string name="report_feedback_thanks">Дякуємо! Скаргу збережено 🛡️</string>
+    <string name="report_feedback_saved_locally">Збережено на пристрої. Не вдалося надіслати на сервер: %1$s</string>
+    <string name="privacy_erased">Ваші скарги видалено.</string>
+    <string name="privacy_erase_failed">Не вдалося видалити. Спробуйте ще раз.</string>
+    <string name="api_test_unreachable">Недоступний.</string>
+
+    <!-- Country picker (Home + Settings) -->
+    <string name="country_dialog_title">Країна для відстеження</string>
+
+    <!-- Home screen -->
+    <string name="home_sync_button">Оновити список</string>
+    <plurals name="home_sync_progress">
+        <item quantity="one">Отримано %1$s номер…</item>
+        <item quantity="few">Отримано %1$s номери…</item>
+        <item quantity="many">Отримано %1$s номерів…</item>
+        <item quantity="other">Отримано %1$s номера…</item>
+    </plurals>
+    <string name="home_sms_on">Увімкнено · небажані SMS приховуються</string>
+    <string name="home_sms_off">Приховуйте сповіщення про небажані SMS</string>
+    <string name="home_covered_numbers">Номерів у базі</string>
+    <string name="home_auto_update">Автооновлення · %1$s</string>
+    <string name="home_blocked_calls">Заблоковані дзвінки</string>
+    <string name="home_none_yet">Поки немає</string>
+    <string name="home_update_today">оновлено сьогодні</string>
+    <string name="home_update_yesterday">оновлено вчора</string>
+    <string name="home_update_days_ago">оновлено %1$d дн. тому</string>
+    <string name="home_update_on">оновлено %1$s</string>
+    <string name="home_community_title">Щит спільноти</string>
+
+    <!-- Report screen -->
+    <string name="report_title">Поскаржитися на номер</string>
+    <string name="report_subtitle">Анонімно — без облікового запису й особистих даних.</string>
+    <string name="report_phone_label">Номер (напр. +33 6 12 34 56 78)</string>
+    <string name="report_call_type">Тип дзвінка</string>
+    <string name="report_submit">Надіслати скаргу</string>
+    <string name="report_allow">Дозволити</string>
+    <string name="report_empty_recent_title">Нещодавніх дзвінків немає</string>
+
+    <!-- Number detail (call detail + number lookup) -->
+    <string name="detail_title">Відомості про номер</string>
+    <string name="detail_filtered_on">Відфільтровано</string>
+    <string name="detail_badge_community">Спільнота</string>
+    <string name="detail_stats_top_reason">Найчастіше: %1$s (%2$d %%)</string>
+    <string name="detail_stats_24h">24 год</string>
+    <string name="detail_stats_7d">7 дн.</string>
+    <string name="detail_stats_30d">30 дн.</string>
+    <string name="detail_stats_1y">1 рік</string>
+
+    <!-- My reports (Journal tab) -->
+    <string name="myreports_title">Мої скарги</string>
+    <string name="myreports_intro">Передумайте або видаліть скаргу, надіслану помилково.</string>
+    <string name="myreports_delete_title">Видалити цю скаргу?</string>
+    <string name="myreports_delete_body">Скаргу на +%1$s буде видалено (з пристрою та з наших серверів). Цю дію неможливо скасувати.</string>
+    <string name="myreports_empty_title">Скарг немає</string>
+    <string name="myreports_empty_body">Тут з\'являться ваші скарги. Поскаржтеся на небажаний номер, щоб захистити спільноту.</string>
+    <string name="myreports_sync_sent">надіслано</string>
+    <string name="myreports_sync_failed">не надіслано</string>
+    <string name="myreports_sync_pending">очікує</string>
+    <string name="myreports_change_mind">Передумати</string>
+
+    <!-- Filtered-call history -->
+    <string name="history_empty_title">Відфільтрованих дзвінків немає</string>
+    <string name="history_copied">Номер скопійовано</string>
+
+    <!-- SMS shield -->
+    <string name="sms_title">SMS-щит</string>
+    <string name="sms_subtitle">Приховуйте небажані SMS</string>
+    <string name="sms_access_required">Потрібен доступ до сповіщень</string>
+    <string name="sms_access_body">Щоб приховувати небажані SMS, дозвольте Who Called доступ до сповіщень. Ми ніколи не читаємо ваших повідомлень: ми лише приховуємо сповіщення від небажаного відправника. SMS залишається у вашому застосунку для повідомлень.</string>
+    <string name="sms_access_button">Увімкнути доступ до сповіщень</string>
+    <string name="sms_hide_title">Приховувати сповіщення про небажані SMS</string>
+    <string name="sms_hide_desc">Повідомлення залишається в застосунку SMS як непрочитане. Жодне повідомлення не читається й не видаляється.</string>
+    <string name="sms_notify_title">Повідомляти про приховані SMS</string>
+    <string name="sms_notify_desc">Показує ненав\'язливе сповіщення, коли небажане SMS приховано.</string>
+    <string name="sms_how_title">Як це працює</string>
+    <string name="sms_how_body">Android не дозволяє блокувати SMS, не ставши застосунком для повідомлень за замовчуванням. Who Called залишається фільтром: ми лише приховуємо сповіщення від відправників із високим індексом спаму, використовуючи той самий список, що й для дзвінків.</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Налаштування</string>
+    <string name="settings_erase_dialog_title">Видалити мої дані?</string>
+    <string name="settings_erase_dialog_body">Усі скарги, надіслані з цього пристрою, буде остаточно видалено з наших серверів. Цю дію неможливо скасувати.</string>
+    <string name="settings_section_filtering">Фільтрування</string>
+    <string name="settings_block_title">Блокувати небажані дзвінки</string>
+    <string name="settings_block_desc">Номери з високим індексом спаму відхиляються автоматично: телефон не дзвонить.</string>
+    <string name="settings_warn_title">Попереджати в разі сумніву</string>
+    <string name="settings_warn_desc">Для номерів із середнім індексом телефон дзвонить, а ви отримуєте попередження. Ви вирішуєте, чи відповідати.</string>
+    <string name="settings_blocked_notif_title">Повідомляти про заблокований дзвінок</string>
+    <string name="settings_blocked_notif_desc">Показує ненав\'язливе сповіщення після кожного заблокованого небажаного дзвінка.</string>
+    <string name="settings_fun_title">Веселі сповіщення 😜</string>
+    <string name="settings_fun_desc">Веселі повідомлення під час блокування спаму («Спам у нокауті!»). За замовчуванням вимкнено.</string>
+    <string name="settings_fun_messages_title">Повідомлення 😜</string>
+    <string name="settings_fun_messages_desc">Ось усі повідомлення, що чергуються під час блокування спаму. Додайте свої, змініть їх або поверніться до стандартних.</string>
+    <string name="settings_fun_defaults">Стандартні повідомлення</string>
+    <string name="settings_fun_yours">Ваші повідомлення ✍️</string>
+    <string name="settings_fun_none">Власних повідомлень поки немає — напишіть своє нижче.</string>
+    <string name="settings_fun_edit">Змінити повідомлення</string>
+    <string name="settings_fun_delete">Видалити повідомлення</string>
+    <string name="settings_fun_placeholder">Напр.: 🎣 Ще один фішинг зірвався з гачка!</string>
+    <string name="settings_fun_counter">%1$d/%2$d · емодзі вітаються 😄</string>
+    <string name="settings_fun_add">Додати</string>
+    <string name="settings_fun_reset">Скинути (повернути стандартні повідомлення)</string>
+    <string name="settings_section_games">Ігри</string>
+    <string name="settings_reminder_title">Щоденне нагадування про гру 🎮</string>
+    <string name="settings_reminder_desc">Дружнє нагадування з 18:30 до 20:30, але ніколи, якщо ви вже грали. Якщо ігнорувати його кілька вечорів поспіль (%1$d), воно призупиниться на %2$d дн., а потім повернеться.</string>
+    <string name="settings_country_desc">Завантажувати лише номери цієї країни (менший кеш). Визначається автоматично, можна змінити.</string>
+    <string name="settings_threshold">Чутливість блокування: %1$d %%</string>
+    <string name="settings_threshold_desc">Починаючи з цього індексу спаму номер блокується. Нижче — лише попередження (якщо ввімкнено опцію вище). Що нижчий поріг, то більше блокується — з ризиком хибних спрацювань.</string>
+    <string name="settings_section_info">Інформація</string>
+    <string name="settings_link_privacy">Конфіденційність</string>
+    <string name="settings_link_legal">Правова інформація</string>
+    <string name="settings_link_site">Офіційний сайт</string>
+    <string name="settings_link_rate">Оцінити застосунок</string>
+    <string name="settings_link_source">Вихідний код (open source)</string>
+    <string name="settings_link_contact">Зв\'язатися з нами</string>
+    <string name="settings_contact_subject">Who Called — зворотний зв\'язок</string>
+    <string name="settings_section_data">Мої дані</string>
+    <string name="settings_erase_title">Видалити мої скарги</string>
+    <string name="settings_erase_desc">Остаточно видаляє всі скарги, надіслані з цього пристрою. Відповідно до вашого права на видалення (GDPR).</string>
+    <string name="settings_erase_button">Видалити мої дані</string>
+    <string name="settings_erasing">Видалення…</string>
+    <string name="settings_section_diagnostic">Діагностика</string>
+    <string name="settings_api_title">Підключення до API</string>
+    <string name="settings_api_desc">Перевірте, чи застосунок підключається до сервера Who Called.</string>
+    <string name="settings_api_testing">Перевірка…</string>
+    <string name="settings_api_test">Перевірити підключення</string>
+    <string name="settings_api_ok">API OK ✓ (%1$d мс)</string>
+    <string name="settings_api_failed">API недоступний ✗ — %1$s</string>
+    <string name="settings_free_title">Безкоштовно й з відкритим кодом</string>
+    <string name="settings_free_body" formatted="false">Who Called на 100 % безкоштовний, а його код відкритий. На 100 % анонімно — без облікового запису й особистих даних. Номери в міжнародному форматі.</string>
+    <string name="settings_version_hint">Двічі торкніться, щоб перевірити API</string>
+    <string name="settings_version_testing">Перевірка API…</string>
+
+    <!-- Settings: hidden notification debug card (long-press the version) -->
+    <string name="debug_title">Налагодження сповіщень</string>
+    <string name="debug_permission">Дозвіл на сповіщення: %1$s</string>
+    <string name="debug_permission_granted">надано ✓</string>
+    <string name="debug_permission_denied">ВІДХИЛЕНО ✗ — нічого не з\'явиться</string>
+    <string name="debug_request">Запитати</string>
+    <string name="debug_system_settings">Налаштування системи</string>
+    <string name="debug_blocked_standard">Заблокований дзвінок (звичайний)</string>
+    <string name="debug_blocked_fun">Заблокований дзвінок (веселий)</string>
+    <string name="debug_sms">Небажане SMS приховано</string>
+    <string name="debug_reminder">Щоденне нагадування про гру</string>
+    <string name="debug_hide_hint">Утримуйте номер версії, щоб приховати цю панель.</string>
+
+    <!-- Games: shared -->
+    <string name="game_leaderboard_button">🏆 Рейтинг</string>
+    <string name="game_start">Почати ▸</string>
+    <string name="game_share">Поділитися</string>
+    <string name="game_replay">Ще раз</string>
+    <string name="game_quit">Вийти</string>
+    <string name="game_quit_title">Вийти з гри?</string>
+    <string name="game_daily_rank">Рейтинг дня · топ %1$d %%</string>
+    <plurals name="game_players_best">
+        <item quantity="one">%1$d гравець · найкращий %2$d</item>
+        <item quantity="few">%1$d гравці · найкращий %2$d</item>
+        <item quantity="many">%1$d гравців · найкращий %2$d</item>
+        <item quantity="other">%1$d гравця · найкращий %2$d</item>
+    </plurals>
+
+    <!-- Games hub -->
+    <string name="games_subtitle">Одне завдання на день, ваш рейтинг</string>
+    <string name="games_defense_tagline">Аркада — знищуйте спам-дзвінки.</string>
+    <string name="games_trace_tagline">Головоломка — викрийте прихованого шахрая.</string>
+    <string name="games_practice">🎯 Вільне тренування TRACE — поза рейтингом</string>
+    <string name="games_footer" formatted="false">Нове завдання щодня · 3 рейтингові ігри на день · 100 % анонімно.</string>
+    <string name="games_record">Рекорд: %1$d бал.</string>
+    <string name="games_not_played">Ще не зіграно</string>
+    <string name="games_play_daily">Зіграти завдання дня ▸</string>
+    <plurals name="games_play_attempts">
+        <item quantity="one">Грати (залишилася %1$d рейтингова спроба)</item>
+        <item quantity="few">Грати (залишилося %1$d рейтингові спроби)</item>
+        <item quantity="many">Грати (залишилося %1$d рейтингових спроб)</item>
+        <item quantity="other">Грати (залишилося %1$d рейтингової спроби)</item>
+    </plurals>
+    <string name="games_replay_practice">Ще раз (тренування)</string>
+
+    <!-- Daily streak screen -->
+    <string name="streak_title">Щоденна серія</string>
+    <string name="streak_current">Поточна серія</string>
+    <string name="streak_best">Найкраща серія: %1$d</string>
+    <string name="streak_kept">Чудово — серію сьогодні збережено! 🔥</string>
+    <string name="streak_keep_going">Зіграйте сьогодні, щоб продовжити серію ☀️</string>
+    <string name="streak_milestone_reached">Рубіж у 7 днів досягнуто! 🎁</string>
+    <string name="streak_next_milestone">Наступний рубіж: 7 днів 🎁</string>
+    <string name="streak_weekday_mon">ПН</string>
+    <string name="streak_weekday_tue">ВТ</string>
+    <string name="streak_weekday_wed">СР</string>
+    <string name="streak_weekday_thu">ЧТ</string>
+    <string name="streak_weekday_fri">ПТ</string>
+    <string name="streak_weekday_sat">СБ</string>
+    <string name="streak_weekday_sun">НД</string>
+
+    <!-- Leaderboard screen -->
+    <string name="leaderboard_title">Рейтинг %1$s</string>
+    <string name="leaderboard_period_day">Сьогодні</string>
+    <string name="leaderboard_period_week">Тиждень</string>
+    <string name="leaderboard_period_all">За весь час</string>
+    <string name="leaderboard_day_today">Сьогодні</string>
+    <string name="leaderboard_day_yesterday">Учора</string>
+    <string name="leaderboard_days_ago">%1$d дн. тому</string>
+    <plurals name="leaderboard_unit_grids">
+        <item quantity="one">%1$d сітка</item>
+        <item quantity="few">%1$d сітки</item>
+        <item quantity="many">%1$d сіток</item>
+        <item quantity="other">%1$d сітки</item>
+    </plurals>
+    <string name="leaderboard_unit_wave">хвиля %1$d</string>
+    <plurals name="leaderboard_summary">
+        <item quantity="one">%1$d гравець · найкращий %2$d · медіана %3$d</item>
+        <item quantity="few">%1$d гравці · найкращий %2$d · медіана %3$d</item>
+        <item quantity="many">%1$d гравців · найкращий %2$d · медіана %3$d</item>
+        <item quantity="other">%1$d гравця · найкращий %2$d · медіана %3$d</item>
+    </plurals>
+    <string name="leaderboard_summary_solo">1 гравець (ви) · найкращий %1$d</string>
+    <string name="leaderboard_be_first">Наберіть бали першими! 🚀</string>
+    <string name="leaderboard_your_rank">Ваше місце</string>
+    <string name="leaderboard_you_top">Топ %1$d %% · %2$d бал. (%3$s)</string>
+    <string name="leaderboard_you_local">%1$d бал. (%2$s)</string>
+    <string name="leaderboard_not_played">Ви ще не грали за цей період — почніть гру!</string>
+    <string name="leaderboard_top">Топ</string>
+    <string name="leaderboard_sync_pending">Ваш результат з\'явиться в рейтингу після синхронізації.</string>
+    <string name="leaderboard_no_scores">Результатів поки немає. Ваш хід!</string>
+    <string name="leaderboard_history">Ваша історія</string>
+    <string name="leaderboard_history_rank">#%1$d/%2$d · топ %3$d %%</string>
+    <string name="leaderboard_history_empty">Зіграйте, щоб почати історію.</string>
+
+    <!-- DEFENSE game -->
+    <string name="defense_hud_score">РАХУНОК</string>
+    <string name="defense_hud_wave">ХВИЛЯ</string>
+    <string name="defense_item_ready">ПРЕДМЕТ ГОТОВИЙ — торкніться</string>
+    <string name="defense_intro">Утримуйте, щоб стріляти, ведіть, щоб цілитися.\nЗнищуйте небажані дзвінки — вони заповнюють шкалу ПРЕДМЕТА (активуєте його ви самі!).\nЗелені дзвінки дружні; ловіть 🎁, щоб одразу отримати предмет.</string>
+    <string name="defense_game_over">Щит упав</string>
+    <plurals name="defense_result">
+        <item quantity="one">Хвиля %1$d · заблоковано %2$d спам-дзвінок</item>
+        <item quantity="few">Хвиля %1$d · заблоковано %2$d спам-дзвінки</item>
+        <item quantity="many">Хвиля %1$d · заблоковано %2$d спам-дзвінків</item>
+        <item quantity="other">Хвиля %1$d · заблоковано %2$d спам-дзвінка</item>
+    </plurals>
+    <string name="defense_share_text">who-called DEFENSE · %1$d бал. · Хвиля %2$d 🛡️\nБлокуйте спам і ви 👉 %3$s</string>
+    <string name="defense_quit_body">Ви втратите прогрес поточної хвилі.</string>
+    <string name="defense_incoming">ВХІДНИЙ…</string>
+    <string name="defense_item_rapid">ШВИДКИЙ ВОГОНЬ</string>
+    <string name="defense_item_spread">ПОСТРІЛ ×5</string>
+    <string name="defense_item_slow">СПОВІЛЬНЕННЯ</string>
+    <string name="defense_item_repair">РЕМОНТ</string>
+    <string name="defense_item_shield">ЩИТ</string>
+    <string name="defense_pop_combo">КОМБО ×%1$d</string>
+    <string name="defense_pop_boss_bonus">БОС +%1$d</string>
+    <string name="defense_pop_surge">НАТИСК ×%1$d</string>
+    <string name="defense_pop_boss">⚠ БОС</string>
+    <string name="defense_pop_bonus">БОНУС 🎁</string>
+
+    <!-- TRACE game -->
+    <string name="trace_mode_daily">Завдання дня</string>
+    <string name="trace_mode_practice">Тренування</string>
+    <string name="trace_tutorial">Навчання</string>
+    <string name="trace_toast_error">−1 життя · −%1$d бал.</string>
+    <string name="trace_toast_points">+%1$d бал.!</string>
+    <string name="trace_hint">💡 Підказка</string>
+    <string name="trace_hint_desc">Ставить шахрая · −%1$d бал.</string>
+    <string name="trace_no_hints">Підказок немає</string>
+    <string name="trace_rules_title">3 ПРАВИЛА</string>
+    <string name="trace_controls">1 дотик = ✗ безпечно · 2 дотики = шахрай · 3 дотики = стерти\nПроведіть пальцем по сітці, щоб поставити кілька ✗</string>
+    <string name="trace_resume">Продовжити ▸</string>
+    <string name="trace_intro_daily">Завдання дня · 5 сіток · 3 життя</string>
+    <string name="trace_intro_practice">Вільне тренування · поза рейтингом</string>
+    <string name="trace_replay_tutorial">❓ Пройти інтерактивне навчання знову</string>
+    <string name="trace_size">Розмір: %1$d×%1$d</string>
+    <string name="trace_grid_solved">Сітку %1$d розв\'язано!</string>
+    <string name="trace_score">Рахунок: %1$d</string>
+    <string name="trace_next_grid">Наступна сітка…</string>
+    <string name="trace_sprint_done">Спринт завершено!</string>
+    <plurals name="trace_all_grids">
+        <item quantity="one">Знешкоджено %1$d сітку 🎉</item>
+        <item quantity="few">Усі %1$d сітки знешкоджено 🎉</item>
+        <item quantity="many">Усі %1$d сіток знешкоджено 🎉</item>
+        <item quantity="other">Усі %1$d сітки знешкоджено 🎉</item>
+    </plurals>
+    <string name="trace_no_lives">Життя скінчилися…</string>
+    <plurals name="trace_partial">
+        <item quantity="one">Нічого страшного — розв\'язано %1$d/%2$d сіток!</item>
+        <item quantity="few">Нічого страшного — розв\'язано %1$d/%2$d сіток!</item>
+        <item quantity="many">Нічого страшного — розв\'язано %1$d/%2$d сіток!</item>
+        <item quantity="other">Нічого страшного — розв\'язано %1$d/%2$d сіток!</item>
+    </plurals>
+    <string name="trace_points">балів</string>
+    <string name="trace_share_text">who-called TRACE · %1$d бал. · %2$d/%3$d сіток 🛡️\nВистежуйте спамерів і ви 👉 %4$s</string>
+    <string name="trace_new_grid">Нова сітка</string>
+    <string name="trace_quit_body">Ви втратите прогрес поточного завдання.</string>
+    <string name="trace_rule_color">1 на колір</string>
+    <string name="trace_rule_line">1 / рядок і стовпець</string>
+    <string name="trace_rule_adjacent">Ніколи поруч</string>
+    <string name="trace_tap_label">Дотик:</string>
+    <string name="trace_safe">безпечно</string>
+    <string name="trace_fraudster">шахрай</string>
+    <string name="trace_loading">Підготовка завдання…</string>
+    <string name="trace_error_title">Не вдалося завантажити завдання</string>
+    <string name="trace_error_body">Перевірте з\'єднання та спробуйте ще раз.</string>
+
+    <!-- TRACE villains (cosmetic fraudster per grid) -->
+    <string name="trace_villain_imp">Чортеня</string>
+    <string name="trace_villain_demon">Демон</string>
+    <string name="trace_villain_supervillain">Суперлиходій</string>
+    <string name="trace_villain_ninja">Ніндзя</string>
+    <string name="trace_villain_robot">Спам-робот</string>
+    <string name="trace_villain_alien">Прибулець</string>
+    <string name="trace_villain_scammer">Аферист</string>
+    <string name="trace_villain_impostor">Самозванець</string>
+
+    <!-- TRACE interactive tutorial -->
+    <string name="trace_tuto_title">НАВЧАННЯ — %1$s Як грати</string>
+    <string name="trace_tuto_step0">Лише 3 правила:\n1 шахрай на колір -- 1 на рядок\nі стовпець -- ніколи поруч</string>
+    <string name="trace_tuto_step1">У рожевій зоні лише одна клітинка:\nшахрай точно там.\nТоркніться двічі, щоб поставити його.</string>
+    <string name="trace_tuto_step2">У цих клітинках ніколи\nне буде шахрая. Поставте X\nна 3 підсвічені клітинки.</string>
+    <string name="trace_tuto_step3">1 шахрай на рядок, 1 на стовпець:\nу кожного своє місце. Поставте X на\n3 підсвічені клітинки.</string>
+    <string name="trace_tuto_step4">Ніколи поруч, навіть\nпо діагоналі. Поставте X на\nпідсвічені клітинки.</string>
+    <string name="trace_tuto_step5">Рядок 2: вільна лише одна клітинка.\nШахрай точно там.\nТоркніться двічі, щоб поставити його.</string>
+    <string name="trace_tuto_step6">А якщо помилитися?\nТоркніться двічі клітинки\nв червоній рамці.</string>
+    <string name="trace_tuto_step7">3-й дотик стирає.\nТоркніться клітинки ще раз.</string>
+    <string name="trace_tuto_step8_a">Залишилося 2 шахраї.\nРядок 3: вільна лише одна клітинка.\nТоркніться її двічі.</string>
+    <string name="trace_tuto_step8_b">Останній: рядок 4!\nТоркніться її двічі.</string>
+    <string name="trace_tuto_tap_again_place">Ще один дотик, щоб поставити!</string>
+    <string name="trace_tuto_tap_again">Ще один дотик!</string>
+    <string name="trace_tuto_tap_again_ellipsis">Ще один дотик...</string>
+    <string name="trace_tuto_done1">Добре. 1 шахрай на колір.</string>
+    <string name="trace_tuto_done2">Ось так. Кожен X виключає клітинку.\nМенше клітинок — легше\nзнайти наступного.</string>
+    <string name="trace_tuto_done3">1 шахрай на рядок, 1 на стовпець.\nX — ваша пам\'ять: сюди не можна.</string>
+    <string name="trace_tuto_done4">Усе, що торкається шахрая,\nбезпечне: позначайте X.</string>
+    <string name="trace_tuto_done5">Чудово. X звужують пошук,\nдоки не залишиться одна\nможлива клітинка. У цьому вся суть.</string>
+    <string name="trace_tuto_done6">Неправильно: він торкався шахрая.\n-1 життя, -200 бал.</string>
+    <string name="trace_tuto_done7">Стерто. Цикл:\nпорожньо, X, шахрай, порожньо.</string>
+    <string name="trace_tuto_done8">Готово. Кожен колір, рядок\nі стовпець має СВОГО шахрая.\nВаш хід!</string>
+    <string name="trace_tuto_tap_glowing_any">Торкніться клітинки, що світиться</string>
+    <string name="trace_tuto_tap_glowing">Торкніться клітинки, що світиться</string>
+    <string name="trace_tuto_erased">Стерто</string>
+    <string name="trace_tuto_got_it">Зрозуміло ▸</string>
+    <string name="trace_tuto_skip">Пропустити</string>
+    <string name="trace_tuto_lets_go">Уперед ▸</string>
+    <string name="trace_tuto_next">Далі ▸</string>
+    <string name="nav_games">Ігри</string>
+    <string name="nav_settings">Налаштування</string>
+    <string name="home_country_dialog_title">Країна для відстеження</string>
+    <string name="home_sync_connecting">Підключення до сервера…</string>
+    <string name="home_sms_title">SMS-щит</string>
+    <string name="setup_skip">Пропустити</string>
+    <string name="warn_detail_channel_name">Відомості про підозрілий дзвінок</string>
+    <string name="warn_detail_channel_desc">Ненав\'язливе сповіщення без спливного банера, щоб відкрити відомості після попередження на екрані.</string>
+    <string name="warn_detail_title">Підозрілий дзвінок</string>
+    <string name="warn_detail_line">%1$s · %2$d %% · Докладніше</string>
+    <string name="warn_group_title">Підозрілі дзвінки</string>
+    <string name="overlay_title">Підозрілий дзвінок</string>
+    <string name="overlay_not_blocked">Не заблоковано — вирішувати вам</string>
+    <string name="overlay_dismiss">Закрити попередження</string>
+    <string name="home_overlay_title">Попередження під час дзвінка</string>
+    <string name="home_overlay_body">Дозвольте показ поверх інших застосунків, щоб бачити ризик спаму, поки телефон дзвонить, не закриваючи кнопку «Відповісти».</string>
+    <string name="home_overlay_cta">Дозволити показ</string>
+    <string name="nav_home">Головна</string>
+    <string name="nav_calls">Дзвінки</string>
+    <string name="nav_report">Скарга</string>
+    <string name="common_collapse">Згорнути</string>
+    <string name="common_expand">Розгорнути</string>
+    <string name="common_scroll_top">Угору</string>
+    <string name="home_protected">Ви під захистом</string>
+    <string name="home_protection_to_enable">Захист не ввімкнено</string>
+    <string name="home_sync_updating">Оновлення…</string>
+    <string name="home_country_watched">Відстежувані номери: %1$s %2$s</string>
+    <string name="home_country_detected">Визначено автоматично. Натисніть «Змінити», щоб вибрати іншу країну.</string>
+    <string name="home_shield_partial">Частковий захист · %1$d/%2$d</string>
+    <string name="home_shield_off">Щит не ввімкнено · %1$d/%2$d</string>
+    <string name="home_shield_enable_filter">Увімкніть фільтр дзвінків, щоб блокувати небажані.</string>
+    <string name="home_shield_enable_notifs">Попередження вимкнено: увімкніть сповіщення.</string>
+    <string name="home_enable_blocker">Увімкнути блокувальник</string>
+    <string name="home_enable_alerts">Увімкнути попередження</string>
+    <string name="home_recent_blocked_title">Небажаний дзвінок заблоковано</string>
+    <string name="home_recent_blocked_msg">Who Called скинув його до того, як задзвонив телефон.</string>
+    <string name="home_recent_warned_title">Виявлено підозрілий дзвінок</string>
+    <string name="home_recent_warned_msg">Телефон дзвонив, ви отримали попередження.</string>
+    <string name="home_recent_reported_title">Номер позначено як небажаний</string>
+    <string name="home_recent_reported_msg">Ви вже позначили цей номер як небажаний.</string>
+    <string name="home_recent_legit_title">Номер позначено як надійний</string>
+    <string name="home_recent_legit_msg">Ви вказали, що цей номер надійний.</string>
+    <string name="home_recent_unknown_title">Вам дзвонили з невідомого номера</string>
+    <string name="home_recent_unknown_msg">Перевірте номер, перш ніж передзвонювати.</string>
+    <string name="home_recent_see_number">Відкрити номер</string>
+    <plurals name="home_recent_others">
+        <item quantity="one">і ще %1$d дзвінок за останні 24 год</item>
+        <item quantity="few">і ще %1$d дзвінки за останні 24 год</item>
+        <item quantity="many">і ще %1$d дзвінків за останні 24 год</item>
+        <item quantity="other">і ще %1$d дзвінка за останні 24 год</item>
+    </plurals>
+    <string name="home_quiet">Нових дзвінків для перевірки немає — усе спокійно.</string>
+    <string name="home_blocker_active">Блокувальник увімкнено й оновлено</string>
+    <string name="home_country_breakdown">%1$s %2$s · номерів: %3$s%4$s</string>
+    <string name="home_arcep_prefixes"> · префіксів ARCEP: %1$s</string>
+    <string name="home_blocked_detail">Відхилено без дзвінка · докладніше</string>
+    <string name="home_suspect_calls">Підозрілі дзвінки</string>
+    <string name="home_suspect_detail">Телефон дзвонив, вас попередили · докладніше</string>
+    <string name="home_games_row">Ігри — завдання дня й рейтинги%1$s</string>
+    <string name="home_community_line">Скарг від спільноти: %1$s · +%2$s за тиждень</string>
+    <string name="report_feedback_flip">Відгук оновлено ✓</string>
+    <string name="report_feedback_refine">Дякуємо, уточнення збережено ✓</string>
+    <string name="sync_error_rate_limited">Забагато оновлень із цієї мережі. Зачекайте кілька хвилин і спробуйте ще раз.</string>
+    <string name="sync_error_server">Сервер відхилив оновлення (помилка %1$d). Спробуйте пізніше.</string>
+    <string name="sync_error_generic">Не вдалося оновити. Спробуйте ще раз за мить.</string>
+    <string name="report_error_invalid_phone">Неправильний номер — перевірте формат.</string>
+    <string name="report_error_daily_limit">Досягнуто денного ліміту скарг. Ваш відгук збережено на пристрої й буде надіслано автоматично.</string>
+    <string name="myreports_resend_now">Надіслати зараз</string>
+    <string name="settings_overlay_title">Банер на екрані дзвінка</string>
+    <string name="settings_overlay_desc">Показує попередження поверх вхідного дзвінка. Відповідаєте ви, як і раніше, у застосунку «Телефон». Без цього сповіщення ховається за екраном дзвінка.</string>
+    <string name="settings_reminder_paused_title">Нагадування на паузі</string>
+    <string name="settings_reminder_paused_until">Кілька нагадувань залишилися без відповіді — вони відновляться автоматично %1$s.</string>
+    <string name="settings_reminder_paused_soon">Кілька нагадувань залишилися без відповіді — вони відновляться автоматично за кілька днів.</string>
+    <string name="settings_reminder_resume">Відновити</string>
+    <string name="settings_link_arcep">Джерело префіксів ARCEP (arcep.fr)</string>
+    <string name="settings_independent_title">Незалежний застосунок</string>
+    <string name="settings_independent_body">Who Called — не офіційний застосунок: він не пов\'язаний ні з ARCEP, ні з жодною державною структурою і не представляє жоден державний орган. Використані префікси телемаркетингу взято з національного плану нумерації, опублікованого ARCEP (посилання «Джерело префіксів ARCEP» вище).</string>
+    <string name="debug_overlay_granted">Показ поверх інших застосунків: дозволено ✓</string>
+    <string name="debug_overlay_denied">Показ поверх інших застосунків: заборонено — банер дзвінка не з\'явиться</string>
+    <string name="debug_overlay_allow">Дозволити показ поверх інших застосунків</string>
+    <string name="debug_simulate_hint">Прихований тест — імітує підозрілий дзвінок (сповіщення + банер на 45 с):</string>
+    <string name="debug_simulate">Імітувати підозрілий дзвінок</string>
+    <string name="debug_other_tests">Інші тести:</string>
+    <string name="debug_overlay_only">Лише банер поверх екрана</string>
+    <string name="calls_filter_all">Усі</string>
+    <string name="calls_filter_review">Перевірити</string>
+    <string name="calls_filter_filtered">Відфільтровані</string>
+    <string name="calls_title">Нещодавні дзвінки</string>
+    <string name="calls_subtitle">Дзвінки, що пройшли через фільтр · зберігаються на вашому телефоні</string>
+    <string name="calls_empty_review_title">Номерів для перевірки немає</string>
+    <string name="calls_empty_body_on">Тут з\'являться наступні дзвінки, що пройдуть через фільтр.</string>
+    <string name="calls_empty_body_off">Увімкніть фільтр дзвінків, щоб бачити, хто вам дзвонить.</string>
+    <string name="calls_copy_hint">Утримуйте номер, щоб скопіювати його.</string>
+    <string name="calls_status_unknown">Не оцінено</string>
+    <string name="calls_direction_incoming">Вхідний</string>
+    <plurals name="calls_attempts">
+        <item quantity="one">%1$d дзвінок</item>
+        <item quantity="few">%1$d дзвінки</item>
+        <item quantity="many">%1$d дзвінків</item>
+        <item quantity="other">%1$d дзвінка</item>
+    </plurals>
+    <string name="report_see_my_reports">Мої скарги</string>
+    <string name="report_pick_recent">Вибрати з нещодавніх дзвінків</string>
+    <string name="gauge_risk_high">Високий</string>
+    <string name="gauge_risk_medium">Помірний</string>
+    <string name="gauge_risk_low">Низький</string>
+    <string name="gauge_risk_caption">Ризик</string>
+    <string name="setup_done_screening_count">✓ Фільтр увімкнено · номерів у базі: %1$s</string>
+    <string name="setup_done_screening">✓ Фільтр дзвінків увімкнено</string>
+    <string name="setup_done_notifications">✓ Попередження ввімкнено</string>
+    <string name="setup_done_overlay">✓ Банер на екрані дзвінка</string>
+    <string name="setup_step">Крок %1$d/%2$d</string>
+    <string name="setup_continue">Продовжити</string>
+    <string name="setup_continue_without">Продовжити без блокування</string>
+    <string name="setup_later">Пізніше</string>
+    <string name="setup_footer">Можна змінити в налаштуваннях. Без дозволів ігри та пошук залишаються доступними.</string>
+    <string name="setup_complete_title">Ви під захистом</string>
+    <string name="setup_complete_count">Номерів готово до фільтрування: %1$s</string>
+    <string name="setup_complete_ready">Ваш щит Who Called готовий</string>
+    <string name="setup_already_screening">Захист уже ввімкнено</string>
+    <string name="setup_already_notifications">Попередження вже ввімкнено</string>
+    <string name="setup_already_overlay">Банер уже дозволено</string>
+    <string name="setup_already_body">Цей дозвіл уже надано. Переходьте до наступного кроку.</string>
+    <string name="setup_screening_title">Увімкніть свій щит</string>
+    <string name="setup_screening_body">Who Called нічого не може блокувати, доки не ввімкнено системний фільтр дзвінків. Кілька секунд · можна скасувати будь-коли.</string>
+    <string name="setup_screening_cta">Увімкнути захист</string>
+    <string name="setup_notifications_title">Будьте в курсі</string>
+    <string name="setup_notifications_body">Без сповіщень захист працює мовчки: ні попередження про підозрілий дзвінок, ні підтвердження, що номер заблоковано.</string>
+    <string name="setup_notifications_cta">Увімкнути попередження</string>
+    <string name="setup_overlay_body">Застосунок «Телефон» закриває сповіщення. Дозвольте показ поверх інших застосунків, щоб індекс спаму залишався на екрані, поки телефон дзвонить, — без блокування дзвінка й без заміни застосунку для дзвінків.</string>
+    <string name="detail_confirm_title_spam">Небажаний номер</string>
+    <string name="detail_confirm_title_suspect">Підозрілий номер</string>
+    <string name="detail_confirm_call_body">Цей номер може бути небезпечним. Справді відкрити набір номера?</string>
+    <string name="detail_confirm_sms_body">Цей номер може бути небезпечним. Справді підготувати SMS?</string>
+    <string name="detail_confirm_continue">Продовжити</string>
+    <string name="detail_received_today">Дзвінок отримано сьогодні о %1$s</string>
+    <string name="detail_received_on_date">Дзвінок отримано %1$s о %2$s</string>
+    <string name="detail_warn_score_explanation">Індекс %1$d %%. Скарги є, але їх недостатньо для автоматичного блокування. Телефон дзвонив: відповідати чи ні, вирішували ви.</string>
+    <string name="detail_warn_score_explanation_category">Індекс %1$d %% · %2$s. Скарги є, але їх недостатньо для автоматичного блокування. Телефон дзвонив: відповідати чи ні, вирішували ви.</string>
+    <string name="detail_status_suspect">Підозрілий</string>
+    <string name="detail_status_rather_legit">Імовірно, надійний</string>
+    <string name="detail_status_little_data">Мало даних</string>
+    <string name="detail_stats_loading">Статистика…</string>
+    <string name="detail_action_call">Подзвонити</string>
+    <string name="detail_action_sms">SMS</string>
+    <string name="detail_action_block">Блокувати</string>
+    <string name="detail_action_copy">Копіювати</string>
+    <string name="detail_rule_always_allowed">Завжди дозволено на цьому пристрої.</string>
+    <string name="detail_rule_blocked">Заблоковано на цьому пристрої.</string>
+    <string name="detail_your_opinion">Ваш відгук</string>
+    <string name="detail_why_optional">Чому? (необов\'язково)</string>
+    <string name="detail_arcep_range">Офіційний діапазон ARCEP</string>
+    <string name="detail_arcep_range_pattern">Офіційний діапазон ARCEP · %1$s</string>
+    <string name="detail_arcep_official_source">Офіційне джерело: план нумерації (arcep.fr)</string>
+    <string name="detail_arcep_not_affiliated">Who Called — незалежний застосунок, не пов\'язаний з ARCEP.</string>
+    <string name="detail_why_evaluation">Чому така оцінка</string>
+    <string name="detail_your_calls">Ваші дзвінки з цим номером</string>
+    <string name="detail_your_calls_subtitle">%1$d за 30 днів · %2$d за 7 днів</string>
+    <string name="detail_received_on">Отримано</string>
+    <string name="detail_badge_mixed">ARCEP + спільнота</string>
+    <string name="detail_badge_arcep">ARCEP</string>
+    <string name="detail_badge_none">Немає даних</string>
+    <plurals name="detail_spam_count">
+        <item quantity="one">%1$d небажаний</item>
+        <item quantity="few">%1$d небажані</item>
+        <item quantity="many">%1$d небажаних</item>
+        <item quantity="other">%1$d небажаних</item>
+    </plurals>
+    <plurals name="detail_legit_count">
+        <item quantity="one">%1$d надійний</item>
+        <item quantity="few">%1$d надійні</item>
+        <item quantity="many">%1$d надійних</item>
+        <item quantity="other">%1$d надійних</item>
+    </plurals>
+    <string name="detail_raw_counts_note">Показано початкову кількість відгуків; вердикт також зважає на їхню давність і репутацію авторів.</string>
+    <string name="detail_reviews_activity">Активність відгуків</string>
+    <string name="detail_headline_mixed">ARCEP і відгуки спільноти</string>
+    <string name="detail_headline_community">Відгуки спільноти</string>
+    <string name="detail_headline_none">Даних від спільноти немає</string>
+    <string name="detail_explanation_mixed">Цей номер входить до діапазону ARCEP і має відгуки спільноти. Вердикт враховує і те, і те.</string>
+    <string name="detail_explanation_arcep">Цей номер відповідає префіксу з офіційного списку номерів телемаркетингу (ARCEP / оператори). Це джерело не залежить від відгуків спільноти.</string>
+    <string name="detail_explanation_arcep_pattern">Цей номер відповідає префіксу з офіційного списку номерів телемаркетингу (ARCEP / оператори): %1$s. Це джерело не залежить від відгуків спільноти.</string>
+    <string name="detail_explanation_community">Вердикт враховує нещодавні відгуки, їхню кількість і репутацію авторів.</string>
+    <string name="detail_explanation_none">Відсутність відгуків не означає, що номер надійний. Будьте обережні, перш ніж передзвонювати.</string>
+    <string name="detail_verdict_block_high">Відгуки впевнено вказують на небажаний дзвінок.</string>
+    <string name="detail_verdict_block">Оцінено як небажаний, але даних поки небагато.</string>
+    <string name="detail_verdict_warn">Є негативні відгуки, але вердикт ще не підтверджено.</string>
+    <string name="detail_verdict_allow_high">Відгуки сходяться: номер надійний.</string>
+    <string name="detail_verdict_allow">Імовірно, надійний, але відгуків поки мало.</string>
+    <string name="detail_verdict_unknown">Недостатньо даних, щоб оцінити цей номер.</string>
+    <string name="detail_confidence_official">офіційне джерело</string>
+    <string name="detail_confidence_high">висока достовірність</string>
+    <string name="detail_confidence_medium">середня достовірність</string>
+    <string name="detail_confidence_low">низька достовірність</string>
+    <string name="detail_confidence_none">достовірність не оцінено</string>
+    <string name="detail_confidence_official_body">Статус узято з офіційного діапазону, а не розраховано за відгуками спільноти.</string>
+    <string name="detail_confidence_high_body">Зваженого обсягу відгуків достатньо для впевненої оцінки (%1$d %%).</string>
+    <string name="detail_confidence_medium_body">Відгуків кілька, але даних варто накопичити більше (%1$d %%).</string>
+    <string name="detail_confidence_low_body">Замало зважених відгуків для впевненого висновку (%1$d %%).</string>
+    <string name="detail_confidence_none_body">Придатних зважених відгуків поки немає.</string>
+</resources>

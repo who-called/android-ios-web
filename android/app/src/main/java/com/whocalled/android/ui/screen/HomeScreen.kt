@@ -232,7 +232,7 @@ fun HomeContent(
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Text(c.flag, Modifier.padding(end = 10.dp))
-                            Text(c.name, Modifier.weight(1f))
+                            Text(stringResource(c.nameRes), Modifier.weight(1f))
                         }
                     }
                 }
@@ -302,7 +302,10 @@ fun HomeContent(
                 )
                 Text(
                     if (state.syncProgress > 0)
-                        stringResource(R.string.home_sync_progress, numberFormat.format(state.syncProgress))
+                        pluralStringResource(
+                            R.plurals.home_sync_progress, state.syncProgress,
+                            numberFormat.format(state.syncProgress),
+                        )
                     else stringResource(R.string.home_sync_connecting),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -329,7 +332,7 @@ fun HomeContent(
                         Icon(Icons.Rounded.Public, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                         Column(Modifier.weight(1f).padding(horizontal = 10.dp)) {
                             Text(
-                                stringResource(R.string.home_country_watched, c.flag, c.name),
+                                stringResource(R.string.home_country_watched, c.flag, stringResource(c.nameRes)),
                                 fontWeight = FontWeight.SemiBold,
                             )
                             Text(
@@ -551,7 +554,7 @@ private fun RecentCallCard(
                     modifier = Modifier.padding(top = 4.dp),
                 )
                 Text(
-                    "${RelativeTime.format(LocalContext.current.resources, call.timestamp, now)} · $message",
+                    "${RelativeTime.format(LocalContext.current, call.timestamp, now)} · $message",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -660,7 +663,7 @@ private fun ProtectionCard(
                 val arcep = s.countryArcepPatternCount
                     ?.let { stringResource(R.string.home_arcep_prefixes, nf.format(it)) } ?: ""
                 Text(
-                    stringResource(R.string.home_country_breakdown, c.flag, c.name, nf.format(cn), arcep),
+                    stringResource(R.string.home_country_breakdown, c.flag, stringResource(c.nameRes), nf.format(cn), arcep),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(start = 30.dp, bottom = 6.dp),
@@ -776,9 +779,10 @@ private fun DailyChallengeCard(
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text("🎮", style = MaterialTheme.typography.bodyMedium)
             Column(Modifier.weight(1f).padding(horizontal = 10.dp)) {
+                val bestLabel = stringResource(R.string.common_points, bestToday)
                 val extra = buildString {
                     if (streak > 0) append("  ·  $streak🔥")
-                    if (playedToday && bestToday > 0) append("  ·  $bestToday pts")
+                    if (playedToday && bestToday > 0) append("  ·  $bestLabel")
                 }
                 Text(
                     stringResource(R.string.home_games_row, extra),

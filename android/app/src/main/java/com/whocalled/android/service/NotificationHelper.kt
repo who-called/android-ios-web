@@ -76,11 +76,11 @@ object NotificationHelper {
      * never guilt-trippy. Opt-in and skipped if the user already played today.
      */
     private val reminderMessages = listOf(
-        "🧩 Le défi TRACE du jour t'attend — 5 grilles, 3 minutes chrono." to "Grimpe au classement, à ton rythme.",
-        "🔥 Garde ta série en vie" to "Une partie rapide suffit pour continuer sur ta lancée.",
-        "🏆 Quelqu'un a peut-être battu ton score" to "À toi de reprendre la tête, en toute bienveillance.",
-        "🛡️ Pause futée du jour" to "Un défi anti-spam pour se changer les idées ?",
-        "✨ Nouveau défi disponible" to "Mêmes grilles pour tout le monde aujourd'hui — montre ce que tu sais faire !",
+        R.string.reminder_1_title to R.string.reminder_1_body,
+        R.string.reminder_2_title to R.string.reminder_2_body,
+        R.string.reminder_3_title to R.string.reminder_3_body,
+        R.string.reminder_4_title to R.string.reminder_4_body,
+        R.string.reminder_5_title to R.string.reminder_5_body,
     )
 
     /** Stable id so the opt-out action can dismiss the reminder. */
@@ -94,7 +94,9 @@ object NotificationHelper {
         // caller never counts an "ignored" reminder nobody could see.
         val channel = manager.getNotificationChannelCompat(CHANNEL_REMINDER)
         if (channel != null && channel.importance == NotificationManagerCompat.IMPORTANCE_NONE) return false
-        val (title, body) = reminderMessages.random()
+        val (titleRes, bodyRes) = reminderMessages.random()
+        val title = context.getString(titleRes)
+        val body = context.getString(bodyRes)
         val notification = NotificationCompat.Builder(context, CHANNEL_REMINDER)
             .setSmallIcon(R.drawable.ic_notification_shield)
             .setColor(WCColor.Blue.toArgb())
@@ -134,17 +136,12 @@ object NotificationHelper {
      */
     /**
      * Playful, opt-in wording for blocked-call notifications — built-in defaults
-     * in French AND English, with emojis. The user can add their own phrases in
-     * Settings (they join this rotation) or reset back to just these defaults.
+     * (string-array `fun_blocked_default_titles`: the UI language AND English, with
+     * emojis). The user can add their own phrases in Settings (they join this
+     * rotation) or reset back to just these defaults.
      */
-    val defaultFunBlockedTitles = listOf(
-        // 🇫🇷
-        "🥊 Spam K.O. !", "🛡️ Bien tenté, spammeur", "🚫 Démarcheur refoulé",
-        "📵 Un importun de moins", "☀️ Encore un vendeur de panneaux solaires bloqué",
-        // 🇬🇧
-        "🥊 Spam knocked out!", "🛡️ Nice try, spammer", "🚫 Cold caller turned away",
-        "📵 One less nuisance", "😎 Blocked — you're welcome",
-    )
+    fun defaultFunBlockedTitles(context: Context): List<String> =
+        context.resources.getStringArray(R.array.fun_blocked_default_titles).toList()
 
     fun showBlockedCall(
         context: Context,
@@ -156,7 +153,7 @@ object NotificationHelper {
         if (NotificationManagerCompat.from(context).areNotificationsEnabled().not()) return
         val number = rawPhone?.takeIf { it.isNotBlank() }?.let { if (it.startsWith("+")) it else "+$it" }
         val title = if (funMode) {
-            (defaultFunBlockedTitles + customTitles).random()
+            (defaultFunBlockedTitles(context) + customTitles).random()
         } else {
             context.getString(R.string.call_blocked_title)
         }

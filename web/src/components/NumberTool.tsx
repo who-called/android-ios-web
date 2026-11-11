@@ -13,6 +13,7 @@ import {
 import { PhoneInput } from "@/components/PhoneInput";
 import { defaultCountry, type Country } from "@/lib/countries";
 import type { Dict } from "@/i18n/dictionaries";
+import { toDictLocale } from "@/i18n/locales";
 
 type Mode = "lookup" | "report";
 
@@ -96,7 +97,7 @@ export function NumberTool({
         deviceId: webDeviceId(),
         vote,
         category: vote === "spam" ? category : null,
-        locale,
+        locale: toDictLocale(locale),
       });
       // Playful nudge if they re-report the same number (clicking again is fine).
       setMessage({

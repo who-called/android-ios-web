@@ -71,8 +71,8 @@ class CallHistoryGroupingTest {
             event(1, "33622222222", ageDays = 1),
         )
         val sections = groupCallHistory(entries, now)
-        assertEquals("Aujourd’hui", sections.first().title)
-        assertEquals("Hier", sections[1].title)
+        assertEquals(R.string.history_section_today, sections.first().titleRes)
+        assertEquals(R.string.history_section_yesterday, sections[1].titleRes)
     }
 
     private fun journal(id: Long, phone: String, action: String, ageMs: Long = 0) =

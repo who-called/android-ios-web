@@ -4,7 +4,16 @@ import { config } from "@/lib/config";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { getDict } from "@/i18n/dictionaries";
-import { alternatesFor, isUrlLocale, toDictLocale, ogLocale, urlLocales, type UrlLocale } from "@/i18n/locales";
+import {
+  alternatesFor,
+  isPublished,
+  isUrlLocale,
+  ogLocale,
+  publishedLocales,
+  toDictLocale,
+  urlLocales,
+  type UrlLocale,
+} from "@/i18n/locales";
 
 export function generateStaticParams() {
   return urlLocales.map((locale) => ({ locale }));
@@ -19,18 +28,21 @@ export async function generateMetadata({
   if (!isUrlLocale(locale)) return {};
   const t = getDict(toDictLocale(locale));
 
+  const indexable = isPublished(locale);
+
   return {
     metadataBase: new URL(config.siteUrl),
     title: { default: t.meta.homeTitle, template: "%s — Who Called" },
     description: t.meta.homeDescription,
     applicationName: "Who Called",
-    // hreflang cluster + x-default → fr-FR (pages override with their own path).
+    // hreflang cluster + x-default (pages override with their own path).
     alternates: alternatesFor(locale),
     // NOTE: no og:url here — it would be inherited by every sub-page and act
     // as a conflicting canonical hint (GSC "duplicate, wrong canonical").
     openGraph: {
       type: "website",
       locale: ogLocale(locale),
+      alternateLocale: publishedLocales.filter((l) => l !== locale).map(ogLocale),
       siteName: "Who Called",
       title: t.meta.homeTitle,
       description: t.meta.homeDescription,
@@ -38,7 +50,8 @@ export async function generateMetadata({
     },
     twitter: { card: "summary_large_image", images: ["/og.png"] },
     icons: { icon: "/favicon.svg", apple: "/apple-touch-icon.png" },
-    robots: { index: true, follow: true },
+    // Draft locales (partially translated) must not be indexed.
+    robots: indexable ? { index: true, follow: true } : { index: false, follow: false },
   };
 }
 
@@ -51,10 +64,9 @@ export default async function LocaleLayout({
 }) {
   const { locale } = await params;
   if (!isUrlLocale(locale)) notFound();
-  const lang = toDictLocale(locale as UrlLocale);
 
   return (
-    <html lang={lang}>
+    <html lang={locale}>
       <body className="flex min-h-screen flex-col">
         <Header locale={locale as UrlLocale} />
         <main className="flex-1 overflow-x-hidden">{children}</main>

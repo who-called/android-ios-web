@@ -11,6 +11,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.res.stringResource
 import com.whocalled.android.ui.MainViewModel
 import com.whocalled.android.ui.WhoCalledApp
 import com.whocalled.android.ui.theme.WhoCalledTheme

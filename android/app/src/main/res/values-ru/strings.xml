@@ -1,0 +1,666 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Русский. Source language is French (values/). Keep keys in sync. -->
+<resources>
+    <!-- WARN notification -->
+    <string name="warn_channel_name">Предупреждения о подозрительных звонках</string>
+    <string name="warn_channel_desc">Уведомляет, когда у входящего звонка высокий рейтинг спама.</string>
+    <string name="warn_title">⚠️ Подозрительный звонок — не заблокирован</string>
+    <string name="warn_subtext">Who Called · телефон звонит</string>
+
+    <!-- SMS shield -->
+    <string name="sms_blocked_channel_name">Скрытые нежелательные SMS</string>
+    <string name="sms_blocked_channel_desc">Ненавязчиво уведомляет, когда уведомление о нежелательном SMS скрыто.</string>
+    <string name="sms_blocked_title">Нежелательное SMS скрыто</string>
+    <string name="sms_blocked_body">Уведомление от %1$s скрыто. Сообщение остаётся в вашем приложении SMS.</string>
+    <string name="sms_listener_label">SMS-щит Who Called</string>
+
+    <!-- Blocked-call notification -->
+    <string name="call_blocked_channel_name">Заблокированные звонки</string>
+    <string name="call_blocked_channel_desc">Ненавязчиво уведомляет, когда нежелательный звонок заблокирован.</string>
+    <string name="call_blocked_title">Звонок заблокирован</string>
+    <string name="call_blocked_unknown">Скрытый номер</string>
+
+    <!-- Daily game reminder -->
+    <string name="reminder_channel_name">Напоминание об игре</string>
+    <string name="reminder_channel_desc">Дружеское напоминание раз в день, чтобы сыграть в ежедневный вызов. Можно отключить в настройках.</string>
+
+    <!-- Common -->
+    <string name="common_back">Назад</string>
+    <string name="common_close">Закрыть</string>
+    <string name="common_cancel">Отмена</string>
+    <string name="common_delete">Удалить</string>
+    <string name="common_edit">Изменить</string>
+    <string name="common_loading">Загрузка…</string>
+    <string name="common_connecting">Подключение к серверу…</string>
+    <string name="common_retry">Повторить</string>
+    <string name="common_points">%1$d очк.</string>
+    <string name="common_vote_spam">Нежелательный</string>
+    <string name="common_vote_legit">Законный</string>
+    <string name="common_status_blocked">Заблокирован</string>
+    <string name="common_status_warned">Предупреждение</string>
+
+    <!-- Bottom navigation tabs (keep short) -->
+    <string name="tab_games">Игры</string>
+
+    <!-- Daily game reminder notification (pairs of title + body, picked at random) -->
+    <string name="reminder_1_title">🧩 Задание TRACE дня ждёт вас — 5 сеток, 3 минуты.</string>
+    <string name="reminder_1_body">Поднимайтесь в рейтинге в своём темпе.</string>
+    <string name="reminder_2_title">🔥 Не прерывайте серию</string>
+    <string name="reminder_2_body">Одной быстрой партии хватит, чтобы продолжить.</string>
+    <string name="reminder_3_title">🏆 Возможно, кто-то побил ваш рекорд</string>
+    <string name="reminder_3_body">Ваш черёд вернуть лидерство — по-дружески.</string>
+    <string name="reminder_4_title">🛡️ Умная пауза дня</string>
+    <string name="reminder_4_body">Антиспам-задание, чтобы отвлечься?</string>
+    <string name="reminder_5_title">✨ Доступно новое задание</string>
+    <string name="reminder_5_body">Сегодня у всех одинаковые сетки — покажите, на что вы способны!</string>
+
+    <!-- Playful blocked-call notification titles (opt-in). Built-in defaults: local language + English. -->
+    <string-array name="fun_blocked_default_titles">
+        <item>🥊 Спам в нокауте!</item>
+        <item>🛡️ Хорошая попытка, спамер</item>
+        <item>🚫 Навязчивый продавец отшит</item>
+        <item>📵 Одним надоедой меньше</item>
+        <item>☀️ Ещё один продавец солнечных панелей заблокирован</item>
+        <item>🥊 Spam knocked out!</item>
+        <item>🛡️ Nice try, spammer</item>
+        <item>🚫 Cold caller turned away</item>
+        <item>📵 One less nuisance</item>
+        <item>😎 Blocked — you\'re welcome</item>
+    </string-array>
+
+    <!-- Country scopes for the spam list -->
+    <string name="country_all">Все страны</string>
+    <string name="country_fr">Франция</string>
+    <string name="country_be">Бельгия</string>
+    <string name="country_ch">Швейцария</string>
+    <string name="country_lu">Люксембург</string>
+    <string name="country_es">Испания</string>
+    <string name="country_it">Италия</string>
+    <string name="country_de">Германия</string>
+    <string name="country_gb">Великобритания</string>
+    <string name="country_pt">Португалия</string>
+    <string name="country_us">США</string>
+    <string name="country_ca">Канада</string>
+    <string name="country_ma">Марокко</string>
+    <string name="country_dz">Алжир</string>
+    <string name="country_tn">Тунис</string>
+
+    <!-- Report categories -->
+    <string name="category_telemarketing">Телемаркетинг</string>
+    <string name="category_scam">Мошенничество</string>
+    <string name="category_robocall">Автозвонок</string>
+    <string name="category_silent">Молчащий звонок</string>
+    <string name="category_debt">Взыскание долгов</string>
+    <string name="category_survey">Опрос</string>
+    <string name="category_other">Другое</string>
+    <string name="category_unknown">Неизвестно</string>
+
+    <!-- Call history sections -->
+    <string name="history_section_today">Сегодня</string>
+    <string name="history_section_yesterday">Вчера</string>
+    <string name="history_section_this_week">На этой неделе</string>
+    <string name="history_section_this_month">В этом месяце</string>
+    <string name="history_section_older">Ранее</string>
+
+    <!-- Relative time -->
+    <string name="time_just_now">только что</string>
+    <string name="time_minutes_ago">%1$d мин назад</string>
+    <string name="time_hours_ago">%1$d ч назад</string>
+    <string name="time_yesterday">вчера</string>
+    <string name="time_days_ago">%1$d дн. назад</string>
+
+    <!-- Errors and status messages (ViewModel / repository) -->
+    <string name="error_invalid_phone">Неверный номер.</string>
+    <string name="error_network">Нет соединения. Повторите попытку.</string>
+    <string name="error_server">Ошибка сервера (%1$d).</string>
+    <string name="error_unknown">Неизвестная ошибка.</string>
+    <string name="sync_up_to_date">Уже обновлено ✓ Новых номеров нет.</string>
+    <plurals name="sync_done">
+        <item quantity="one">Обновление завершено 📥 Обновлён %1$d номер.</item>
+        <item quantity="few">Обновление завершено 📥 Обновлено %1$d номера.</item>
+        <item quantity="many">Обновление завершено 📥 Обновлено %1$d номеров.</item>
+        <item quantity="other">Обновление завершено 📥 Обновлено %1$d номера.</item>
+    </plurals>
+    <string name="sync_failed">Не удалось обновить. Проверьте подключение и повторите попытку.</string>
+    <string name="report_feedback_repeat">Принято 😊 Не нужно повторять — одной жалобы достаточно!</string>
+    <string name="report_feedback_thanks">Спасибо! Жалоба сохранена 🛡️</string>
+    <string name="report_feedback_saved_locally">Сохранено на устройстве. Не удалось отправить на сервер: %1$s</string>
+    <string name="privacy_erased">Ваши жалобы удалены.</string>
+    <string name="privacy_erase_failed">Не удалось удалить. Повторите попытку.</string>
+    <string name="api_test_unreachable">Недоступен.</string>
+
+    <!-- Country picker (Home + Settings) -->
+    <string name="country_dialog_title">Отслеживаемая страна</string>
+
+    <!-- Home screen -->
+    <string name="home_sync_button">Обновить список</string>
+    <plurals name="home_sync_progress">
+        <item quantity="one">Получен %1$s номер…</item>
+        <item quantity="few">Получено %1$s номера…</item>
+        <item quantity="many">Получено %1$s номеров…</item>
+        <item quantity="other">Получено %1$s номера…</item>
+    </plurals>
+    <string name="home_sms_on">Включён · нежелательные SMS скрываются</string>
+    <string name="home_sms_off">Скрывайте уведомления о нежелательных SMS</string>
+    <string name="home_covered_numbers">Номеров в базе</string>
+    <string name="home_auto_update">Автообновление · %1$s</string>
+    <string name="home_blocked_calls">Заблокированные звонки</string>
+    <string name="home_none_yet">Пока нет</string>
+    <string name="home_update_today">обновлено сегодня</string>
+    <string name="home_update_yesterday">обновлено вчера</string>
+    <string name="home_update_days_ago">обновлено %1$d дн. назад</string>
+    <string name="home_update_on">обновлено %1$s</string>
+    <string name="home_community_title">Щит сообщества</string>
+
+    <!-- Report screen -->
+    <string name="report_title">Пожаловаться на номер</string>
+    <string name="report_subtitle">Анонимно — без аккаунта и личных данных.</string>
+    <string name="report_phone_label">Номер (напр. +33 6 12 34 56 78)</string>
+    <string name="report_call_type">Тип звонка</string>
+    <string name="report_submit">Отправить жалобу</string>
+    <string name="report_allow">Разрешить</string>
+    <string name="report_empty_recent_title">Недавних звонков нет</string>
+
+    <!-- Number detail (call detail + number lookup) -->
+    <string name="detail_title">Сведения о номере</string>
+    <string name="detail_filtered_on">Отфильтрован</string>
+    <string name="detail_badge_community">Сообщество</string>
+    <string name="detail_stats_top_reason">Чаще всего: %1$s (%2$d %%)</string>
+    <string name="detail_stats_24h">24 ч</string>
+    <string name="detail_stats_7d">7 дн.</string>
+    <string name="detail_stats_30d">30 дн.</string>
+    <string name="detail_stats_1y">1 год</string>
+
+    <!-- My reports (Journal tab) -->
+    <string name="myreports_title">Мои жалобы</string>
+    <string name="myreports_intro">Передумайте или удалите жалобу, отправленную по ошибке.</string>
+    <string name="myreports_delete_title">Удалить эту жалобу?</string>
+    <string name="myreports_delete_body">Жалоба на +%1$s будет удалена (с устройства и с наших серверов). Это действие необратимо.</string>
+    <string name="myreports_empty_title">Жалоб нет</string>
+    <string name="myreports_empty_body">Здесь появятся ваши жалобы. Пожалуйтесь на нежелательный номер, чтобы защитить сообщество.</string>
+    <string name="myreports_sync_sent">отправлена</string>
+    <string name="myreports_sync_failed">не отправлена</string>
+    <string name="myreports_sync_pending">ожидает</string>
+    <string name="myreports_change_mind">Передумать</string>
+
+    <!-- Filtered-call history -->
+    <string name="history_empty_title">Отфильтрованных звонков нет</string>
+    <string name="history_copied">Номер скопирован</string>
+
+    <!-- SMS shield -->
+    <string name="sms_title">SMS-щит</string>
+    <string name="sms_subtitle">Скрывайте нежелательные SMS</string>
+    <string name="sms_access_required">Нужен доступ к уведомлениям</string>
+    <string name="sms_access_body">Чтобы скрывать нежелательные SMS, разрешите Who Called доступ к уведомлениям. Мы никогда не читаем ваши сообщения: мы лишь скрываем уведомление от нежелательного отправителя. SMS остаётся в вашем приложении для сообщений.</string>
+    <string name="sms_access_button">Включить доступ к уведомлениям</string>
+    <string name="sms_hide_title">Скрывать уведомления о нежелательных SMS</string>
+    <string name="sms_hide_desc">Сообщение остаётся в приложении SMS как непрочитанное. Сообщения не читаются и не удаляются.</string>
+    <string name="sms_notify_title">Сообщать о скрытых SMS</string>
+    <string name="sms_notify_desc">Показывает ненавязчивое уведомление, когда нежелательное SMS скрыто.</string>
+    <string name="sms_how_title">Как это работает</string>
+    <string name="sms_how_body">Android не позволяет блокировать SMS, не став приложением для сообщений по умолчанию. Who Called остаётся фильтром: мы лишь скрываем уведомления от отправителей с высоким индексом спама, используя тот же список, что и для звонков.</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Настройки</string>
+    <string name="settings_erase_dialog_title">Удалить мои данные?</string>
+    <string name="settings_erase_dialog_body">Все жалобы, отправленные с этого устройства, будут безвозвратно удалены с наших серверов. Это действие необратимо.</string>
+    <string name="settings_section_filtering">Фильтрация</string>
+    <string name="settings_block_title">Блокировать нежелательные звонки</string>
+    <string name="settings_block_desc">Номера с высоким индексом спама отклоняются автоматически: телефон не звонит.</string>
+    <string name="settings_warn_title">Предупреждать при сомнении</string>
+    <string name="settings_warn_desc">Для номеров со средним индексом телефон звонит, а вы получаете предупреждение. Вы решаете, отвечать ли.</string>
+    <string name="settings_blocked_notif_title">Сообщать о заблокированном звонке</string>
+    <string name="settings_blocked_notif_desc">Показывает ненавязчивое уведомление после каждого заблокированного звонка.</string>
+    <string name="settings_fun_title">Весёлые уведомления 😜</string>
+    <string name="settings_fun_desc">Весёлые сообщения при блокировке спама («Спам в нокауте!»). По умолчанию выключено.</string>
+    <string name="settings_fun_messages_title">Сообщения 😜</string>
+    <string name="settings_fun_messages_desc">Вот все сообщения, которые чередуются при блокировке спама. Добавьте свои, измените их или вернитесь к стандартным.</string>
+    <string name="settings_fun_defaults">Стандартные сообщения</string>
+    <string name="settings_fun_yours">Ваши сообщения ✍️</string>
+    <string name="settings_fun_none">Своих сообщений пока нет — напишите своё ниже.</string>
+    <string name="settings_fun_edit">Изменить сообщение</string>
+    <string name="settings_fun_delete">Удалить сообщение</string>
+    <string name="settings_fun_placeholder">Напр.: 🎣 Ещё один фишинг сорвался с крючка!</string>
+    <string name="settings_fun_counter">%1$d/%2$d · эмодзи приветствуются 😄</string>
+    <string name="settings_fun_add">Добавить</string>
+    <string name="settings_fun_reset">Сбросить (вернуть стандартные сообщения)</string>
+    <string name="settings_section_games">Игры</string>
+    <string name="settings_reminder_title">Ежедневное напоминание об игре 🎮</string>
+    <string name="settings_reminder_desc">Дружеское напоминание с 18:30 до 20:30, но не если вы уже играли. Если игнорировать его несколько вечеров подряд (%1$d), оно приостановится на %2$d дн., а затем вернётся.</string>
+    <string name="settings_country_desc">Загружать только номера этой страны (меньше кэш). Определяется автоматически, можно изменить.</string>
+    <string name="settings_threshold">Чувствительность блокировки: %1$d %%</string>
+    <string name="settings_threshold_desc">Начиная с этого индекса спама номер блокируется. Ниже — только предупреждение (если включена опция выше). Чем ниже порог, тем больше блокируется — с риском ложных срабатываний.</string>
+    <string name="settings_section_info">Информация</string>
+    <string name="settings_link_privacy">Конфиденциальность</string>
+    <string name="settings_link_legal">Правовая информация</string>
+    <string name="settings_link_site">Официальный сайт</string>
+    <string name="settings_link_rate">Оценить приложение</string>
+    <string name="settings_link_source">Исходный код (open source)</string>
+    <string name="settings_link_contact">Связаться с нами</string>
+    <string name="settings_contact_subject">Who Called — обратная связь</string>
+    <string name="settings_section_data">Мои данные</string>
+    <string name="settings_erase_title">Удалить мои жалобы</string>
+    <string name="settings_erase_desc">Безвозвратно удаляет все жалобы, отправленные с этого устройства. В соответствии с вашим правом на удаление (GDPR).</string>
+    <string name="settings_erase_button">Удалить мои данные</string>
+    <string name="settings_erasing">Удаление…</string>
+    <string name="settings_section_diagnostic">Диагностика</string>
+    <string name="settings_api_title">Подключение к API</string>
+    <string name="settings_api_desc">Проверьте, что приложение подключается к серверу Who Called.</string>
+    <string name="settings_api_testing">Проверка…</string>
+    <string name="settings_api_test">Проверить подключение</string>
+    <string name="settings_api_ok">API OK ✓ (%1$d мс)</string>
+    <string name="settings_api_failed">API недоступен ✗ — %1$s</string>
+    <string name="settings_free_title">Бесплатно и с открытым кодом</string>
+    <string name="settings_free_body" formatted="false">Who Called на 100 % бесплатен, а его код открыт. На 100 % анонимно — без аккаунта и личных данных. Номера в международном формате.</string>
+    <string name="settings_version_hint">Дважды нажмите, чтобы проверить API</string>
+    <string name="settings_version_testing">Проверка API…</string>
+
+    <!-- Settings: hidden notification debug card (long-press the version) -->
+    <string name="debug_title">Отладка уведомлений</string>
+    <string name="debug_permission">Разрешение на уведомления: %1$s</string>
+    <string name="debug_permission_granted">выдано ✓</string>
+    <string name="debug_permission_denied">ОТКАЗАНО ✗ — ничего не появится</string>
+    <string name="debug_request">Запросить</string>
+    <string name="debug_system_settings">Настройки системы</string>
+    <string name="debug_blocked_standard">Заблокированный звонок (обычный)</string>
+    <string name="debug_blocked_fun">Заблокированный звонок (весёлый)</string>
+    <string name="debug_sms">Нежелательное SMS скрыто</string>
+    <string name="debug_reminder">Ежедневное напоминание об игре</string>
+    <string name="debug_hide_hint">Удерживайте номер версии, чтобы скрыть эту панель.</string>
+
+    <!-- Games: shared -->
+    <string name="game_leaderboard_button">🏆 Рейтинг</string>
+    <string name="game_start">Начать ▸</string>
+    <string name="game_share">Поделиться</string>
+    <string name="game_replay">Ещё раз</string>
+    <string name="game_quit">Выйти</string>
+    <string name="game_quit_title">Выйти из игры?</string>
+    <string name="game_daily_rank">Рейтинг дня · топ %1$d %%</string>
+    <plurals name="game_players_best">
+        <item quantity="one">%1$d игрок · лучший %2$d</item>
+        <item quantity="few">%1$d игрока · лучший %2$d</item>
+        <item quantity="many">%1$d игроков · лучший %2$d</item>
+        <item quantity="other">%1$d игрока · лучший %2$d</item>
+    </plurals>
+
+    <!-- Games hub -->
+    <string name="games_subtitle">Одно задание в день, ваш рейтинг</string>
+    <string name="games_defense_tagline">Аркада — уничтожайте спам-звонки.</string>
+    <string name="games_trace_tagline">Головоломка — разоблачите скрытого мошенника.</string>
+    <string name="games_practice">🎯 Свободная тренировка TRACE — вне рейтинга</string>
+    <string name="games_footer" formatted="false">Новое задание каждый день · 3 рейтинговые игры в день · 100 % анонимно.</string>
+    <string name="games_record">Рекорд: %1$d очк.</string>
+    <string name="games_not_played">Ещё не сыграно</string>
+    <string name="games_play_daily">Играть в задание дня ▸</string>
+    <plurals name="games_play_attempts">
+        <item quantity="one">Играть (осталась %1$d рейтинговая попытка)</item>
+        <item quantity="few">Играть (осталось %1$d рейтинговые попытки)</item>
+        <item quantity="many">Играть (осталось %1$d рейтинговых попыток)</item>
+        <item quantity="other">Играть (осталось %1$d рейтинговой попытки)</item>
+    </plurals>
+    <string name="games_replay_practice">Ещё раз (тренировка)</string>
+
+    <!-- Daily streak screen -->
+    <string name="streak_title">Ежедневная серия</string>
+    <string name="streak_current">Текущая серия</string>
+    <string name="streak_best">Лучшая серия: %1$d</string>
+    <string name="streak_kept">Отлично — серия сохранена сегодня! 🔥</string>
+    <string name="streak_keep_going">Сыграйте сегодня, чтобы продолжить серию ☀️</string>
+    <string name="streak_milestone_reached">Рубеж в 7 дней достигнут! 🎁</string>
+    <string name="streak_next_milestone">Следующий рубеж: 7 дней 🎁</string>
+    <string name="streak_weekday_mon">ПН</string>
+    <string name="streak_weekday_tue">ВТ</string>
+    <string name="streak_weekday_wed">СР</string>
+    <string name="streak_weekday_thu">ЧТ</string>
+    <string name="streak_weekday_fri">ПТ</string>
+    <string name="streak_weekday_sat">СБ</string>
+    <string name="streak_weekday_sun">ВС</string>
+
+    <!-- Leaderboard screen -->
+    <string name="leaderboard_title">Рейтинг %1$s</string>
+    <string name="leaderboard_period_day">Сегодня</string>
+    <string name="leaderboard_period_week">Неделя</string>
+    <string name="leaderboard_period_all">За всё время</string>
+    <string name="leaderboard_day_today">Сегодня</string>
+    <string name="leaderboard_day_yesterday">Вчера</string>
+    <string name="leaderboard_days_ago">%1$d дн. назад</string>
+    <plurals name="leaderboard_unit_grids">
+        <item quantity="one">%1$d сетка</item>
+        <item quantity="few">%1$d сетки</item>
+        <item quantity="many">%1$d сеток</item>
+        <item quantity="other">%1$d сетки</item>
+    </plurals>
+    <string name="leaderboard_unit_wave">волна %1$d</string>
+    <plurals name="leaderboard_summary">
+        <item quantity="one">%1$d игрок · лучший %2$d · медиана %3$d</item>
+        <item quantity="few">%1$d игрока · лучший %2$d · медиана %3$d</item>
+        <item quantity="many">%1$d игроков · лучший %2$d · медиана %3$d</item>
+        <item quantity="other">%1$d игрока · лучший %2$d · медиана %3$d</item>
+    </plurals>
+    <string name="leaderboard_summary_solo">1 игрок (вы) · лучший %1$d</string>
+    <string name="leaderboard_be_first">Будьте первым, кто наберёт очки! 🚀</string>
+    <string name="leaderboard_your_rank">Ваше место</string>
+    <string name="leaderboard_you_top">Топ %1$d %% · %2$d очк. (%3$s)</string>
+    <string name="leaderboard_you_local">%1$d очк. (%2$s)</string>
+    <string name="leaderboard_not_played">Вы ещё не играли за этот период — начните игру!</string>
+    <string name="leaderboard_top">Топ</string>
+    <string name="leaderboard_sync_pending">Ваш результат появится в рейтинге после синхронизации.</string>
+    <string name="leaderboard_no_scores">Результатов пока нет. Ваш ход!</string>
+    <string name="leaderboard_history">Ваша история</string>
+    <string name="leaderboard_history_rank">#%1$d/%2$d · топ %3$d %%</string>
+    <string name="leaderboard_history_empty">Сыграйте, чтобы начать историю.</string>
+
+    <!-- DEFENSE game -->
+    <string name="defense_hud_score">СЧЁТ</string>
+    <string name="defense_hud_wave">ВОЛНА</string>
+    <string name="defense_item_ready">ПРЕДМЕТ ГОТОВ — нажмите</string>
+    <string name="defense_intro">Удерживайте, чтобы стрелять, ведите, чтобы целиться.\nУничтожайте нежелательные звонки — они заполняют шкалу ПРЕДМЕТА (активируете его вы сами!).\nЗелёные звонки дружелюбны; ловите 🎁, чтобы сразу получить предмет.</string>
+    <string name="defense_game_over">Щит пал</string>
+    <plurals name="defense_result">
+        <item quantity="one">Волна %1$d · заблокирован %2$d спам</item>
+        <item quantity="few">Волна %1$d · заблокировано %2$d спама</item>
+        <item quantity="many">Волна %1$d · заблокировано %2$d спамов</item>
+        <item quantity="other">Волна %1$d · заблокировано %2$d спама</item>
+    </plurals>
+    <string name="defense_share_text">who-called DEFENSE · %1$d очк. · Волна %2$d 🛡️\nБлокируйте спам и вы 👉 %3$s</string>
+    <string name="defense_quit_body">Вы потеряете прогресс текущей волны.</string>
+    <string name="defense_incoming">ВХОДЯЩИЙ…</string>
+    <string name="defense_item_rapid">СКОРОСТРЕЛ</string>
+    <string name="defense_item_spread">ВЫСТРЕЛ ×5</string>
+    <string name="defense_item_slow">ЗАМЕДЛЕНИЕ</string>
+    <string name="defense_item_repair">РЕМОНТ</string>
+    <string name="defense_item_shield">ЩИТ</string>
+    <string name="defense_pop_combo">КОМБО ×%1$d</string>
+    <string name="defense_pop_boss_bonus">БОСС +%1$d</string>
+    <string name="defense_pop_surge">НАТИСК ×%1$d</string>
+    <string name="defense_pop_boss">⚠ БОСС</string>
+    <string name="defense_pop_bonus">БОНУС 🎁</string>
+
+    <!-- TRACE game -->
+    <string name="trace_mode_daily">Задание дня</string>
+    <string name="trace_mode_practice">Тренировка</string>
+    <string name="trace_tutorial">Обучение</string>
+    <string name="trace_toast_error">−1 жизнь · −%1$d очк.</string>
+    <string name="trace_toast_points">+%1$d очк.!</string>
+    <string name="trace_hint">💡 Подсказка</string>
+    <string name="trace_hint_desc">Ставит мошенника · −%1$d очк.</string>
+    <string name="trace_no_hints">Подсказок нет</string>
+    <string name="trace_rules_title">3 ПРАВИЛА</string>
+    <string name="trace_controls">1 касание = ✗ безопасно · 2 касания = мошенник · 3 касания = стереть\nПроведите пальцем по сетке, чтобы поставить несколько ✗</string>
+    <string name="trace_resume">Продолжить ▸</string>
+    <string name="trace_intro_daily">Задание дня · 5 сеток · 3 жизни</string>
+    <string name="trace_intro_practice">Свободная тренировка · вне рейтинга</string>
+    <string name="trace_replay_tutorial">❓ Пройти обучение заново</string>
+    <string name="trace_size">Размер: %1$d×%1$d</string>
+    <string name="trace_grid_solved">Сетка %1$d решена!</string>
+    <string name="trace_score">Счёт: %1$d</string>
+    <string name="trace_next_grid">Следующая сетка…</string>
+    <string name="trace_sprint_done">Спринт завершён!</string>
+    <plurals name="trace_all_grids">
+        <item quantity="one">Обезврежена %1$d сетка 🎉</item>
+        <item quantity="few">Все %1$d сетки обезврежены 🎉</item>
+        <item quantity="many">Все %1$d сеток обезврежены 🎉</item>
+        <item quantity="other">Все %1$d сетки обезврежены 🎉</item>
+    </plurals>
+    <string name="trace_no_lives">Жизни кончились…</string>
+    <plurals name="trace_partial">
+        <item quantity="one">Ничего страшного — решено %1$d/%2$d сетки!</item>
+        <item quantity="few">Ничего страшного — решено %1$d/%2$d сеток!</item>
+        <item quantity="many">Ничего страшного — решено %1$d/%2$d сеток!</item>
+        <item quantity="other">Ничего страшного — решено %1$d/%2$d сетки!</item>
+    </plurals>
+    <string name="trace_points">очков</string>
+    <string name="trace_share_text">who-called TRACE · %1$d очк. · %2$d/%3$d сеток 🛡️\nВыслеживайте спамеров и вы 👉 %4$s</string>
+    <string name="trace_new_grid">Новая сетка</string>
+    <string name="trace_quit_body">Вы потеряете прогресс текущего задания.</string>
+    <string name="trace_rule_color">1 на цвет</string>
+    <string name="trace_rule_line">1 / строка и столбец</string>
+    <string name="trace_rule_adjacent">Никогда рядом</string>
+    <string name="trace_tap_label">Касание:</string>
+    <string name="trace_safe">безопасно</string>
+    <string name="trace_fraudster">мошенник</string>
+    <string name="trace_loading">Подготовка задания…</string>
+    <string name="trace_error_title">Не удалось загрузить задание</string>
+    <string name="trace_error_body">Проверьте подключение и повторите попытку.</string>
+
+    <!-- TRACE villains (cosmetic fraudster per grid) -->
+    <string name="trace_villain_imp">Чертёнок</string>
+    <string name="trace_villain_demon">Демон</string>
+    <string name="trace_villain_supervillain">Суперзлодей</string>
+    <string name="trace_villain_ninja">Ниндзя</string>
+    <string name="trace_villain_robot">Спам-робот</string>
+    <string name="trace_villain_alien">Пришелец</string>
+    <string name="trace_villain_scammer">Аферист</string>
+    <string name="trace_villain_impostor">Самозванец</string>
+
+    <!-- TRACE interactive tutorial -->
+    <string name="trace_tuto_title">ОБУЧЕНИЕ — %1$s Как играть</string>
+    <string name="trace_tuto_step0">Всего 3 правила:\n1 мошенник на цвет -- 1 на строку\nи столбец -- никогда рядом</string>
+    <string name="trace_tuto_step1">В розовой зоне одна клетка:\nмошенник точно там.\nКоснитесь дважды, чтобы поставить его.</string>
+    <string name="trace_tuto_step2">В этих клетках никогда\nне будет мошенника. Поставьте X\nна 3 подсвеченные клетки.</string>
+    <string name="trace_tuto_step3">1 мошенник на строку, 1 на столбец:\nу каждого своё место. Поставьте X на\n3 подсвеченные клетки.</string>
+    <string name="trace_tuto_step4">Никогда рядом, даже\nпо диагонали. Поставьте X на\nподсвеченные клетки.</string>
+    <string name="trace_tuto_step5">Строка 2: свободна одна клетка.\nМошенник точно там.\nКоснитесь дважды, чтобы поставить его.</string>
+    <string name="trace_tuto_step6">А если ошибиться?\nКоснитесь дважды клетки\nв красной рамке.</string>
+    <string name="trace_tuto_step7">3-е касание стирает.\nКоснитесь клетки ещё раз.</string>
+    <string name="trace_tuto_step8_a">Осталось 2 мошенника.\nСтрока 3: свободна одна клетка.\nКоснитесь её дважды.</string>
+    <string name="trace_tuto_step8_b">Последний: строка 4!\nКоснитесь её дважды.</string>
+    <string name="trace_tuto_tap_again_place">Ещё одно касание, чтобы поставить!</string>
+    <string name="trace_tuto_tap_again">Ещё одно касание!</string>
+    <string name="trace_tuto_tap_again_ellipsis">Ещё одно касание...</string>
+    <string name="trace_tuto_done1">Хорошо. 1 мошенник на цвет.</string>
+    <string name="trace_tuto_done2">Вот так. Каждый X исключает клетку.\nМеньше клеток — проще\nнайти следующего.</string>
+    <string name="trace_tuto_done3">1 мошенник на строку, 1 на столбец.\nX — ваша память: сюда нельзя.</string>
+    <string name="trace_tuto_done4">Всё, что касается мошенника,\nбезопасно: отмечайте X.</string>
+    <string name="trace_tuto_done5">Отлично. X сужают поиск,\nпока не останется одна\nвозможная клетка. В этом вся суть.</string>
+    <string name="trace_tuto_done6">Неверно: он касался мошенника.\n-1 жизнь, -200 очк.</string>
+    <string name="trace_tuto_done7">Стёрто. Цикл:\nпусто, X, мошенник, пусто.</string>
+    <string name="trace_tuto_done8">Готово. У каждого цвета, строки\nи столбца — СВОЙ мошенник.\nВаш ход!</string>
+    <string name="trace_tuto_tap_glowing_any">Коснитесь светящейся клетки</string>
+    <string name="trace_tuto_tap_glowing">Коснитесь светящейся клетки</string>
+    <string name="trace_tuto_erased">Стёрто</string>
+    <string name="trace_tuto_got_it">Понятно ▸</string>
+    <string name="trace_tuto_skip">Пропустить</string>
+    <string name="trace_tuto_lets_go">Поехали ▸</string>
+    <string name="trace_tuto_next">Далее ▸</string>
+    <string name="nav_games">Игры</string>
+    <string name="nav_settings">Настройки</string>
+    <string name="home_country_dialog_title">Отслеживаемая страна</string>
+    <string name="home_sync_connecting">Подключение к серверу…</string>
+    <string name="home_sms_title">SMS-щит</string>
+    <string name="setup_skip">Пропустить</string>
+    <string name="warn_detail_channel_name">Сведения о подозрительном звонке</string>
+    <string name="warn_detail_channel_desc">Ненавязчивое уведомление без всплывающего баннера, чтобы открыть сведения после предупреждения на экране.</string>
+    <string name="warn_detail_title">Подозрительный звонок</string>
+    <string name="warn_detail_line">%1$s · %2$d %% · Подробнее</string>
+    <string name="warn_group_title">Подозрительные звонки</string>
+    <string name="overlay_title">Подозрительный звонок</string>
+    <string name="overlay_not_blocked">Не заблокирован — решать вам</string>
+    <string name="overlay_dismiss">Закрыть предупреждение</string>
+    <string name="home_overlay_title">Предупреждение во время звонка</string>
+    <string name="home_overlay_body">Разрешите показ поверх других приложений, чтобы видеть риск спама, пока телефон звонит, не закрывая кнопку «Ответить».</string>
+    <string name="home_overlay_cta">Разрешить показ</string>
+    <string name="nav_home">Главная</string>
+    <string name="nav_calls">Звонки</string>
+    <string name="nav_report">Жалоба</string>
+    <string name="common_collapse">Свернуть</string>
+    <string name="common_expand">Развернуть</string>
+    <string name="common_scroll_top">Наверх</string>
+    <string name="home_protected">Вы под защитой</string>
+    <string name="home_protection_to_enable">Защита не включена</string>
+    <string name="home_sync_updating">Обновление…</string>
+    <string name="home_country_watched">Отслеживаемые номера: %1$s %2$s</string>
+    <string name="home_country_detected">Определено автоматически. Нажмите «Изменить», чтобы выбрать другую страну.</string>
+    <string name="home_shield_partial">Частичная защита · %1$d/%2$d</string>
+    <string name="home_shield_off">Щит не включён · %1$d/%2$d</string>
+    <string name="home_shield_enable_filter">Включите фильтр звонков, чтобы блокировать нежелательные.</string>
+    <string name="home_shield_enable_notifs">Предупреждения отключены: включите уведомления.</string>
+    <string name="home_enable_blocker">Включить блокировщик</string>
+    <string name="home_enable_alerts">Включить предупреждения</string>
+    <string name="home_recent_blocked_title">Нежелательный звонок заблокирован</string>
+    <string name="home_recent_blocked_msg">Who Called сбросил его до того, как зазвонил телефон.</string>
+    <string name="home_recent_warned_title">Обнаружен подозрительный звонок</string>
+    <string name="home_recent_warned_msg">Телефон звонил, вы получили предупреждение.</string>
+    <string name="home_recent_reported_title">Номер отмечен как нежелательный</string>
+    <string name="home_recent_reported_msg">Вы уже отметили этот номер как нежелательный.</string>
+    <string name="home_recent_legit_title">Номер отмечен как законный</string>
+    <string name="home_recent_legit_msg">Вы указали, что этот номер законный.</string>
+    <string name="home_recent_unknown_title">Вам звонили с неизвестного номера</string>
+    <string name="home_recent_unknown_msg">Проверьте номер, прежде чем перезванивать.</string>
+    <string name="home_recent_see_number">Открыть номер</string>
+    <plurals name="home_recent_others">
+        <item quantity="one">и ещё %1$d звонок за последние 24 ч</item>
+        <item quantity="few">и ещё %1$d звонка за последние 24 ч</item>
+        <item quantity="many">и ещё %1$d звонков за последние 24 ч</item>
+        <item quantity="other">и ещё %1$d звонка за последние 24 ч</item>
+    </plurals>
+    <string name="home_quiet">Новых звонков для проверки нет — всё спокойно.</string>
+    <string name="home_blocker_active">Блокировщик включён и обновлён</string>
+    <string name="home_country_breakdown">%1$s %2$s · номеров: %3$s%4$s</string>
+    <string name="home_arcep_prefixes"> · префиксов ARCEP: %1$s</string>
+    <string name="home_blocked_detail">Отклонены без звонка · подробнее</string>
+    <string name="home_suspect_calls">Подозрительные звонки</string>
+    <string name="home_suspect_detail">Телефон звонил, вас предупредили · подробнее</string>
+    <string name="home_games_row">Игры — задания дня и рейтинги%1$s</string>
+    <string name="home_community_line">Жалоб от сообщества: %1$s · +%2$s за неделю</string>
+    <string name="report_feedback_flip">Отзыв обновлён ✓</string>
+    <string name="report_feedback_refine">Спасибо, уточнение сохранено ✓</string>
+    <string name="sync_error_rate_limited">Слишком много обновлений из этой сети. Подождите несколько минут и повторите попытку.</string>
+    <string name="sync_error_server">Сервер отклонил обновление (ошибка %1$d). Повторите попытку позже.</string>
+    <string name="sync_error_generic">Не удалось обновить. Повторите попытку чуть позже.</string>
+    <string name="report_error_invalid_phone">Неверный номер — проверьте формат.</string>
+    <string name="report_error_daily_limit">Достигнут дневной лимит жалоб. Ваш отзыв сохранён на устройстве и будет отправлен автоматически.</string>
+    <string name="myreports_resend_now">Отправить сейчас</string>
+    <string name="settings_overlay_title">Баннер на экране звонка</string>
+    <string name="settings_overlay_desc">Показывает предупреждение поверх входящего звонка. Отвечаете вы по-прежнему в приложении «Телефон». Без этого уведомление скрывается за экраном звонка.</string>
+    <string name="settings_reminder_paused_title">Напоминания на паузе</string>
+    <string name="settings_reminder_paused_until">Несколько напоминаний остались без ответа — они возобновятся автоматически %1$s.</string>
+    <string name="settings_reminder_paused_soon">Несколько напоминаний остались без ответа — они возобновятся автоматически через несколько дней.</string>
+    <string name="settings_reminder_resume">Возобновить</string>
+    <string name="settings_link_arcep">Источник префиксов ARCEP (arcep.fr)</string>
+    <string name="settings_independent_title">Независимое приложение</string>
+    <string name="settings_independent_body">Who Called — не официальное приложение: оно не связано ни с ARCEP, ни с какими-либо государственными структурами и не представляет ни один государственный орган. Используемые префиксы телемаркетинга взяты из национального плана нумерации, опубликованного ARCEP (ссылка «Источник префиксов ARCEP» выше).</string>
+    <string name="debug_overlay_granted">Показ поверх других приложений: разрешён ✓</string>
+    <string name="debug_overlay_denied">Показ поверх других приложений: запрещён — баннер звонка не появится</string>
+    <string name="debug_overlay_allow">Разрешить показ поверх других приложений</string>
+    <string name="debug_simulate_hint">Скрытый тест — имитирует подозрительный звонок (уведомление + баннер на 45 с):</string>
+    <string name="debug_simulate">Имитировать подозрительный звонок</string>
+    <string name="debug_other_tests">Другие тесты:</string>
+    <string name="debug_overlay_only">Только баннер поверх экрана</string>
+    <string name="calls_filter_all">Все</string>
+    <string name="calls_filter_review">Проверить</string>
+    <string name="calls_filter_filtered">Отфильтрованные</string>
+    <string name="calls_title">Недавние звонки</string>
+    <string name="calls_subtitle">Звонки, прошедшие через фильтр · хранятся на вашем телефоне</string>
+    <string name="calls_empty_review_title">Номеров для проверки нет</string>
+    <string name="calls_empty_body_on">Здесь появятся следующие звонки, прошедшие через фильтр.</string>
+    <string name="calls_empty_body_off">Включите фильтр звонков, чтобы видеть, кто вам звонит.</string>
+    <string name="calls_copy_hint">Удерживайте номер, чтобы скопировать его.</string>
+    <string name="calls_status_unknown">Не оценён</string>
+    <string name="calls_direction_incoming">Входящий</string>
+    <plurals name="calls_attempts">
+        <item quantity="one">%1$d звонок</item>
+        <item quantity="few">%1$d звонка</item>
+        <item quantity="many">%1$d звонков</item>
+        <item quantity="other">%1$d звонка</item>
+    </plurals>
+    <string name="report_see_my_reports">Мои жалобы</string>
+    <string name="report_pick_recent">Выбрать из недавних звонков</string>
+    <string name="gauge_risk_high">Высокий</string>
+    <string name="gauge_risk_medium">Средний</string>
+    <string name="gauge_risk_low">Низкий</string>
+    <string name="gauge_risk_caption">Риск</string>
+    <string name="setup_done_screening_count">✓ Фильтр включён · номеров в базе: %1$s</string>
+    <string name="setup_done_screening">✓ Фильтр звонков включён</string>
+    <string name="setup_done_notifications">✓ Предупреждения включены</string>
+    <string name="setup_done_overlay">✓ Баннер на экране звонка</string>
+    <string name="setup_step">Шаг %1$d/%2$d</string>
+    <string name="setup_continue">Продолжить</string>
+    <string name="setup_continue_without">Продолжить без блокировки</string>
+    <string name="setup_later">Позже</string>
+    <string name="setup_footer">Можно изменить в настройках. Без разрешений игры и поиск остаются доступны.</string>
+    <string name="setup_complete_title">Вы под защитой</string>
+    <string name="setup_complete_count">Номеров готово к фильтрации: %1$s</string>
+    <string name="setup_complete_ready">Ваш щит Who Called готов</string>
+    <string name="setup_already_screening">Защита уже включена</string>
+    <string name="setup_already_notifications">Предупреждения уже включены</string>
+    <string name="setup_already_overlay">Баннер уже разрешён</string>
+    <string name="setup_already_body">Это разрешение уже выдано. Переходите к следующему шагу.</string>
+    <string name="setup_screening_title">Включите свой щит</string>
+    <string name="setup_screening_body">Who Called ничего не может блокировать, пока не включён системный фильтр звонков. Пара секунд · можно отменить в любой момент.</string>
+    <string name="setup_screening_cta">Включить защиту</string>
+    <string name="setup_notifications_title">Будьте в курсе</string>
+    <string name="setup_notifications_body">Без уведомлений защита работает молча: ни предупреждения о подозрительном звонке, ни подтверждения, что номер заблокирован.</string>
+    <string name="setup_notifications_cta">Включить предупреждения</string>
+    <string name="setup_overlay_body">Приложение «Телефон» закрывает уведомление. Разрешите показ поверх других приложений, чтобы индекс спама оставался на экране, пока телефон звонит, — без блокировки звонка и без замены приложения для звонков.</string>
+    <string name="detail_confirm_title_spam">Нежелательный номер</string>
+    <string name="detail_confirm_title_suspect">Подозрительный номер</string>
+    <string name="detail_confirm_call_body">Этот номер может быть опасен. Точно открыть набор номера?</string>
+    <string name="detail_confirm_sms_body">Этот номер может быть опасен. Точно подготовить SMS?</string>
+    <string name="detail_confirm_continue">Продолжить</string>
+    <string name="detail_received_today">Звонок получен сегодня в %1$s</string>
+    <string name="detail_received_on_date">Звонок получен %1$s в %2$s</string>
+    <string name="detail_warn_score_explanation">Индекс %1$d %%. Жалобы есть, но их недостаточно для автоматической блокировки. Телефон звонил: отвечать или нет, решали вы.</string>
+    <string name="detail_warn_score_explanation_category">Индекс %1$d %% · %2$s. Жалобы есть, но их недостаточно для автоматической блокировки. Телефон звонил: отвечать или нет, решали вы.</string>
+    <string name="detail_status_suspect">Подозрительный</string>
+    <string name="detail_status_rather_legit">Скорее законный</string>
+    <string name="detail_status_little_data">Мало данных</string>
+    <string name="detail_stats_loading">Статистика…</string>
+    <string name="detail_action_call">Позвонить</string>
+    <string name="detail_action_sms">SMS</string>
+    <string name="detail_action_block">Блокировать</string>
+    <string name="detail_action_copy">Копировать</string>
+    <string name="detail_rule_always_allowed">Всегда разрешён на этом устройстве.</string>
+    <string name="detail_rule_blocked">Заблокирован на этом устройстве.</string>
+    <string name="detail_your_opinion">Ваш отзыв</string>
+    <string name="detail_why_optional">Почему? (необязательно)</string>
+    <string name="detail_arcep_range">Официальный диапазон ARCEP</string>
+    <string name="detail_arcep_range_pattern">Официальный диапазон ARCEP · %1$s</string>
+    <string name="detail_arcep_official_source">Официальный источник: план нумерации (arcep.fr)</string>
+    <string name="detail_arcep_not_affiliated">Who Called — независимое приложение, не связанное с ARCEP.</string>
+    <string name="detail_why_evaluation">Почему такая оценка</string>
+    <string name="detail_your_calls">Ваши звонки с этим номером</string>
+    <string name="detail_your_calls_subtitle">%1$d за 30 дней · %2$d за 7 дней</string>
+    <string name="detail_received_on">Получен</string>
+    <string name="detail_badge_mixed">ARCEP + сообщество</string>
+    <string name="detail_badge_arcep">ARCEP</string>
+    <string name="detail_badge_none">Нет данных</string>
+    <plurals name="detail_spam_count">
+        <item quantity="one">%1$d нежелательный</item>
+        <item quantity="few">%1$d нежелательных</item>
+        <item quantity="many">%1$d нежелательных</item>
+        <item quantity="other">%1$d нежелательных</item>
+    </plurals>
+    <plurals name="detail_legit_count">
+        <item quantity="one">%1$d законный</item>
+        <item quantity="few">%1$d законных</item>
+        <item quantity="many">%1$d законных</item>
+        <item quantity="other">%1$d законных</item>
+    </plurals>
+    <string name="detail_raw_counts_note">Показано исходное число отзывов; вердикт также учитывает их давность и репутацию авторов.</string>
+    <string name="detail_reviews_activity">Активность отзывов</string>
+    <string name="detail_headline_mixed">ARCEP и отзывы сообщества</string>
+    <string name="detail_headline_community">Отзывы сообщества</string>
+    <string name="detail_headline_none">Данных от сообщества нет</string>
+    <string name="detail_explanation_mixed">Этот номер входит в диапазон ARCEP, и на него есть отзывы сообщества. Вердикт учитывает и то, и другое.</string>
+    <string name="detail_explanation_arcep">Этот номер соответствует префиксу из официального списка номеров телемаркетинга (ARCEP / операторы). Этот источник не зависит от отзывов сообщества.</string>
+    <string name="detail_explanation_arcep_pattern">Этот номер соответствует префиксу из официального списка номеров телемаркетинга (ARCEP / операторы): %1$s. Этот источник не зависит от отзывов сообщества.</string>
+    <string name="detail_explanation_community">Вердикт учитывает недавние отзывы, их количество и репутацию авторов.</string>
+    <string name="detail_explanation_none">Отсутствие отзывов не означает, что номер надёжен. Будьте осторожны, прежде чем перезванивать.</string>
+    <string name="detail_verdict_block_high">Отзывы уверенно указывают на нежелательный звонок.</string>
+    <string name="detail_verdict_block">Оценён как нежелательный, но данных пока немного.</string>
+    <string name="detail_verdict_warn">Есть отрицательные отзывы, но вердикт ещё не подтверждён.</string>
+    <string name="detail_verdict_allow_high">Отзывы сходятся: номер законный.</string>
+    <string name="detail_verdict_allow">Скорее законный, но отзывов пока мало.</string>
+    <string name="detail_verdict_unknown">Недостаточно данных, чтобы оценить этот номер.</string>
+    <string name="detail_confidence_official">официальный источник</string>
+    <string name="detail_confidence_high">высокая достоверность</string>
+    <string name="detail_confidence_medium">средняя достоверность</string>
+    <string name="detail_confidence_low">низкая достоверность</string>
+    <string name="detail_confidence_none">достоверность не оценена</string>
+    <string name="detail_confidence_official_body">Статус взят из официального диапазона, а не рассчитан по отзывам сообщества.</string>
+    <string name="detail_confidence_high_body">Взвешенного объёма отзывов достаточно для уверенной оценки (%1$d %%).</string>
+    <string name="detail_confidence_medium_body">Отзывов несколько, но данных стоит накопить больше (%1$d %%).</string>
+    <string name="detail_confidence_low_body">Слишком мало взвешенных отзывов для уверенного вывода (%1$d %%).</string>
+    <string name="detail_confidence_none_body">Пригодных взвешенных отзывов пока нет.</string>
+</resources>
