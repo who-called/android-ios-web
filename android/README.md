@@ -68,5 +68,10 @@ emulator). Release uses `https://api.who-called.com/api/v1`. See `app/build.grad
 
 ## i18n
 
-UI strings live in `res/values/strings.xml` (FR). Add `values-xx/strings.xml`
-to translate. The API carries a `locale` field on reports.
+UI strings live in `res/values/strings.xml` (FR, the source) and are translated in
+`res/values-<lang>/strings.xml` (en, es, it, pt-BR, ru, pl, cs, de, uk, in, sv, nl, sk).
+The per-app language picker (Android 13+) is generated from those folders. Rules,
+checks and how to add a language: see [`I18N.md`](../I18N.md). The API carries a
+`locale` field on reports.
+
+Play "What's new" texts for each release live in `store/play/`.
